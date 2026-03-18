@@ -27,8 +27,8 @@ export const GeneratePassageBody = zod.object({
     "advanced",
   ]),
   length: zod.enum(["short", "medium", "long"]),
-  vocabularyFocus: zod.string().optional(),
-  grammarFocus: zod.string().optional(),
+  vocabularyFocus: zod.string().nullable().optional(),
+  grammarFocus: zod.string().nullable().optional(),
   readingStyle: zod.enum(["story", "article", "dialogue", "reflection"]),
 });
 
@@ -38,8 +38,8 @@ export const GeneratePassageResponse = zod.object({
   topic: zod.string(),
   difficulty: zod.string(),
   length: zod.string(),
-  vocabularyFocus: zod.string().optional(),
-  grammarFocus: zod.string().optional(),
+  vocabularyFocus: zod.string().nullable().optional(),
+  grammarFocus: zod.string().nullable().optional(),
   readingStyle: zod.string(),
   koreanText: zod.string(),
   sentences: zod.array(
@@ -59,7 +59,7 @@ export const GeneratePassageResponse = zod.object({
   ),
   imageUrls: zod.array(zod.string()),
   isBookmarked: zod.boolean(),
-  createdAt: zod.date(),
+  createdAt: zod.coerce.date(),
 });
 
 /**
@@ -71,8 +71,8 @@ export const ListPassagesResponseItem = zod.object({
   topic: zod.string(),
   difficulty: zod.string(),
   length: zod.string(),
-  vocabularyFocus: zod.string().optional(),
-  grammarFocus: zod.string().optional(),
+  vocabularyFocus: zod.string().nullable().optional(),
+  grammarFocus: zod.string().nullable().optional(),
   readingStyle: zod.string(),
   koreanText: zod.string(),
   sentences: zod.array(
@@ -92,7 +92,7 @@ export const ListPassagesResponseItem = zod.object({
   ),
   imageUrls: zod.array(zod.string()),
   isBookmarked: zod.boolean(),
-  createdAt: zod.date(),
+  createdAt: zod.coerce.date(),
 });
 export const ListPassagesResponse = zod.array(ListPassagesResponseItem);
 
@@ -104,8 +104,8 @@ export const SavePassageBody = zod.object({
   topic: zod.string(),
   difficulty: zod.string(),
   length: zod.string(),
-  vocabularyFocus: zod.string().optional(),
-  grammarFocus: zod.string().optional(),
+  vocabularyFocus: zod.string().nullable().optional(),
+  grammarFocus: zod.string().nullable().optional(),
   readingStyle: zod.string(),
   koreanText: zod.string(),
   sentences: zod.array(
@@ -140,8 +140,8 @@ export const GetPassageResponse = zod.object({
   topic: zod.string(),
   difficulty: zod.string(),
   length: zod.string(),
-  vocabularyFocus: zod.string().optional(),
-  grammarFocus: zod.string().optional(),
+  vocabularyFocus: zod.string().nullable().optional(),
+  grammarFocus: zod.string().nullable().optional(),
   readingStyle: zod.string(),
   koreanText: zod.string(),
   sentences: zod.array(
@@ -161,7 +161,7 @@ export const GetPassageResponse = zod.object({
   ),
   imageUrls: zod.array(zod.string()),
   isBookmarked: zod.boolean(),
-  createdAt: zod.date(),
+  createdAt: zod.coerce.date(),
 });
 
 /**
@@ -192,8 +192,8 @@ export const ToggleBookmarkResponse = zod.object({
   topic: zod.string(),
   difficulty: zod.string(),
   length: zod.string(),
-  vocabularyFocus: zod.string().optional(),
-  grammarFocus: zod.string().optional(),
+  vocabularyFocus: zod.string().nullable().optional(),
+  grammarFocus: zod.string().nullable().optional(),
   readingStyle: zod.string(),
   koreanText: zod.string(),
   sentences: zod.array(
@@ -213,7 +213,7 @@ export const ToggleBookmarkResponse = zod.object({
   ),
   imageUrls: zod.array(zod.string()),
   isBookmarked: zod.boolean(),
-  createdAt: zod.date(),
+  createdAt: zod.coerce.date(),
 });
 
 /**
