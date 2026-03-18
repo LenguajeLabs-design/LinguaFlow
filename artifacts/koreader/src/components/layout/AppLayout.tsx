@@ -32,7 +32,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <BookOpen className="w-4 h-4" />
             </div>
             <span className="font-serif font-semibold text-lg tracking-tight text-primary hidden sm:inline">
-              Koreader
+              Hangul Flow
             </span>
           </Link>
 
