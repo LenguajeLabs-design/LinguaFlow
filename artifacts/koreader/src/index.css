@@ -46,39 +46,72 @@
   --radius-2xl: calc(var(--radius) + 8px);
 }
 
+/* ─── Light Mode ────────────────────────────────────── */
 :root {
-  /* Calm, elegant minimalist palette - warm off-whites, stone grays, ink */
-  --background: 40 33% 98%;      /* #FCFAF8 - Warm off-white */
-  --foreground: 24 10% 15%;      /* #2A2624 - Soft ink black/brown */
-  
-  --card: 0 0% 100%;             /* #FFFFFF */
+  --background: 40 33% 98%;
+  --foreground: 24 10% 15%;
+
+  --card: 0 0% 100%;
   --card-foreground: 24 10% 15%;
   --card-border: 30 15% 90%;
-  
+
   --popover: 0 0% 100%;
   --popover-foreground: 24 10% 15%;
   --popover-border: 30 15% 90%;
-  
-  --primary: 24 15% 30%;         /* #564A44 - Deep warm stone */
+
+  --primary: 24 15% 30%;
   --primary-foreground: 40 33% 98%;
-  
-  --secondary: 35 20% 92%;       /* #EFECE6 - Light warm gray */
+
+  --secondary: 35 20% 92%;
   --secondary-foreground: 24 15% 30%;
-  
+
   --muted: 35 20% 92%;
-  --muted-foreground: 24 10% 45%; /* #7A726E - Medium warm gray */
-  
-  --accent: 15 40% 55%;          /* #B56D5B - Muted persimmon/terracotta */
+  --muted-foreground: 24 10% 45%;
+
+  --accent: 15 40% 55%;
   --accent-foreground: 0 0% 100%;
-  
+
   --destructive: 0 60% 50%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 30 15% 90%;          /* #EDE9E4 */
+  --border: 30 15% 90%;
   --input: 30 15% 90%;
   --ring: 24 15% 30%;
 
   --radius: 0.75rem;
+}
+
+/* ─── Dark Mode ─────────────────────────────────────── */
+.dark {
+  --background: 24 12% 10%;
+  --foreground: 40 20% 90%;
+
+  --card: 24 10% 14%;
+  --card-foreground: 40 20% 90%;
+  --card-border: 24 10% 22%;
+
+  --popover: 24 10% 13%;
+  --popover-foreground: 40 20% 90%;
+  --popover-border: 24 10% 22%;
+
+  --primary: 35 25% 72%;
+  --primary-foreground: 24 12% 10%;
+
+  --secondary: 24 10% 18%;
+  --secondary-foreground: 40 20% 80%;
+
+  --muted: 24 10% 18%;
+  --muted-foreground: 35 12% 58%;
+
+  --accent: 15 42% 62%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 55% 55%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 24 10% 22%;
+  --input: 24 10% 20%;
+  --ring: 35 25% 72%;
 }
 
 @layer base {
@@ -86,10 +119,16 @@
     @apply border-border;
   }
 
+  html {
+    @apply scroll-smooth;
+  }
+
   body {
     @apply font-sans antialiased bg-background text-foreground selection:bg-accent/20 selection:text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     @apply tracking-tight;
   }
@@ -99,12 +138,35 @@
   .text-balance {
     text-wrap: balance;
   }
-  
+
   .glass-panel {
     @apply bg-white/70 backdrop-blur-md border border-white/50 shadow-lg shadow-black/5;
   }
 
-  /* Custom scrollbar for a cleaner look */
+  /* Korean text optimizations */
+  .font-korean {
+    font-family: 'Noto Sans KR', sans-serif;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .korean-reading-text {
+    font-family: 'Noto Sans KR', sans-serif;
+    line-height: 2.2;
+    letter-spacing: 0.01em;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    word-spacing: 0.05em;
+  }
+
+  /* Reading mode: distraction-free */
+  .reading-mode-article p {
+    @apply leading-[2.2] tracking-wide;
+  }
+
+  /* Scrollbar styling */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -113,9 +175,9 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/30 rounded-full;
+    @apply bg-muted-foreground/25 rounded-full;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/50;
+    @apply bg-muted-foreground/45;
   }
 }

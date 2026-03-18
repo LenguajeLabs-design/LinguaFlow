@@ -1,5 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
-import { Volume2, VolumeX, Eye, BookOpen, Layout, CheckCircle2, Bookmark } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import {
+  Volume2, VolumeX, Eye, EyeOff, BookOpen, Layout, Bookmark,
+  Type, ChevronDown, ChevronUp, List
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Passage } from '@workspace/api-client-react';
 import { DifficultyBadge } from './DifficultyBadge';
@@ -9,6 +12,7 @@ import { cn } from '@/components/layout/AppLayout';
 import { useSavePassage, useToggleBookmark } from '@workspace/api-client-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { getListPassagesQueryKey, getGetPassageQueryKey } from '@workspace/api-client-react';
+import { useSettings, fontSizeMap } from '@/hooks/use-settings';
 
 type ViewMode = 'reading' | 'study' | 'full';
 
@@ -21,28 +25,26 @@ interface PassageReaderProps {
 export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageReaderProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('study');
   const [expandedSentences, setExpandedSentences] = useState<Set<number>>(new Set());
-  const [activeWord, setActiveWord] = useState<{word: string, context: string, pos: {x: number, y: number}} | null>(null);
+  const [allExpanded, setAllExpanded] = useState(false);
+  const [activeWord, setActiveWord] = useState<{ word: string; context: string; anchorRect: DOMRect } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   const { toggle: toggleTTS, isPlaying, stop: stopTTS } = useTTS();
+  const { fontSize } = useSettings();
   const queryClient = useQueryClient();
 
   const saveMutation = useSavePassage();
   const bookmarkMutation = useToggleBookmark();
 
-  // Clean up TTS when unmounting
-  useEffect(() => {
-    return () => stopTTS();
-  }, [stopTTS]);
+  useEffect(() => () => stopTTS(), [stopTTS]);
 
-  const handleWordClick = (e: React.MouseEvent<HTMLSpanElement>, word: string, context: string) => {
+  const handleWordClick = useCallback((e: React.MouseEvent<HTMLSpanElement>, word: string, context: string) => {
+    e.stopPropagation();
+    const cleaned = word.replace(/[.,!?"""''·…—\-]/g, '').trim();
+    if (!cleaned) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    setActiveWord({
-      word: word.replace(/[.,!?“”"']/g, ''), // Strip basic punctuation
-      context,
-      pos: { x: rect.left + rect.width / 2, y: rect.bottom }
-    });
-  };
+    setActiveWord({ word: cleaned, context, anchorRect: rect });
+  }, []);
 
   const toggleSentence = (index: number) => {
     setExpandedSentences(prev => {
@@ -53,10 +55,20 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
     });
   };
 
+  const toggleAll = () => {
+    if (allExpanded) {
+      setExpandedSentences(new Set());
+      setAllExpanded(false);
+    } else {
+      setExpandedSentences(new Set(passage.sentences.map((_, i) => i)));
+      setAllExpanded(true);
+    }
+  };
+
   const handleSave = () => {
     if (!isUnsaved) return;
     saveMutation.mutate(
-      { data: passage as any }, // Assuming structure matches CreatePassageRequest
+      { data: passage as any },
       {
         onSuccess: (data) => {
           queryClient.invalidateQueries({ queryKey: getListPassagesQueryKey() });
@@ -67,7 +79,7 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
   };
 
   const handleBookmark = () => {
-    if (isUnsaved) return; // Can't bookmark unsaved
+    if (isUnsaved) return;
     bookmarkMutation.mutate(
       { id: passage.id, data: { isBookmarked: !passage.isBookmarked } },
       {
@@ -80,147 +92,212 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
   };
 
   const modes = [
-    { id: 'reading', label: 'Reading', icon: Eye },
-    { id: 'study', label: 'Study', icon: BookOpen },
-    { id: 'full', label: 'Full View', icon: Layout },
+    { id: 'reading', label: 'Reading', icon: Eye,      tooltip: 'Clean Korean text only' },
+    { id: 'study',   label: 'Study',   icon: BookOpen, tooltip: 'Tap to reveal translations' },
+    { id: 'full',    label: 'Full',    icon: Layout,   tooltip: 'All translations visible' },
   ] as const;
 
+  const koreanFontClass = cn('korean-reading-text font-korean text-foreground', fontSizeMap[fontSize]);
+
   return (
-    <div className="max-w-3xl mx-auto pb-24" ref={containerRef}>
-      {/* Header & Controls */}
-      <div className="sticky top-16 z-30 bg-background/95 backdrop-blur-md py-4 mb-8 border-b border-border/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex bg-secondary/50 p-1 rounded-xl w-fit">
-          {modes.map(mode => {
-            const isActive = viewMode === mode.id;
-            return (
-              <button
-                key={mode.id}
-                onClick={() => setViewMode(mode.id)}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
-                  isActive ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <mode.icon className={cn("w-4 h-4", isActive && "text-primary")} />
-                <span className="hidden sm:inline">{mode.label}</span>
-              </button>
-            );
-          })}
-        </div>
+    <div className="max-w-2xl mx-auto pb-28 md:pb-16" ref={containerRef}>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => toggleTTS(passage.koreanText)}
-            className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200",
-              isPlaying 
-                ? "bg-accent/10 text-accent border-accent/20" 
-                : "bg-card text-foreground border-border hover:border-primary/30"
-            )}
-          >
-            {isPlaying ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-            {isPlaying ? 'Stop' : 'Listen'}
-          </button>
+      {/* ── Sticky toolbar ── */}
+      <div className="sticky top-14 z-30 -mx-4 sm:mx-0 mb-10 px-4 sm:px-0 pt-3 pb-3 bg-background/95 backdrop-blur-md border-b border-border/40">
+        <div className="flex flex-wrap items-center justify-between gap-3">
 
-          {isUnsaved ? (
+          {/* View mode pills */}
+          <div className="flex bg-secondary/60 p-0.5 rounded-xl gap-0.5">
+            {modes.map(mode => {
+              const isActive = viewMode === mode.id;
+              return (
+                <button
+                  key={mode.id}
+                  onClick={() => setViewMode(mode.id)}
+                  title={mode.tooltip}
+                  className={cn(
+                    'flex items-center gap-1.5 px-3 py-1.5 rounded-[0.6rem] text-xs sm:text-sm font-medium transition-all duration-200',
+                    isActive
+                      ? 'bg-card text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  <mode.icon className={cn('w-3.5 h-3.5', isActive && 'text-accent')} />
+                  {mode.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Right controls */}
+          <div className="flex items-center gap-2">
+            {/* Font size quick toggle */}
             <button
-              onClick={handleSave}
-              disabled={saveMutation.isPending}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-medium bg-primary text-primary-foreground shadow-md hover:bg-primary/90 transition-all duration-200 disabled:opacity-50"
+              title="Cycle font size"
+              onClick={() => {
+                const { fontSize: fs, setFontSize } = useSettings.getState();
+                const cycle: Record<string, 'normal' | 'large' | 'xlarge'> = {
+                  normal: 'large', large: 'xlarge', xlarge: 'normal',
+                };
+                setFontSize(cycle[fs]);
+              }}
+              className="p-2 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all duration-150"
             >
-              {saveMutation.isPending ? <span className="animate-pulse">Saving...</span> : 'Save to Library'}
+              <Type className="w-4 h-4" />
             </button>
-          ) : (
+
+            {/* TTS */}
             <button
-              onClick={handleBookmark}
-              disabled={bookmarkMutation.isPending}
+              onClick={() => toggleTTS(passage.koreanText)}
               className={cn(
-                "p-2 rounded-xl border transition-all duration-200",
-                passage.isBookmarked 
-                  ? "bg-accent/10 border-accent/20 text-accent" 
-                  : "bg-card border-border text-muted-foreground hover:text-foreground hover:border-primary/30"
+                'flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium border transition-all duration-200',
+                isPlaying
+                  ? 'bg-accent/10 text-accent border-accent/30'
+                  : 'bg-card text-foreground border-border hover:border-primary/30'
               )}
             >
-              <Bookmark className={cn("w-5 h-5", passage.isBookmarked && "fill-current")} />
+              {isPlaying ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+              <span className="hidden sm:inline">{isPlaying ? 'Stop' : 'Listen'}</span>
             </button>
-          )}
+
+            {/* Save / Bookmark */}
+            {isUnsaved ? (
+              <button
+                onClick={handleSave}
+                disabled={saveMutation.isPending}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 transition-all duration-200 disabled:opacity-50"
+              >
+                {saveMutation.isPending ? (
+                  <span className="animate-pulse">Saving…</span>
+                ) : (
+                  'Save to Library'
+                )}
+              </button>
+            ) : (
+              <button
+                onClick={handleBookmark}
+                disabled={bookmarkMutation.isPending}
+                title={passage.isBookmarked ? 'Remove from favorites' : 'Add to favorites'}
+                className={cn(
+                  'p-2 rounded-xl border transition-all duration-200',
+                  passage.isBookmarked
+                    ? 'bg-accent/10 border-accent/30 text-accent'
+                    : 'bg-card border-border text-muted-foreground hover:text-foreground hover:border-primary/30'
+                )}
+              >
+                <Bookmark className={cn('w-4 h-4', passage.isBookmarked && 'fill-current')} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Title & Meta */}
-      <header className="mb-10 text-center space-y-4">
+      {/* ── Title & meta ── */}
+      <header className="mb-10 text-center space-y-3">
         <div className="flex items-center justify-center gap-2 flex-wrap">
           <DifficultyBadge difficulty={passage.difficulty} />
-          <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
+          <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground capitalize">
             {passage.topic}
           </span>
-          <span className="px-2.5 py-0.5 rounded-full text-xs font-medium border border-border text-muted-foreground">
+          <span className="px-2.5 py-0.5 rounded-full text-xs font-medium border border-border text-muted-foreground capitalize">
             {passage.readingStyle}
           </span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-korean font-bold text-foreground leading-tight text-balance">
+        <h1 className={cn('font-korean font-bold text-foreground leading-tight text-balance', fontSizeMap[fontSize].includes('xl') ? 'text-3xl' : 'text-2xl sm:text-3xl')}>
           {passage.title}
         </h1>
       </header>
 
-      {/* Images (if any) */}
+      {/* ── Images ── */}
       {passage.imageUrls && passage.imageUrls.length > 0 && (
-        <div className="mb-12 grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-2xl overflow-hidden shadow-sm">
+        <div className={cn(
+          'mb-12 overflow-hidden rounded-2xl shadow-sm',
+          passage.imageUrls.length > 1 ? 'grid grid-cols-2 gap-3' : ''
+        )}>
           {passage.imageUrls.map((url, i) => (
-            <img 
-              key={i} 
-              src={url} 
-              alt="Passage illustration" 
-              className={cn("w-full h-64 object-cover", passage.imageUrls.length === 1 && "sm:col-span-2 sm:h-80")} 
+            <img
+              key={i}
+              src={url}
+              alt="Passage illustration"
+              className={cn(
+                'w-full object-cover',
+                passage.imageUrls.length === 1 ? 'h-72 sm:h-80 rounded-2xl' : 'h-48 rounded-xl'
+              )}
             />
           ))}
         </div>
       )}
 
-      {/* Content Area */}
-      <article className="space-y-8">
+      {/* ── Study mode: Show/hide all translations ── */}
+      {viewMode === 'study' && (
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={toggleAll}
+            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary transition-colors px-3 py-1.5 rounded-full border border-border hover:border-primary/30"
+          >
+            {allExpanded
+              ? <><EyeOff className="w-3.5 h-3.5" /> Hide all</>
+              : <><Eye className="w-3.5 h-3.5" /> Show all translations</>
+            }
+          </button>
+        </div>
+      )}
+
+      {/* ── Reading content ── */}
+      <article
+        className="space-y-7 reading-mode-article"
+        onClick={() => setActiveWord(null)}
+      >
         {passage.sentences.map((sentence, idx) => (
           <div key={idx} className="group relative">
-            <p className="text-[1.35rem] sm:text-[1.5rem] leading-[2.1] font-korean text-foreground tracking-wide break-keep">
+            {/* Korean text */}
+            <p className={koreanFontClass}>
               {sentence.korean.split(' ').map((word, wIdx) => (
-                <span 
+                <span
                   key={wIdx}
                   onClick={(e) => handleWordClick(e, word, sentence.korean)}
-                  className="inline-block cursor-pointer hover:bg-primary/10 hover:text-primary rounded px-0.5 -mx-0.5 transition-colors duration-150"
+                  className="inline cursor-pointer rounded px-0.5 -mx-0.5 transition-colors duration-100 hover:bg-primary/12 hover:text-primary active:bg-primary/20"
                 >
                   {word}{' '}
                 </span>
               ))}
             </p>
 
-            {/* Translation block based on view mode */}
+            {/* Translation area */}
             {viewMode !== 'reading' && (
-              <div className="mt-3 relative">
+              <div className="mt-2">
                 {viewMode === 'study' && !expandedSentences.has(idx) ? (
-                  <button 
+                  <button
                     onClick={() => toggleSentence(idx)}
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors py-1 opacity-50 hover:opacity-100"
+                    className="flex items-center gap-1.5 text-xs text-muted-foreground/60 hover:text-primary transition-colors py-1 group/btn"
                   >
-                    <Eye className="w-4 h-4" /> Show translation
+                    <ChevronDown className="w-3.5 h-3.5 group-hover/btn:translate-y-0.5 transition-transform" />
+                    Show translation
                   </button>
                 ) : (
-                  <motion.div 
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="pl-4 border-l-2 border-primary/30"
-                  >
-                    <p className="font-serif text-lg text-muted-foreground leading-relaxed">
-                      {sentence.english}
-                    </p>
-                    {viewMode === 'study' && (
-                      <button 
-                        onClick={() => toggleSentence(idx)}
-                        className="text-xs font-medium text-muted-foreground/60 hover:text-muted-foreground mt-2 uppercase tracking-widest"
-                      >
-                        Hide
-                      </button>
-                    )}
-                  </motion.div>
+                  <AnimatePresence initial={false}>
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2, ease: 'easeOut' }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pl-3 border-l-2 border-primary/25 mt-2">
+                        <p className="font-serif text-base text-muted-foreground leading-relaxed">
+                          {sentence.english}
+                        </p>
+                        {viewMode === 'study' && (
+                          <button
+                            onClick={() => toggleSentence(idx)}
+                            className="flex items-center gap-1 text-xs text-muted-foreground/40 hover:text-muted-foreground mt-2 transition-colors"
+                          >
+                            <ChevronUp className="w-3 h-3" /> Hide
+                          </button>
+                        )}
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
                 )}
               </div>
             )}
@@ -228,29 +305,31 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
         ))}
       </article>
 
-      {/* Vocabulary Section (hidden in reading mode) */}
+      {/* ── Vocabulary section ── */}
       {viewMode !== 'reading' && passage.vocabulary && passage.vocabulary.length > 0 && (
-        <section className="mt-20 pt-10 border-t border-border">
-          <h3 className="text-xl font-bold font-serif text-foreground mb-6 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-primary" />
-            Vocabulary Focus
+        <section className="mt-16 pt-8 border-t border-border">
+          <h3 className="text-lg font-bold font-serif text-foreground mb-5 flex items-center gap-2">
+            <List className="w-4 h-4 text-primary" />
+            Vocabulary
           </h3>
-          
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2">
             {passage.vocabulary.map((vocab, idx) => (
-              <div key={idx} className="bg-card border border-border/60 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <span className="text-lg font-korean font-bold text-foreground">{vocab.korean}</span>
-                    <span className="text-sm font-mono text-muted-foreground ml-2">{vocab.romanization}</span>
+              <div
+                key={idx}
+                className="bg-card border border-border/50 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow group"
+              >
+                <div className="flex items-start justify-between mb-1.5">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-base font-korean font-bold text-foreground">{vocab.korean}</span>
+                    <span className="text-xs font-mono text-muted-foreground">{vocab.romanization}</span>
                   </div>
-                  <span className="text-[10px] uppercase tracking-wider font-semibold text-accent bg-accent/10 px-2 py-0.5 rounded">
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-accent bg-accent/10 px-2 py-0.5 rounded shrink-0">
                     {vocab.partOfSpeech}
                   </span>
                 </div>
-                <p className="font-serif text-foreground font-medium mb-3">{vocab.english}</p>
+                <p className="text-sm font-serif text-foreground font-medium mb-2">{vocab.english}</p>
                 {vocab.exampleSentence && (
-                  <p className="text-sm text-muted-foreground font-korean bg-secondary/50 p-2 rounded-lg leading-relaxed">
+                  <p className="text-xs text-muted-foreground font-korean bg-secondary/50 px-3 py-2 rounded-lg leading-relaxed">
                     {vocab.exampleSentence}
                   </p>
                 )}
@@ -260,13 +339,13 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
         </section>
       )}
 
-      {/* Popover rendered via Portal or inline if high enough z-index */}
-      <WordPopover 
-        word={activeWord?.word || ''} 
+      {/* ── Word popover ── */}
+      <WordPopover
+        word={activeWord?.word || ''}
         contextSentence={activeWord?.context || ''}
         difficulty={passage.difficulty}
-        position={activeWord?.pos || null} 
-        onClose={() => setActiveWord(null)} 
+        anchorRect={activeWord?.anchorRect || null}
+        onClose={() => setActiveWord(null)}
       />
     </div>
   );

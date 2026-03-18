@@ -1,144 +1,170 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, BookOpen } from 'lucide-react';
 import { useGlossWord } from '@workspace/api-client-react';
 import { cn } from '@/components/layout/AppLayout';
+import { useSettings } from '@/hooks/use-settings';
 
 interface WordPopoverProps {
   word: string;
   contextSentence: string;
   difficulty: string;
-  position: { x: number; y: number } | null;
+  anchorRect: DOMRect | null;
   onClose: () => void;
 }
 
-export function WordPopover({ word, contextSentence, difficulty, position, onClose }: WordPopoverProps) {
-  const [hasFetched, setHasFetched] = useState(false);
-  
+const POPOVER_WIDTH = 320;
+const POPOVER_OFFSET = 12;
+
+function computePosition(rect: DOMRect): { top?: string; bottom?: string; left: string; openUp: boolean } {
+  const viewH = window.innerHeight;
+  const viewW = window.innerWidth;
+  const spaceBelow = viewH - rect.bottom;
+  const openUp = spaceBelow < 260 && rect.top > 260;
+
+  const rawLeft = rect.left + rect.width / 2 - POPOVER_WIDTH / 2;
+  const clampedLeft = Math.max(12, Math.min(rawLeft, viewW - POPOVER_WIDTH - 12));
+
+  if (openUp) {
+    return {
+      bottom: `${viewH - rect.top + POPOVER_OFFSET}px`,
+      left: `${clampedLeft}px`,
+      openUp: true,
+    };
+  }
+  return {
+    top: `${rect.bottom + POPOVER_OFFSET}px`,
+    left: `${clampedLeft}px`,
+    openUp: false,
+  };
+}
+
+export function WordPopover({ word, contextSentence, difficulty, anchorRect, onClose }: WordPopoverProps) {
+  const { showRomanization } = useSettings();
   const glossMutation = useGlossWord();
+  const prevWordRef = useRef('');
 
   useEffect(() => {
-    if (word && position && !hasFetched) {
-      setHasFetched(true);
-      glossMutation.mutate({
-        data: {
-          word,
-          context: contextSentence,
-          difficulty
-        }
-      });
+    if (word && anchorRect && word !== prevWordRef.current) {
+      prevWordRef.current = word;
+      glossMutation.mutate({ data: { word, context: contextSentence, difficulty } });
     }
-  }, [word, position]);
+  }, [word, anchorRect]);
 
-  // Reset fetch state when word changes
   useEffect(() => {
-    setHasFetched(false);
+    if (!word) prevWordRef.current = '';
   }, [word]);
 
-  if (!position || !word) return null;
+  const isOpen = Boolean(word && anchorRect);
 
-  // Determine if popover should open upwards or downwards
-  const isBottomHalf = position.y > window.innerHeight / 2;
-  const top = isBottomHalf ? 'auto' : `${position.y + 10}px`;
-  const bottom = isBottomHalf ? `${window.innerHeight - position.y + 10}px` : 'auto';
-  
-  // Center horizontally relative to click, but keep within viewport bounds
-  let left = position.x - 160; // 320px width / 2
-  if (left < 16) left = 16;
-  if (left + 320 > window.innerWidth - 16) left = window.innerWidth - 336;
+  const pos = anchorRect ? computePosition(anchorRect) : null;
 
-  return (
+  const popover = (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 pointer-events-auto sm:pointer-events-none"
-        onClick={onClose}
-      >
-        <div className="absolute inset-0 bg-background/20 backdrop-blur-[2px] sm:hidden" />
-        
-        <motion.div
-          initial={{ opacity: 0, y: isBottomHalf ? 10 : -10, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          style={{ top, bottom, left }}
-          onClick={(e) => e.stopPropagation()}
-          className={cn(
-            "fixed w-[calc(100vw-32px)] sm:w-[320px] bg-card rounded-2xl shadow-xl shadow-black/10 border border-border/80 overflow-hidden pointer-events-auto",
-            isBottomHalf ? "origin-bottom" : "origin-top"
-          )}
-        >
-          <div className="flex items-start justify-between p-4 pb-3 border-b border-border/50 bg-secondary/30">
-            <div>
-              <h3 className="text-2xl font-korean font-bold text-foreground leading-none">{word}</h3>
-              {glossMutation.data?.romanization && (
-                <p className="text-sm text-muted-foreground mt-1 font-mono">{glossMutation.data.romanization}</p>
-              )}
+      {isOpen && pos && (
+        <>
+          {/* Dismiss overlay */}
+          <div
+            className="fixed inset-0 z-50"
+            onClick={onClose}
+          />
+
+          <motion.div
+            key={word}
+            initial={{ opacity: 0, y: pos.openUp ? 6 : -6, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.12 } }}
+            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              position: 'fixed',
+              width: `min(${POPOVER_WIDTH}px, calc(100vw - 24px))`,
+              top: pos.top,
+              bottom: pos.bottom,
+              left: pos.left,
+              zIndex: 51,
+              transformOrigin: pos.openUp ? 'bottom center' : 'top center',
+            }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-card rounded-2xl shadow-2xl shadow-black/15 border border-border/70 overflow-hidden"
+          >
+            {/* Header */}
+            <div className="flex items-start justify-between px-4 pt-4 pb-3 border-b border-border/40 bg-secondary/20">
+              <div>
+                <h3 className="text-xl font-korean font-bold text-foreground leading-tight">{word}</h3>
+                {showRomanization && glossMutation.data?.romanization && (
+                  <p className="text-xs text-muted-foreground mt-0.5 font-mono tracking-wide">
+                    {glossMutation.data.romanization}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={onClose}
+                className="p-1 -mr-1 -mt-0.5 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            <button 
-              onClick={onClose}
-              className="p-1 -mr-1 -mt-1 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
 
-          <div className="p-4 min-h-[120px]">
-            {glossMutation.isPending && (
-              <div className="flex flex-col items-center justify-center h-full gap-3 text-muted-foreground py-6">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span className="text-sm">Looking up dictionary...</span>
-              </div>
-            )}
+            {/* Body */}
+            <div className="p-4 min-h-[100px]">
+              {glossMutation.isPending && (
+                <div className="flex flex-col items-center justify-center gap-2.5 py-5 text-muted-foreground">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span className="text-xs">Looking up…</span>
+                </div>
+              )}
 
-            {glossMutation.isError && (
-              <div className="text-center py-6 text-destructive text-sm">
-                Failed to load dictionary definition.
-              </div>
-            )}
+              {glossMutation.isError && (
+                <p className="text-center py-5 text-destructive text-sm">
+                  Could not load definition.
+                </p>
+              )}
 
-            {glossMutation.isSuccess && glossMutation.data && (
-              <div className="space-y-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-accent bg-accent/10 px-1.5 py-0.5 rounded">
+              {glossMutation.isSuccess && glossMutation.data && (
+                <div className="space-y-3">
+                  {/* Part of speech + meaning */}
+                  <div>
+                    <span className="inline-block text-[10px] uppercase tracking-widest font-semibold text-accent bg-accent/10 px-2 py-0.5 rounded mb-2">
                       {glossMutation.data.partOfSpeech}
                     </span>
+                    <p className="text-base font-serif font-medium text-foreground leading-snug">
+                      {glossMutation.data.englishMeaning}
+                    </p>
                   </div>
-                  <p className="text-lg font-serif font-medium text-foreground">
-                    {glossMutation.data.englishMeaning}
-                  </p>
-                </div>
 
-                {glossMutation.data.grammarNote && (
-                  <div className="bg-secondary/50 rounded-lg p-3 text-sm">
-                    <div className="flex items-center gap-1.5 text-primary font-medium mb-1">
-                      <BookOpen className="w-3.5 h-3.5" />
-                      <span>Grammar Note</span>
+                  {/* Grammar note */}
+                  {glossMutation.data.grammarNote && (
+                    <div className="bg-secondary/60 rounded-lg px-3 py-2.5 text-xs">
+                      <div className="flex items-center gap-1.5 text-primary font-semibold mb-1">
+                        <BookOpen className="w-3 h-3" />
+                        Grammar
+                      </div>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {glossMutation.data.grammarNote}
+                      </p>
                     </div>
-                    <p className="text-muted-foreground leading-relaxed">
-                      {glossMutation.data.grammarNote}
-                    </p>
-                  </div>
-                )}
+                  )}
 
-                {glossMutation.data.exampleSentence && (
-                  <div className="pt-2 border-t border-border/50">
-                    <p className="font-korean text-foreground leading-relaxed">
-                      {glossMutation.data.exampleSentence}
-                    </p>
-                    <p className="text-sm font-serif text-muted-foreground mt-1">
-                      {glossMutation.data.exampleTranslation}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </motion.div>
-      </motion.div>
+                  {/* Example */}
+                  {glossMutation.data.exampleSentence && (
+                    <div className="border-t border-border/40 pt-3 space-y-1">
+                      <p className="font-korean text-sm text-foreground leading-relaxed">
+                        {glossMutation.data.exampleSentence}
+                      </p>
+                      <p className="text-xs font-serif text-muted-foreground leading-relaxed">
+                        {glossMutation.data.exampleTranslation}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
     </AnimatePresence>
   );
+
+  return createPortal(popover, document.body);
 }
