@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Koreader"
+version = "1.0.0"
+id = "artifacts/koreader"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+localPort = 20794
+name = "web"
+paths = ["/"]
+
+[services.development]
+run = "pnpm --filter @workspace/koreader run dev"
+
+[services.env]
+PORT = "20794"
+BASE_PATH = "/"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/koreader", "run", "build"]
+publicDir = "artifacts/koreader/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"

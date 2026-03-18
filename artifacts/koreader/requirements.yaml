@@ -1,0 +1,19 @@
+packages:
+  "framer-motion": "For smooth page transitions and micro-interactions"
+  "zustand": "For lightweight global state to hold unsaved generated passages"
+  "date-fns": "For formatting passage creation dates nicely"
+  "clsx": "For conditional class names"
+  "tailwind-merge": "For merging tailwind classes safely"
+
+images:
+  - path: "artifacts/koreader/public/images/hero-bg.png"
+    description: "Subtle, elegant abstract background inspired by traditional Korean Hanji paper texture with warm off-white and very soft ink-wash gray accents, minimalist"
+    aspect_ratio: "16:9"
+  - path: "artifacts/koreader/public/images/logo.png"
+    description: "Minimalist geometric logo mark representing a book and a Korean hangul character, elegant warm dark brown on transparent background"
+    aspect_ratio: "1:1"
+
+notes:
+  - Using generated hooks from @workspace/api-client-react for all data fetching.
+  - Zustand used for passing newly generated (unsaved) passages from the Generate page to the Reader page without messy URL state.
+  - Text-to-Speech uses native window.speechSynthesis with 'ko-KR' lang.

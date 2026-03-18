@@ -1,22 +1,28 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Koreader API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: passages
+    description: Reading passage operations
+  - name: library
+    description: Personal library operations
+  - name: vocabulary
+    description: Vocabulary operations
+  - name: generate
+    description: AI generation operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +30,144 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /passages/generate:
+    post:
+      operationId: generatePassage
+      tags: [generate]
+      summary: Generate a Korean reading passage using AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GeneratePassageRequest"
+      responses:
+        "200":
+          description: Generated passage
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Passage"
+
+  /passages:
+    get:
+      operationId: listPassages
+      tags: [library]
+      summary: List all saved passages
+      responses:
+        "200":
+          description: List of passages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Passage"
+    post:
+      operationId: savePassage
+      tags: [library]
+      summary: Save a passage to the library
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePassageRequest"
+      responses:
+        "201":
+          description: Saved passage
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Passage"
+
+  /passages/{id}:
+    get:
+      operationId: getPassage
+      tags: [library]
+      summary: Get a passage by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Passage
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Passage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deletePassage
+      tags: [library]
+      summary: Delete a passage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /passages/{id}/bookmark:
+    put:
+      operationId: toggleBookmark
+      tags: [library]
+      summary: Toggle bookmark on a passage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookmarkRequest"
+      responses:
+        "200":
+          description: Updated passage
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Passage"
+
+  /words/gloss:
+    post:
+      operationId: glossWord
+      tags: [vocabulary]
+      summary: Get gloss (definition, grammar note, example) for a Korean word
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GlossRequest"
+      responses:
+        "200":
+          description: Word gloss
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WordGloss"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +178,210 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required:
+        - success
+
+    GeneratePassageRequest:
+      type: object
+      properties:
+        topic:
+          type: string
+        difficulty:
+          type: string
+          enum: [beginner, lower_intermediate, intermediate, upper_intermediate, advanced]
+        length:
+          type: string
+          enum: [short, medium, long]
+        vocabularyFocus:
+          type: string
+        grammarFocus:
+          type: string
+        readingStyle:
+          type: string
+          enum: [story, article, dialogue, reflection]
+      required:
+        - topic
+        - difficulty
+        - length
+        - readingStyle
+
+    CreatePassageRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        topic:
+          type: string
+        difficulty:
+          type: string
+        length:
+          type: string
+        vocabularyFocus:
+          type: string
+        grammarFocus:
+          type: string
+        readingStyle:
+          type: string
+        koreanText:
+          type: string
+        sentences:
+          type: array
+          items:
+            $ref: "#/components/schemas/PassageSentence"
+        vocabulary:
+          type: array
+          items:
+            $ref: "#/components/schemas/VocabularyItem"
+        imageUrls:
+          type: array
+          items:
+            type: string
+        isBookmarked:
+          type: boolean
+      required:
+        - title
+        - topic
+        - difficulty
+        - length
+        - readingStyle
+        - koreanText
+        - sentences
+        - vocabulary
+
+    BookmarkRequest:
+      type: object
+      properties:
+        isBookmarked:
+          type: boolean
+      required:
+        - isBookmarked
+
+    Passage:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        topic:
+          type: string
+        difficulty:
+          type: string
+        length:
+          type: string
+        vocabularyFocus:
+          type: string
+        grammarFocus:
+          type: string
+        readingStyle:
+          type: string
+        koreanText:
+          type: string
+        sentences:
+          type: array
+          items:
+            $ref: "#/components/schemas/PassageSentence"
+        vocabulary:
+          type: array
+          items:
+            $ref: "#/components/schemas/VocabularyItem"
+        imageUrls:
+          type: array
+          items:
+            type: string
+        isBookmarked:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - topic
+        - difficulty
+        - length
+        - readingStyle
+        - koreanText
+        - sentences
+        - vocabulary
+        - imageUrls
+        - isBookmarked
+        - createdAt
+
+    PassageSentence:
+      type: object
+      properties:
+        korean:
+          type: string
+        english:
+          type: string
+      required:
+        - korean
+        - english
+
+    VocabularyItem:
+      type: object
+      properties:
+        korean:
+          type: string
+        romanization:
+          type: string
+        english:
+          type: string
+        partOfSpeech:
+          type: string
+        exampleSentence:
+          type: string
+      required:
+        - korean
+        - romanization
+        - english
+        - partOfSpeech
+
+    GlossRequest:
+      type: object
+      properties:
+        word:
+          type: string
+        context:
+          type: string
+        difficulty:
+          type: string
+      required:
+        - word
+
+    WordGloss:
+      type: object
+      properties:
+        word:
+          type: string
+        romanization:
+          type: string
+        englishMeaning:
+          type: string
+        partOfSpeech:
+          type: string
+        grammarNote:
+          type: string
+        exampleSentence:
+          type: string
+        exampleTranslation:
+          type: string
+      required:
+        - word
+        - romanization
+        - englishMeaning
+        - partOfSpeech

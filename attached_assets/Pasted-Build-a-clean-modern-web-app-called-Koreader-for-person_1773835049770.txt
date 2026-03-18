@@ -1,0 +1,69 @@
+Build a clean, modern web app called “Koreader” for personalized Korean graded reading practice.
+
+Purpose:
+The app should help an adult learner maintain and improve Korean literacy through personally tailored guided reading passages. It should feel inspired by Du Chinese, but designed for Korean reading practice.
+
+Target user:
+One adult learner who is interested in Korea, Korean language, Korean films, education, philosophy, daily life, travel, temple stays, and culture.
+
+Core features:
+1. Home page with a simple, elegant dashboard
+2. Passage generator form with these fields:
+   - Topic
+   - Difficulty level: Beginner, Lower Intermediate, Intermediate, Upper Intermediate, Advanced
+   - Length: Short, Medium, Long
+   - Vocabulary focus
+   - Grammar focus
+   - Reading style: story, article, dialogue, reflection
+3. Generate a Korean reading passage based on the selected inputs
+4. Display the passage in clear readable Korean text with strong typography and good spacing
+5. Show optional English translation sentence by sentence in a collapsible format
+6. Allow clicking or tapping a Korean word to open a small gloss popup with:
+   - English meaning
+   - simple grammar note if relevant
+   - example sentence if possible
+7. Show 1 to 3 relevant images above or beside the passage to support comprehension
+8. Include audio read-aloud using browser text-to-speech for the Korean passage
+9. Save generated passages to a personal library
+10. Include a vocabulary list for each passage
+11. Include a “study mode” that hides translation by default
+12. Include a “reading mode” that shows only Korean text cleanly
+13. Include a favorites or bookmark feature
+
+Design requirements:
+- Calm, elegant interface
+- Professional and minimalist
+- Responsive design for desktop and mobile browser
+- Prioritize readability
+- Use cards, clean spacing, rounded corners, and subtle shadows
+- Avoid clutter
+- Use a modern sans-serif font stack that supports Korean well
+
+Technical requirements:
+- Build with a simple maintainable stack
+- Separate frontend and backend cleanly if needed
+- Use mock AI generation first if no API key is provided
+- Structure code clearly so a future LLM API can be added later
+- Store saved passages in a simple database or local persistence
+- Add seed sample passages so the app works immediately
+
+Important product behavior:
+- The generated Korean should match the chosen level as closely as possible
+- The passages should be genuinely interesting and personalized, not generic textbook content
+- The app should support multimodal learning: text, images, vocabulary, and audio
+- Make the first version fully functional even with mock data
+- Include a few built-in sample topics such as:
+  - Korean cinema
+  - temple stay
+  - life in Seoul
+  - teaching abroad
+  - language learning
+  - family life
+  - travel in Korea
+
+Please:
+- create the full app
+- choose sensible frameworks and structure
+- explain the folder structure
+- tell me how to run it
+- give me a polished first version before adding advanced features
