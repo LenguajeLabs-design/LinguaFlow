@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link, useLocation } from 'wouter';
-import { BookOpen, Library, PlusCircle, LayoutDashboard, Heart, Settings, Sun, Moon } from 'lucide-react';
+import { Library, PlusCircle, LayoutDashboard, Heart, Settings, Sun, Moon } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useThemeStore, useThemeInit } from '@/hooks/use-theme';
+import appIcon from '/hangul-flow-icon.png';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -26,12 +27,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col bg-background selection:bg-accent/20">
       <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/90 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md shrink-0">
-            <div className="w-7 h-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-sm group-hover:bg-accent transition-colors duration-300">
-              <BookOpen className="w-4 h-4" />
-            </div>
-            <span className="font-serif font-semibold text-lg tracking-tight text-primary hidden sm:inline">
+          <Link href="/" className="flex items-center gap-2.5 group outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg shrink-0">
+            <img
+              src={appIcon}
+              alt="Hangul Flow"
+              className="w-8 h-8 rounded-xl shadow-sm group-hover:shadow-md transition-shadow duration-300 object-cover"
+            />
+            <span className="font-serif font-semibold text-lg tracking-tight text-foreground hidden sm:inline group-hover:hf-gradient-text transition-all duration-300">
               Hangul Flow
             </span>
           </Link>
@@ -53,7 +57,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                       : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'
                   )}
                 >
-                  <item.icon className="w-4 h-4" />
+                  <item.icon className={cn('w-4 h-4', isActive && 'text-accent')} />
                   {item.label}
                 </Link>
               );
@@ -64,10 +68,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <button
             onClick={toggle}
             aria-label="Toggle dark mode"
-            className={cn(
-              'p-2 rounded-full transition-all duration-200 border',
-              'text-muted-foreground hover:text-foreground border-border hover:border-primary/30 hover:bg-secondary/60'
-            )}
+            className="p-2 rounded-full transition-all duration-200 border border-border text-muted-foreground hover:text-foreground hover:border-accent/40 hover:bg-secondary/60"
           >
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
@@ -79,7 +80,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur-md flex justify-around px-2 py-1 safe-area-inset-bottom">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur-md flex justify-around px-2 py-1">
         {navItems.map((item) => {
           const isActive =
             location === item.href ||
@@ -90,12 +91,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               href={item.href}
               className={cn(
                 'flex flex-col items-center justify-center min-w-[52px] py-2 rounded-xl transition-colors duration-200 outline-none gap-0.5',
-                isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                isActive ? 'text-accent' : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              <item.icon
-                className={cn('w-5 h-5', isActive && 'fill-primary/15')}
-              />
+              <item.icon className={cn('w-5 h-5', isActive && 'fill-accent/15')} />
               <span className="text-[9px] font-medium">{item.label}</span>
             </Link>
           );

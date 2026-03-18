@@ -1,0 +1,99 @@
+I want to update the visual design of my app, Hangul Flow, so it matches my app icon.
+
+Important:
+Do not redesign the app completely.
+Keep the current premium, elegant, reading-focused interface.
+But adjust the branding, colors, glow effects, gradients, and decorative accents so the app feels visually consistent with the icon.
+
+Brand direction:
+The icon has:
+- a rounded square shape
+- a soft turquoise / aqua / sky blue / violet / pink gradient
+- white Hangul lettering
+- flowing wave-like motion
+- subtle sparkles
+- a calm but magical, polished feel
+
+Design goals:
+- Keep the app sophisticated and readable
+- Blend premium editorial style with soft luminous gradient accents
+- Make it feel like “calm reading meets elegant flow”
+- Avoid anything childish, loud, neon-heavy, or cluttered
+- Preserve excellent readability for long Korean reading passages
+
+Please make the following changes:
+
+1. BRAND COLORS
+Create a Hangul Flow design system inspired by the icon:
+- deep espresso / near-black for main background areas
+- warm cream / soft parchment for reading cards and surfaces
+- accent gradient using aqua, blue, violet, and soft pink
+- white or cream text on dark surfaces
+- dark text on light reading surfaces
+
+2. NAVBAR LOGO
+- Replace the current small logo area with the uploaded app icon image
+- Show the icon on the left side of “Hangul Flow”
+- Keep the brand name elegant and readable
+- Make the navbar feel premium and cohesive
+
+3. HERO SECTION
+- Keep the current elegant layout and typography
+- Add subtle gradient glow accents behind or around the hero section inspired by the icon
+- Add very soft flowing abstract wave shapes in the background
+- Optional: add tiny subtle sparkles or floating light particles, but keep them minimal
+
+4. BUTTONS
+- Keep buttons clean and readable
+- Make the primary button use a dark base with subtle gradient hover glow
+- Secondary buttons can use soft cream with gentle borders and faint gradient accents
+- Rounded corners should feel soft and modern
+
+5. CARDS AND PANELS
+- Keep reading cards highly legible
+- Add slightly more visual identity through:
+  - subtle gradient borders
+  - soft shadows
+  - faint glow on hover
+- Avoid overusing gradients inside reading areas
+
+6. READING EXPERIENCE
+This is the highest priority:
+- Do not reduce readability
+- Korean passages must stay clear, calm, and easy to read
+- Reading surfaces should remain light and neutral
+- Accent colors should appear around the interface, not overwhelm the text itself
+
+7. DECORATIVE SYSTEM
+Introduce a reusable visual motif inspired by the icon:
+- flowing wave/ribbon shapes
+- soft glow blurs
+- occasional star/sparkle accents
+Use these sparingly in hero areas, section dividers, empty states, and loading states
+
+8. FAVICON AND APP ICON
+- Use the uploaded icon as the favicon for the web app
+- Use the same asset in the navbar logo if appropriate
+
+9. CONSISTENCY
+Please update:
+- global theme variables
+- buttons
+- navbar
+- hero section
+- section accents
+- cards
+- hover states
+so everything feels like one brand
+
+10. IMPLEMENTATION
+Please:
+- identify where to place the uploaded icon file
+- wire it into the navbar and favicon
+- create reusable theme tokens or CSS variables for the color system
+- keep the code clean and maintainable
+
+I want the final result to feel like:
+premium, flowing, calm, intelligent, luminous, and beautiful.
+Not playful-tech startup. Not generic AI app.
+It should feel like a thoughtful Korean reading sanctuary.
