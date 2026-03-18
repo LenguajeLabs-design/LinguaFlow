@@ -7,6 +7,43 @@
  */
 import * as zod from "zod";
 
+const comprehensionQuestionSchema = zod.object({
+  question: zod.string(),
+  answer: zod.string(),
+});
+
+const passageShape = {
+  id: zod.number(),
+  title: zod.string(),
+  topic: zod.string(),
+  difficulty: zod.string(),
+  length: zod.string(),
+  vocabularyFocus: zod.string().nullable().optional(),
+  grammarFocus: zod.string().nullable().optional(),
+  readingStyle: zod.string(),
+  koreanText: zod.string(),
+  summary: zod.string().nullable().optional(),
+  sentences: zod.array(
+    zod.object({
+      korean: zod.string(),
+      english: zod.string(),
+    }),
+  ),
+  vocabulary: zod.array(
+    zod.object({
+      korean: zod.string(),
+      romanization: zod.string(),
+      english: zod.string(),
+      partOfSpeech: zod.string(),
+      exampleSentence: zod.string().optional(),
+    }),
+  ),
+  comprehensionQuestions: zod.array(comprehensionQuestionSchema).nullable().optional(),
+  imageUrls: zod.array(zod.string()),
+  isBookmarked: zod.boolean(),
+  createdAt: zod.coerce.date(),
+};
+
 /**
  * @summary Health check
  */
@@ -32,68 +69,12 @@ export const GeneratePassageBody = zod.object({
   readingStyle: zod.enum(["story", "article", "dialogue", "reflection"]),
 });
 
-export const GeneratePassageResponse = zod.object({
-  id: zod.number(),
-  title: zod.string(),
-  topic: zod.string(),
-  difficulty: zod.string(),
-  length: zod.string(),
-  vocabularyFocus: zod.string().nullable().optional(),
-  grammarFocus: zod.string().nullable().optional(),
-  readingStyle: zod.string(),
-  koreanText: zod.string(),
-  sentences: zod.array(
-    zod.object({
-      korean: zod.string(),
-      english: zod.string(),
-    }),
-  ),
-  vocabulary: zod.array(
-    zod.object({
-      korean: zod.string(),
-      romanization: zod.string(),
-      english: zod.string(),
-      partOfSpeech: zod.string(),
-      exampleSentence: zod.string().optional(),
-    }),
-  ),
-  imageUrls: zod.array(zod.string()),
-  isBookmarked: zod.boolean(),
-  createdAt: zod.coerce.date(),
-});
+export const GeneratePassageResponse = zod.object(passageShape);
 
 /**
  * @summary List all saved passages
  */
-export const ListPassagesResponseItem = zod.object({
-  id: zod.number(),
-  title: zod.string(),
-  topic: zod.string(),
-  difficulty: zod.string(),
-  length: zod.string(),
-  vocabularyFocus: zod.string().nullable().optional(),
-  grammarFocus: zod.string().nullable().optional(),
-  readingStyle: zod.string(),
-  koreanText: zod.string(),
-  sentences: zod.array(
-    zod.object({
-      korean: zod.string(),
-      english: zod.string(),
-    }),
-  ),
-  vocabulary: zod.array(
-    zod.object({
-      korean: zod.string(),
-      romanization: zod.string(),
-      english: zod.string(),
-      partOfSpeech: zod.string(),
-      exampleSentence: zod.string().optional(),
-    }),
-  ),
-  imageUrls: zod.array(zod.string()),
-  isBookmarked: zod.boolean(),
-  createdAt: zod.coerce.date(),
-});
+export const ListPassagesResponseItem = zod.object(passageShape);
 export const ListPassagesResponse = zod.array(ListPassagesResponseItem);
 
 /**
@@ -108,6 +89,7 @@ export const SavePassageBody = zod.object({
   grammarFocus: zod.string().nullable().optional(),
   readingStyle: zod.string(),
   koreanText: zod.string(),
+  summary: zod.string().nullable().optional(),
   sentences: zod.array(
     zod.object({
       korean: zod.string(),
@@ -123,6 +105,7 @@ export const SavePassageBody = zod.object({
       exampleSentence: zod.string().optional(),
     }),
   ),
+  comprehensionQuestions: zod.array(comprehensionQuestionSchema).nullable().optional(),
   imageUrls: zod.array(zod.string()).optional(),
   isBookmarked: zod.boolean().optional(),
 });
@@ -134,35 +117,7 @@ export const GetPassageParams = zod.object({
   id: zod.coerce.number(),
 });
 
-export const GetPassageResponse = zod.object({
-  id: zod.number(),
-  title: zod.string(),
-  topic: zod.string(),
-  difficulty: zod.string(),
-  length: zod.string(),
-  vocabularyFocus: zod.string().nullable().optional(),
-  grammarFocus: zod.string().nullable().optional(),
-  readingStyle: zod.string(),
-  koreanText: zod.string(),
-  sentences: zod.array(
-    zod.object({
-      korean: zod.string(),
-      english: zod.string(),
-    }),
-  ),
-  vocabulary: zod.array(
-    zod.object({
-      korean: zod.string(),
-      romanization: zod.string(),
-      english: zod.string(),
-      partOfSpeech: zod.string(),
-      exampleSentence: zod.string().optional(),
-    }),
-  ),
-  imageUrls: zod.array(zod.string()),
-  isBookmarked: zod.boolean(),
-  createdAt: zod.coerce.date(),
-});
+export const GetPassageResponse = zod.object(passageShape);
 
 /**
  * @summary Delete a passage
@@ -186,35 +141,7 @@ export const ToggleBookmarkBody = zod.object({
   isBookmarked: zod.boolean(),
 });
 
-export const ToggleBookmarkResponse = zod.object({
-  id: zod.number(),
-  title: zod.string(),
-  topic: zod.string(),
-  difficulty: zod.string(),
-  length: zod.string(),
-  vocabularyFocus: zod.string().nullable().optional(),
-  grammarFocus: zod.string().nullable().optional(),
-  readingStyle: zod.string(),
-  koreanText: zod.string(),
-  sentences: zod.array(
-    zod.object({
-      korean: zod.string(),
-      english: zod.string(),
-    }),
-  ),
-  vocabulary: zod.array(
-    zod.object({
-      korean: zod.string(),
-      romanization: zod.string(),
-      english: zod.string(),
-      partOfSpeech: zod.string(),
-      exampleSentence: zod.string().optional(),
-    }),
-  ),
-  imageUrls: zod.array(zod.string()),
-  isBookmarked: zod.boolean(),
-  createdAt: zod.coerce.date(),
-});
+export const ToggleBookmarkResponse = zod.object(passageShape);
 
 /**
  * @summary Get gloss (definition, grammar note, example) for a Korean word

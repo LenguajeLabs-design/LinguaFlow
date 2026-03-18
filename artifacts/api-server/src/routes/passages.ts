@@ -46,8 +46,10 @@ router.post("/passages/generate", async (req, res): Promise<void> => {
     grammarFocus: parsed.data.grammarFocus ?? undefined,
     readingStyle: parsed.data.readingStyle,
     koreanText: generated.koreanText,
+    summary: generated.summary,
     sentences: generated.sentences,
     vocabulary: generated.vocabulary,
+    comprehensionQuestions: generated.comprehensionQuestions,
     imageUrls: generated.imageUrls,
     isBookmarked: false,
     createdAt: new Date().toISOString(),
@@ -83,8 +85,10 @@ router.post("/passages", async (req, res): Promise<void> => {
       grammarFocus: parsed.data.grammarFocus ?? null,
       readingStyle: parsed.data.readingStyle,
       koreanText: parsed.data.koreanText,
+      summary: parsed.data.summary ?? null,
       sentences: parsed.data.sentences as Array<{ korean: string; english: string }>,
       vocabulary: parsed.data.vocabulary as Array<{ korean: string; romanization: string; english: string; partOfSpeech: string; exampleSentence?: string }>,
+      comprehensionQuestions: (parsed.data.comprehensionQuestions ?? null) as Array<{ question: string; answer: string }> | null,
       imageUrls: (parsed.data.imageUrls as string[]) ?? [],
       isBookmarked: parsed.data.isBookmarked ?? false,
     })
@@ -184,8 +188,10 @@ function formatPassage(p: typeof passagesTable.$inferSelect) {
     ...p,
     vocabularyFocus: p.vocabularyFocus ?? undefined,
     grammarFocus: p.grammarFocus ?? undefined,
+    summary: p.summary ?? undefined,
+    comprehensionQuestions: (p.comprehensionQuestions as Array<{ question: string; answer: string }> | null) ?? undefined,
     imageUrls: p.imageUrls ?? [],
-    createdAt: p.createdAt.toISOString(),
+    createdAt: p.createdAt,
   };
 }
 

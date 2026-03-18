@@ -2,6 +2,24 @@ import { pgTable, text, serial, timestamp, boolean, integer, jsonb } from "drizz
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
+export interface PassageSentence {
+  korean: string;
+  english: string;
+}
+
+export interface VocabularyItem {
+  korean: string;
+  romanization: string;
+  english: string;
+  partOfSpeech: string;
+  exampleSentence?: string;
+}
+
+export interface ComprehensionQuestion {
+  question: string;
+  answer: string;
+}
+
 export const passagesTable = pgTable("passages", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
@@ -12,8 +30,10 @@ export const passagesTable = pgTable("passages", {
   grammarFocus: text("grammar_focus"),
   readingStyle: text("reading_style").notNull(),
   koreanText: text("korean_text").notNull(),
-  sentences: jsonb("sentences").notNull().$type<Array<{ korean: string; english: string }>>(),
-  vocabulary: jsonb("vocabulary").notNull().$type<Array<{ korean: string; romanization: string; english: string; partOfSpeech: string; exampleSentence?: string }>>(),
+  summary: text("summary"),
+  sentences: jsonb("sentences").notNull().$type<PassageSentence[]>(),
+  vocabulary: jsonb("vocabulary").notNull().$type<VocabularyItem[]>(),
+  comprehensionQuestions: jsonb("comprehension_questions").$type<ComprehensionQuestion[]>(),
   imageUrls: text("image_urls").array().notNull().default([]),
   isBookmarked: boolean("is_bookmarked").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
