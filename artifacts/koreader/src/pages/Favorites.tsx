@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Heart, BookOpen } from 'lucide-react';
-import { AppLayout } from '@/components/layout/AppLayout';
+import { AppLayout, AuthGate } from '@/components/layout/AppLayout';
 import { useListPassages } from '@workspace/api-client-react';
 import { PassageCard } from '@/components/passage/PassageCard';
 import { cn } from '@/components/layout/AppLayout';
@@ -20,6 +20,7 @@ export default function Favorites() {
 
   return (
     <AppLayout>
+      <AuthGate message="Sign in to see your bookmarked passages.">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -86,6 +87,7 @@ export default function Favorites() {
           </div>
         )}
       </div>
+      </AuthGate>
     </AppLayout>
   );
 }

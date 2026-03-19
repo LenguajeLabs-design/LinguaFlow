@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db, passagesTable } from "@workspace/db";
 import {
   GeneratePassageBody,
@@ -17,10 +17,11 @@ import {
   GlossWordResponse,
 } from "@workspace/api-zod";
 import { generateKoreanPassage, glossKoreanWord } from "../lib/passageGenerator";
+import { requireAuth } from "../middleware/requireAuth";
 
 const router: IRouter = Router();
 
-router.post("/passages/generate", async (req, res): Promise<void> => {
+router.post("/passages/generate", requireAuth, async (req, res): Promise<void> => {
   const parsed = GeneratePassageBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -58,16 +59,18 @@ router.post("/passages/generate", async (req, res): Promise<void> => {
   res.json(GeneratePassageResponse.parse(passage));
 });
 
-router.get("/passages", async (_req, res): Promise<void> => {
+router.get("/passages", requireAuth, async (req, res): Promise<void> => {
+  const userId = req.session.userId;
   const passages = await db
     .select()
     .from(passagesTable)
+    .where(eq(passagesTable.userId, userId))
     .orderBy(passagesTable.createdAt);
 
   res.json(ListPassagesResponse.parse(passages.map(formatPassage)));
 });
 
-router.post("/passages", async (req, res): Promise<void> => {
+router.post("/passages", requireAuth, async (req, res): Promise<void> => {
   const parsed = SavePassageBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -91,13 +94,14 @@ router.post("/passages", async (req, res): Promise<void> => {
       comprehensionQuestions: (parsed.data.comprehensionQuestions ?? null) as Array<{ question: string; answer: string }> | null,
       imageUrls: (parsed.data.imageUrls as string[]) ?? [],
       isBookmarked: parsed.data.isBookmarked ?? false,
+      userId: req.session.userId,
     })
     .returning();
 
   res.status(201).json(GetPassageResponse.parse(formatPassage(passage)));
 });
 
-router.get("/passages/:id", async (req, res): Promise<void> => {
+router.get("/passages/:id", requireAuth, async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const params = GetPassageParams.safeParse({ id: raw });
   if (!params.success) {
@@ -108,7 +112,7 @@ router.get("/passages/:id", async (req, res): Promise<void> => {
   const [passage] = await db
     .select()
     .from(passagesTable)
-    .where(eq(passagesTable.id, params.data.id));
+    .where(and(eq(passagesTable.id, params.data.id), eq(passagesTable.userId, req.session.userId)));
 
   if (!passage) {
     res.status(404).json({ error: "Passage not found" });
@@ -118,7 +122,7 @@ router.get("/passages/:id", async (req, res): Promise<void> => {
   res.json(GetPassageResponse.parse(formatPassage(passage)));
 });
 
-router.delete("/passages/:id", async (req, res): Promise<void> => {
+router.delete("/passages/:id", requireAuth, async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const params = DeletePassageParams.safeParse({ id: raw });
   if (!params.success) {
@@ -128,7 +132,7 @@ router.delete("/passages/:id", async (req, res): Promise<void> => {
 
   const [deleted] = await db
     .delete(passagesTable)
-    .where(eq(passagesTable.id, params.data.id))
+    .where(and(eq(passagesTable.id, params.data.id), eq(passagesTable.userId, req.session.userId)))
     .returning();
 
   if (!deleted) {
@@ -139,7 +143,7 @@ router.delete("/passages/:id", async (req, res): Promise<void> => {
   res.json(DeletePassageResponse.parse({ success: true }));
 });
 
-router.put("/passages/:id/bookmark", async (req, res): Promise<void> => {
+router.put("/passages/:id/bookmark", requireAuth, async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const params = ToggleBookmarkParams.safeParse({ id: raw });
   if (!params.success) {
@@ -156,7 +160,7 @@ router.put("/passages/:id/bookmark", async (req, res): Promise<void> => {
   const [passage] = await db
     .update(passagesTable)
     .set({ isBookmarked: body.data.isBookmarked })
-    .where(eq(passagesTable.id, params.data.id))
+    .where(and(eq(passagesTable.id, params.data.id), eq(passagesTable.userId, req.session.userId)))
     .returning();
 
   if (!passage) {
@@ -167,7 +171,7 @@ router.put("/passages/:id/bookmark", async (req, res): Promise<void> => {
   res.json(ToggleBookmarkResponse.parse(formatPassage(passage)));
 });
 
-router.post("/words/gloss", async (req, res): Promise<void> => {
+router.post("/words/gloss", requireAuth, async (req, res): Promise<void> => {
   const parsed = GlossWordBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });

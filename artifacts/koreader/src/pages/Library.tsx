@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Search, Filter, BookOpen } from 'lucide-react';
-import { AppLayout } from '@/components/layout/AppLayout';
+import { AppLayout, AuthGate } from '@/components/layout/AppLayout';
 import { useListPassages } from '@workspace/api-client-react';
 import { PassageCard } from '@/components/passage/PassageCard';
 import { cn } from '@/components/layout/AppLayout';
@@ -36,6 +36,7 @@ export default function Library() {
 
   return (
     <AppLayout>
+      <AuthGate message="Sign in to access your personal library and saved passages.">
       <div className="pb-12">
         <header className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-serif font-bold text-foreground mb-4">
@@ -130,6 +131,7 @@ export default function Library() {
           </div>
         )}
       </div>
+      </AuthGate>
     </AppLayout>
   );
 }

@@ -52,6 +52,30 @@ export const HealthCheckResponse = zod.object({
 });
 
 /**
+ * @summary Auth — signup
+ */
+export const SignupBody = zod.object({
+  email: zod.string().email(),
+  password: zod.string().min(8, "Password must be at least 8 characters"),
+});
+
+/**
+ * @summary Auth — login
+ */
+export const LoginBody = zod.object({
+  email: zod.string().email(),
+  password: zod.string().min(1),
+});
+
+/**
+ * @summary Auth user response shape
+ */
+export const AuthUserResponse = zod.object({
+  id: zod.number(),
+  email: zod.string(),
+});
+
+/**
  * @summary Generate a Korean reading passage using AI
  */
 export const GeneratePassageBody = zod.object({

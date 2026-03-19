@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Sparkles, Loader2, Settings2, BookType, Hash } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AppLayout } from '@/components/layout/AppLayout';
+import { AppLayout, AuthGate } from '@/components/layout/AppLayout';
 import { useGeneratePassage } from '@workspace/api-client-react';
 import { usePassageStore } from '@/store/use-passage-store';
 import { GeneratePassageRequestDifficulty, GeneratePassageRequestLength, GeneratePassageRequestReadingStyle } from '@workspace/api-client-react';
@@ -57,6 +57,7 @@ export default function Generate() {
 
   return (
     <AppLayout>
+      <AuthGate message="Sign in to generate personalized Korean reading passages.">
       <div className="max-w-2xl mx-auto py-8">
         
         <header className="mb-10 text-center">
@@ -226,6 +227,7 @@ export default function Generate() {
           </button>
         </form>
       </div>
+      </AuthGate>
     </AppLayout>
   );
 }
