@@ -14,7 +14,7 @@ export const useLanguageStore = create<LanguageStore>()(
       language: 'ko',
       setLanguage: (language) => set({ language }),
     }),
-    { name: 'hangulflow-language' }
+    { name: 'linguaflow-language' }
   )
 );
 
@@ -24,7 +24,7 @@ export const LANGUAGE_CONFIG = {
     nativeName: '한국어',
     label: '한',
     flag: '🇰🇷',
-    appName: 'Hangul Flow',
+    appName: 'LinguaFlow',
     difficultyLabel: 'TOPIK Level',
     difficulties: [
       { value: 'beginner',           label: 'Beginner',           desc: 'TOPIK I-1 · Simple sentences' },
@@ -52,7 +52,7 @@ export const LANGUAGE_CONFIG = {
     nativeName: '普通话',
     label: '汉',
     flag: '🇨🇳',
-    appName: 'Hanzi Flow',
+    appName: 'LinguaFlow',
     difficultyLabel: 'HSK Level',
     difficulties: [
       { value: 'hsk1', label: 'HSK 1', desc: '150 words · Very basic' },

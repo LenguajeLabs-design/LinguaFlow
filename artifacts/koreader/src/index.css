@@ -5,7 +5,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ─── Hangul Flow Brand Tokens ───────────────────────────────────────── */
+/* ─── LinguaFlow Brand Tokens ────────────────────────────────────────── */
 :root {
   /* Icon-derived gradient stops */
   --hf-aqua:   174 60% 52%;

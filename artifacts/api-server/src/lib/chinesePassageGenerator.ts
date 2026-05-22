@@ -121,9 +121,9 @@ const hskProfiles: Record<string, {
 };
 
 const lengthMap: Record<string, { sentences: string; chars: string }> = {
-  short:  { sentences: "4–6 sentences",   chars: "60–100 Chinese characters"  },
-  medium: { sentences: "8–11 sentences",  chars: "150–250 Chinese characters" },
-  long:   { sentences: "13–18 sentences", chars: "300–420 Chinese characters" },
+  short:  { sentences: "8–12 sentences",  chars: "130–200 Chinese characters"  },
+  medium: { sentences: "15–20 sentences", chars: "280–400 Chinese characters" },
+  long:   { sentences: "25–35 sentences", chars: "500–720 Chinese characters" },
 };
 
 const styleMap: Record<string, string> = {

@@ -82,7 +82,7 @@ export function AuthModal({ defaultMode = 'login', onClose, onSuccess }: AuthMod
           {/* Brand */}
           <div className="flex flex-col items-center mb-8">
             <div className="relative mb-4">
-              <img src={appIcon} alt="Hangul Flow" className="w-14 h-14 rounded-2xl shadow-lg" />
+              <img src={appIcon} alt="LinguaFlow" className="w-14 h-14 rounded-2xl shadow-lg" />
               <Star className="hf-sparkle absolute -top-1 -right-1 w-3 h-3 text-accent fill-accent" />
             </div>
             <h2 className="text-xl font-serif font-bold text-foreground">

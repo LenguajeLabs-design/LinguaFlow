@@ -86,7 +86,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="flex items-center p-0.5 bg-secondary/60 border border-border rounded-xl gap-0.5">
               <button
                 onClick={() => setLanguage('ko')}
-                title="Korean — Hangul Flow"
+                title="Korean — LinguaFlow"
                 className={cn(
                   'px-2.5 py-1.5 rounded-[0.6rem] text-xs font-bold transition-all duration-200',
                   language === 'ko'
