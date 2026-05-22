@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { Passage, ChineseToken } from '@workspace/api-client-react';
 import { DifficultyBadge } from './DifficultyBadge';
 import { ChineseWordPopover } from './ChineseWordPopover';
+import { ChinesePinyinText } from './ChinesePinyinText';
 import { useTTS } from '@/hooks/use-tts';
 import { cn } from '@/lib/utils';
 import { useSavePassage, useToggleBookmark, getListPassagesQueryKey, getGetPassageQueryKey } from '@workspace/api-client-react';
@@ -371,8 +372,8 @@ export function ChinesePassageReader({ passage, isUnsaved = false, onSaved }: Ch
           <div className="space-y-4">
             {comprehensionQuestions.map((q, idx) => (
               <div key={idx} className="bg-card border border-border/60 rounded-2xl p-5 shadow-sm">
-                <p className={cn('font-chinese font-medium text-foreground mb-3', fontSizeMap[fontSize] === fontSizeMap.xlarge ? 'text-lg' : 'text-base')}>
-                  {idx + 1}. {q.question}
+                <p className={cn('font-chinese font-medium text-foreground mb-3 leading-loose', fontSizeMap[fontSize] === fontSizeMap.xlarge ? 'text-lg' : 'text-base')}>
+                  {idx + 1}. <ChinesePinyinText text={q.question} />
                 </p>
                 <AnimatePresence>
                   {revealedAnswers.has(idx) && (
@@ -382,8 +383,10 @@ export function ChinesePassageReader({ passage, isUnsaved = false, onSaved }: Ch
                       exit={{ opacity: 0, height: 0 }}
                       className="flex items-start gap-2 p-3 bg-accent/8 rounded-xl border border-accent/20"
                     >
-                      <CheckCircle2 className="w-4 h-4 text-accent mt-0.5 shrink-0" />
-                      <p className="text-sm font-chinese text-foreground">{q.answer}</p>
+                      <CheckCircle2 className="w-4 h-4 text-accent mt-1 shrink-0" />
+                      <p className="text-sm font-chinese text-foreground leading-loose">
+                        <ChinesePinyinText text={q.answer} />
+                      </p>
                     </motion.div>
                   )}
                 </AnimatePresence>
