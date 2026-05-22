@@ -9,7 +9,9 @@ const chineseTokenSchema = zod.object({
   hanzi: zod.string(),
   pinyin: zod.string(),
   meaning: zod.string(),
-  type: zod.enum(["word", "punct"]),
+  type: zod.string().transform((v) =>
+    ["punct", "punctuation", "punc", "symbol"].includes(v.toLowerCase()) ? "punct" : "word"
+  ) as zod.ZodType<"word" | "punct">,
 });
 
 const passageShape = {

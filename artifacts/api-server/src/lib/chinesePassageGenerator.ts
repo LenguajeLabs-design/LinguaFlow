@@ -299,6 +299,13 @@ COMPREHENSION QUESTIONS: Write exactly 3 questions in Chinese that test understa
       comprehensionQuestions: Array<{ question: string; answer: string }>;
     };
 
+    const PUNCT_TYPES = new Set(["punct", "punctuation", "punc", "symbol"]);
+    const normalizeTokens = (tokens: any[]): ChineseToken[] =>
+      tokens.map((t) => ({
+        ...t,
+        type: PUNCT_TYPES.has((t.type ?? "").toLowerCase()) ? "punct" : "word",
+      }));
+
     const chineseText = parsed.tokens
       .map((t) => t.hanzi)
       .join("");
@@ -307,7 +314,7 @@ COMPREHENSION QUESTIONS: Write exactly 3 questions in Chinese that test understa
       title: parsed.title || `${input.topic} 阅读`,
       summary: parsed.summary || "",
       chineseText,
-      tokens: parsed.tokens || [],
+      tokens: normalizeTokens(parsed.tokens || []),
       sentences: parsed.sentences || [],
       vocabulary: (parsed.vocabulary || []).slice(0, 12),
       comprehensionQuestions: (parsed.comprehensionQuestions || []).slice(0, 3),
