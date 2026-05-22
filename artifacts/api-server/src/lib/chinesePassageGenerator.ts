@@ -1,4 +1,4 @@
-import { openai } from "./openai";
+import { openai, MODEL } from "./openai";
 
 export interface ChineseToken {
   hanzi: string;
@@ -282,8 +282,8 @@ COMPREHENSION QUESTIONS: Write exactly 3 questions in Chinese that test understa
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-5.2",
-      max_completion_tokens: 5000,
+      model: MODEL,
+      max_tokens: 5000,
       messages: [{ role: "user", content: prompt }],
     });
 
@@ -349,8 +349,8 @@ Return ONLY valid JSON (no markdown):
 }`;
 
   const response = await openai.chat.completions.create({
-    model: "gpt-5.2",
-    max_completion_tokens: 512,
+    model: MODEL,
+    max_tokens: 512,
     messages: [{ role: "user", content: prompt }],
   });
 

@@ -1,4 +1,4 @@
-import { openai } from "./openai";
+import { openai, MODEL } from "./openai";
 
 export interface PassageInput {
   topic: string;
@@ -387,8 +387,8 @@ COMPREHENSION QUESTIONS: Write exactly 3 questions in Korean that test understan
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-5.2",
-      max_completion_tokens: 4096,
+      model: MODEL,
+      max_tokens: 4096,
       messages: [{ role: "user", content: prompt }],
     });
 
@@ -454,8 +454,8 @@ Return ONLY valid JSON (no markdown):
 }`;
 
   const response = await openai.chat.completions.create({
-    model: "gpt-5.2",
-    max_completion_tokens: 512,
+    model: MODEL,
+    max_tokens: 512,
     messages: [{ role: "user", content: prompt }],
   });
 
