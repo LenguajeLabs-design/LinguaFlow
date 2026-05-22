@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import {
-  Volume2, VolumeX, Eye, BookOpen, Layout, Bookmark, Type,
-  FileText, HelpCircle, CheckCircle2, Languages, List
+  Volume2, Eye, BookOpen, Layout, Bookmark, Type,
+  FileText, HelpCircle, CheckCircle2, Languages, List,
+  SkipBack, Play, Pause, Square
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Passage, ChineseToken } from '@workspace/api-client-react';
@@ -47,7 +48,12 @@ export function ChinesePassageReader({ passage, isUnsaved = false, onSaved }: Ch
   const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { toggle: toggleTTS, isPlaying, isLoading: ttsLoading, stop: stopTTS } = useOpenAITTS('zh');
+  const {
+    play: playTTS, pause: pauseTTS, resume: resumeTTS, stop: stopTTS,
+    rewind: rewindTTS, toggle: toggleTTS,
+    isPlaying, isLoading: ttsLoading, hasAudio,
+    currentTime: ttsCurrentTime, duration: ttsDuration,
+  } = useOpenAITTS('zh');
   const { fontSize } = useSettings();
   const queryClient = useQueryClient();
   const saveMutation = useSavePassage();
@@ -165,27 +171,62 @@ export function ChinesePassageReader({ passage, isUnsaved = false, onSaved }: Ch
               <Type className="w-4 h-4" />
             </button>
 
-            <button
-              onClick={() => toggleTTS(passage.koreanText)}
-              disabled={ttsLoading}
-              className={cn(
-                'flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium border transition-all',
-                isPlaying
-                  ? 'bg-accent/10 text-accent border-accent/30'
-                  : ttsLoading
-                  ? 'bg-card text-muted-foreground border-border opacity-70 cursor-wait'
-                  : 'bg-card text-foreground border-border hover:border-primary/30'
-              )}
-            >
-              {ttsLoading
-                ? <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                : isPlaying
-                ? <VolumeX className="w-4 h-4" />
-                : <Volume2 className="w-4 h-4" />}
-              <span className="hidden sm:inline">
-                {ttsLoading ? 'Loading…' : isPlaying ? 'Stop' : 'Listen'}
-              </span>
-            </button>
+            {/* ── Audio player ── */}
+            {!hasAudio && !ttsLoading ? (
+              <button
+                onClick={() => playTTS(passage.koreanText)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium border border-border bg-card text-foreground hover:border-primary/30 transition-all"
+              >
+                <Volume2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Listen</span>
+              </button>
+            ) : ttsLoading ? (
+              <button disabled className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium border border-border bg-card text-muted-foreground opacity-70 cursor-wait">
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                <span className="hidden sm:inline">Loading…</span>
+              </button>
+            ) : (
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => rewindTTS(10)}
+                    title="Rewind 10 s"
+                    className="p-1.5 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all"
+                  >
+                    <SkipBack className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => isPlaying ? pauseTTS() : resumeTTS()}
+                    title={isPlaying ? 'Pause' : 'Resume'}
+                    className="p-1.5 rounded-lg border border-accent/30 bg-accent/10 text-accent hover:bg-accent/20 transition-all"
+                  >
+                    {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                  </button>
+                  <button
+                    onClick={stopTTS}
+                    title="Stop"
+                    className="p-1.5 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all"
+                  >
+                    <Square className="w-3.5 h-3.5" />
+                  </button>
+                  {ttsDuration > 0 && (
+                    <span className="text-[10px] text-muted-foreground tabular-nums ml-1">
+                      {Math.floor(ttsCurrentTime / 60)}:{String(Math.floor(ttsCurrentTime % 60)).padStart(2, '0')}
+                      {' / '}
+                      {Math.floor(ttsDuration / 60)}:{String(Math.floor(ttsDuration % 60)).padStart(2, '0')}
+                    </span>
+                  )}
+                </div>
+                {ttsDuration > 0 && (
+                  <div className="w-full h-1 bg-secondary rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-accent rounded-full transition-all duration-200"
+                      style={{ width: `${(ttsCurrentTime / ttsDuration) * 100}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
 
             {isUnsaved ? (
               <button
@@ -237,17 +278,6 @@ export function ChinesePassageReader({ passage, isUnsaved = false, onSaved }: Ch
           </div>
         )}
       </header>
-
-      {/* ── Images ── */}
-      {passage.imageUrls && passage.imageUrls.length > 0 && (
-        <div className="mb-10 overflow-hidden rounded-2xl shadow-sm">
-          <img
-            src={passage.imageUrls[0]}
-            alt={passage.topic}
-            className="w-full h-52 object-cover"
-          />
-        </div>
-      )}
 
       {/* ── Passage Text ── */}
       <div className="bg-card border border-border/60 rounded-2xl p-6 sm:p-8 shadow-sm mb-10">

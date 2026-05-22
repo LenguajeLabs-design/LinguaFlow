@@ -111,9 +111,9 @@ const difficultyProfiles: Record<string, {
 };
 
 const lengthMap: Record<string, { sentences: string; chars: string }> = {
-  short:  { sentences: "8–12 sentences",   chars: "160–240 Korean characters"  },
-  medium: { sentences: "15–20 sentences",  chars: "320–460 Korean characters" },
-  long:   { sentences: "25–35 sentences",  chars: "550–800 Korean characters" },
+  short:  { sentences: "8–12 sentences",   chars: "160–240 Korean characters"   },
+  medium: { sentences: "15–20 sentences",  chars: "320–460 Korean characters"   },
+  long:   { sentences: "50–70 sentences",  chars: "1,200–1,800 Korean characters" },
 };
 
 const styleMap: Record<string, string> = {
