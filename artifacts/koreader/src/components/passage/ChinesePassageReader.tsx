@@ -8,7 +8,7 @@ import type { Passage, ChineseToken } from '@workspace/api-client-react';
 import { DifficultyBadge } from './DifficultyBadge';
 import { ChineseWordPopover } from './ChineseWordPopover';
 import { useTTS } from '@/hooks/use-tts';
-import { cn } from '@/components/layout/AppLayout';
+import { cn } from '@/lib/utils';
 import { useSavePassage, useToggleBookmark, getListPassagesQueryKey, getGetPassageQueryKey } from '@workspace/api-client-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSettings, fontSizeMap } from '@/hooks/use-settings';

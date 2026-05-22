@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Heart, BookOpen } from 'lucide-react';
-import { AppLayout, AuthGate } from '@/components/layout/AppLayout';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { AuthGate } from '@/components/auth/AuthGate';
 import { useListPassages } from '@workspace/api-client-react';
 import { PassageCard } from '@/components/passage/PassageCard';
-import { cn } from '@/components/layout/AppLayout';
+import { cn } from '@/lib/utils';
 
 export default function Favorites() {
   const { data: passages, isLoading, isError } = useListPassages();

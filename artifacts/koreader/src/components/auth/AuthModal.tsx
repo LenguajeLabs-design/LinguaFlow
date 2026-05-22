@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Mail, Lock, Eye, EyeOff, Loader2, Star } from 'lucide-react';
 import { useAuthStore } from '@/hooks/use-auth';
-import { cn } from '@/components/layout/AppLayout';
+import { cn } from '@/lib/utils';
 import appIcon from '/hangul-flow-icon.png';
 
 interface AuthModalProps {

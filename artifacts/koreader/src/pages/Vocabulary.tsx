@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { BookMarked, Download, Trash2, Check, Loader2, Search, Globe } from 'lucide-react';
-import { AppLayout, AuthGate, cn } from '@/components/layout/AppLayout';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { AuthGate } from '@/components/auth/AuthGate';
+import { cn } from '@/lib/utils';
 import { vocabularyApi } from '@workspace/api-client-react';
 import type { SavedVocab } from '@workspace/api-client-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';

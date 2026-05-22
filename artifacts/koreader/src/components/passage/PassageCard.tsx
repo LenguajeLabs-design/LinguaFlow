@@ -2,7 +2,7 @@ import { Link } from 'wouter';
 import { Bookmark, Clock, BookOpen } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { DifficultyBadge } from './DifficultyBadge';
-import { cn } from '@/components/layout/AppLayout';
+import { cn } from '@/lib/utils';
 import type { Passage } from '@workspace/api-client-react';
 import { useToggleBookmark } from '@workspace/api-client-react';
 import { useQueryClient } from '@tanstack/react-query';

@@ -1,4 +1,4 @@
-import { cn } from '@/components/layout/AppLayout';
+import { cn } from '@/lib/utils';
 
 interface DifficultyBadgeProps {
   difficulty: string;

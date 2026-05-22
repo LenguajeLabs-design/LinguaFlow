@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, BookOpen } from 'lucide-react';
 import { useGlossWord } from '@workspace/api-client-react';
-import { cn } from '@/components/layout/AppLayout';
+import { cn } from '@/lib/utils';
 import { useSettings } from '@/hooks/use-settings';
 
 interface WordPopoverProps {

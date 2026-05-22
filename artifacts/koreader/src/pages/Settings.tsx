@@ -1,6 +1,6 @@
 import { Settings as SettingsIcon, Sun, Moon, Type, Volume2, Eye, Save } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { cn } from '@/components/layout/AppLayout';
+import { cn } from '@/lib/utils';
 import { useThemeStore } from '@/hooks/use-theme';
 import { useSettings } from '@/hooks/use-settings';
 

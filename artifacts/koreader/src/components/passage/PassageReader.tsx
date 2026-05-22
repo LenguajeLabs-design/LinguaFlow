@@ -8,7 +8,7 @@ import type { Passage } from '@workspace/api-client-react';
 import { DifficultyBadge } from './DifficultyBadge';
 import { WordPopover } from './WordPopover';
 import { useTTS } from '@/hooks/use-tts';
-import { cn } from '@/components/layout/AppLayout';
+import { cn } from '@/lib/utils';
 import { useSavePassage, useToggleBookmark } from '@workspace/api-client-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { getListPassagesQueryKey, getGetPassageQueryKey } from '@workspace/api-client-react';

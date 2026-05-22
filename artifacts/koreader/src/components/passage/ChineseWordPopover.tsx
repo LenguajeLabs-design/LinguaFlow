@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, BookMarked, Check, Loader2 } from 'lucide-react';
-import { cn } from '@/components/layout/AppLayout';
+import { cn } from '@/lib/utils';
 import type { ChineseToken } from '@workspace/api-client-react';
 import { vocabularyApi } from '@workspace/api-client-react';
 import { useAuthStore } from '@/hooks/use-auth';
