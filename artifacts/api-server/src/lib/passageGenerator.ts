@@ -1,4 +1,4 @@
-import { openai, MODEL } from "./openai";
+import { chatWithFallback, MODEL } from "./openai";
 
 export interface PassageInput {
   topic: string;
@@ -386,7 +386,7 @@ VOCABULARY: Include exactly 8–12 key items. Select words that are:
 COMPREHENSION QUESTIONS: Write exactly 3 questions in Korean that test understanding. Answers should be short and directly supported by the text.`;
 
   try {
-    const response = await openai.chat.completions.create({
+    const response = await chatWithFallback({
       model: MODEL,
       max_tokens: 4096,
       messages: [{ role: "user", content: prompt }],
@@ -453,7 +453,7 @@ Return ONLY valid JSON (no markdown):
   "exampleTranslation": "English translation of the example"
 }`;
 
-  const response = await openai.chat.completions.create({
+  const response = await chatWithFallback({
     model: MODEL,
     max_tokens: 512,
     messages: [{ role: "user", content: prompt }],
