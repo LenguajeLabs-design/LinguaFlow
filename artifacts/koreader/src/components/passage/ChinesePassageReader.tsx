@@ -8,7 +8,7 @@ import type { Passage, ChineseToken } from '@workspace/api-client-react';
 import { DifficultyBadge } from './DifficultyBadge';
 import { ChineseWordPopover } from './ChineseWordPopover';
 import { ChinesePinyinText } from './ChinesePinyinText';
-import { useTTS } from '@/hooks/use-tts';
+import { useOpenAITTS } from '@/hooks/use-openai-tts';
 import { cn } from '@/lib/utils';
 import { useSavePassage, useToggleBookmark, getListPassagesQueryKey, getGetPassageQueryKey } from '@workspace/api-client-react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -47,7 +47,7 @@ export function ChinesePassageReader({ passage, isUnsaved = false, onSaved }: Ch
   const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { toggle: toggleTTS, isPlaying, stop: stopTTS } = useTTS();
+  const { toggle: toggleTTS, isPlaying, isLoading: ttsLoading, stop: stopTTS } = useOpenAITTS('zh');
   const { fontSize } = useSettings();
   const queryClient = useQueryClient();
   const saveMutation = useSavePassage();
@@ -167,15 +167,24 @@ export function ChinesePassageReader({ passage, isUnsaved = false, onSaved }: Ch
 
             <button
               onClick={() => toggleTTS(passage.koreanText)}
+              disabled={ttsLoading}
               className={cn(
                 'flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium border transition-all',
                 isPlaying
                   ? 'bg-accent/10 text-accent border-accent/30'
+                  : ttsLoading
+                  ? 'bg-card text-muted-foreground border-border opacity-70 cursor-wait'
                   : 'bg-card text-foreground border-border hover:border-primary/30'
               )}
             >
-              {isPlaying ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              <span className="hidden sm:inline">{isPlaying ? 'Stop' : 'Listen'}</span>
+              {ttsLoading
+                ? <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                : isPlaying
+                ? <VolumeX className="w-4 h-4" />
+                : <Volume2 className="w-4 h-4" />}
+              <span className="hidden sm:inline">
+                {ttsLoading ? 'Loading…' : isPlaying ? 'Stop' : 'Listen'}
+              </span>
             </button>
 
             {isUnsaved ? (
