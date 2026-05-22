@@ -6,6 +6,7 @@ import { z } from "zod/v4";
 export interface PassageSentence {
   korean: string;
   english: string;
+  pinyin?: string;
 }
 
 export interface VocabularyItem {
@@ -21,8 +22,16 @@ export interface ComprehensionQuestion {
   answer: string;
 }
 
+export interface ChineseToken {
+  hanzi: string;
+  pinyin: string;
+  meaning: string;
+  type: "word" | "punct";
+}
+
 export const passagesTable = pgTable("passages", {
   id: serial("id").primaryKey(),
+  language: text("language").notNull().default("ko"),
   title: text("title").notNull(),
   topic: text("topic").notNull(),
   difficulty: text("difficulty").notNull(),
@@ -33,6 +42,7 @@ export const passagesTable = pgTable("passages", {
   koreanText: text("korean_text").notNull(),
   summary: text("summary"),
   sentences: jsonb("sentences").notNull().$type<PassageSentence[]>(),
+  tokens: jsonb("tokens").$type<ChineseToken[]>(),
   vocabulary: jsonb("vocabulary").notNull().$type<VocabularyItem[]>(),
   comprehensionQuestions: jsonb("comprehension_questions").$type<ComprehensionQuestion[]>(),
   imageUrls: text("image_urls").array().notNull().default([]),

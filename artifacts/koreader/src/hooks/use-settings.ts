@@ -7,9 +7,11 @@ interface SettingsStore {
   fontSize: FontSize;
   showRomanization: boolean;
   ttsSpeed: number;
+  autosave: boolean;
   setFontSize: (size: FontSize) => void;
   setShowRomanization: (v: boolean) => void;
   setTtsSpeed: (speed: number) => void;
+  setAutosave: (v: boolean) => void;
 }
 
 export const useSettings = create<SettingsStore>()(
@@ -18,9 +20,11 @@ export const useSettings = create<SettingsStore>()(
       fontSize: 'normal',
       showRomanization: true,
       ttsSpeed: 0.85,
+      autosave: false,
       setFontSize: (fontSize) => set({ fontSize }),
       setShowRomanization: (showRomanization) => set({ showRomanization }),
       setTtsSpeed: (ttsSpeed) => set({ ttsSpeed }),
+      setAutosave: (autosave) => set({ autosave }),
     }),
     { name: 'koreader-settings' }
   )

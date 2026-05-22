@@ -17,6 +17,7 @@ import {
   GlossWordResponse,
 } from "@workspace/api-zod";
 import { generateKoreanPassage, glossKoreanWord } from "../lib/passageGenerator";
+import { generateChinesePassage, glossChineseWord } from "../lib/chinesePassageGenerator";
 import { requireAuth } from "../middleware/requireAuth";
 
 const router: IRouter = Router();
@@ -28,33 +29,81 @@ router.post("/passages/generate", requireAuth, async (req, res): Promise<void> =
     return;
   }
 
-  const generated = await generateKoreanPassage({
-    topic: parsed.data.topic,
-    difficulty: parsed.data.difficulty,
-    length: parsed.data.length,
-    vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
-    grammarFocus: parsed.data.grammarFocus ?? undefined,
-    readingStyle: parsed.data.readingStyle,
-  });
+  const lang = parsed.data.language ?? "ko";
 
-  const passage = {
-    id: 0,
-    title: generated.title,
-    topic: parsed.data.topic,
-    difficulty: parsed.data.difficulty,
-    length: parsed.data.length,
-    vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
-    grammarFocus: parsed.data.grammarFocus ?? undefined,
-    readingStyle: parsed.data.readingStyle,
-    koreanText: generated.koreanText,
-    summary: generated.summary,
-    sentences: generated.sentences,
-    vocabulary: generated.vocabulary,
-    comprehensionQuestions: generated.comprehensionQuestions,
-    imageUrls: generated.imageUrls,
-    isBookmarked: false,
-    createdAt: new Date().toISOString(),
-  };
+  let passage: any;
+
+  if (lang === "zh") {
+    const generated = await generateChinesePassage({
+      topic: parsed.data.topic,
+      difficulty: parsed.data.difficulty,
+      length: parsed.data.length,
+      readingStyle: parsed.data.readingStyle,
+      vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
+      grammarFocus: parsed.data.grammarFocus ?? undefined,
+    });
+
+    passage = {
+      id: 0,
+      language: "zh",
+      title: generated.title,
+      topic: parsed.data.topic,
+      difficulty: parsed.data.difficulty,
+      length: parsed.data.length,
+      vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
+      grammarFocus: parsed.data.grammarFocus ?? undefined,
+      readingStyle: parsed.data.readingStyle,
+      koreanText: generated.chineseText,
+      summary: generated.summary,
+      sentences: generated.sentences.map((s) => ({
+        korean: s.chinese,
+        english: s.english,
+        pinyin: s.pinyin,
+      })),
+      tokens: generated.tokens,
+      vocabulary: generated.vocabulary.map((v) => ({
+        korean: v.hanzi,
+        romanization: v.pinyin,
+        english: v.meaning,
+        partOfSpeech: v.partOfSpeech,
+        exampleSentence: v.exampleSentence,
+      })),
+      comprehensionQuestions: generated.comprehensionQuestions,
+      imageUrls: generated.imageUrls,
+      isBookmarked: false,
+      createdAt: new Date().toISOString(),
+    };
+  } else {
+    const generated = await generateKoreanPassage({
+      topic: parsed.data.topic,
+      difficulty: parsed.data.difficulty,
+      length: parsed.data.length,
+      vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
+      grammarFocus: parsed.data.grammarFocus ?? undefined,
+      readingStyle: parsed.data.readingStyle,
+    });
+
+    passage = {
+      id: 0,
+      language: "ko",
+      title: generated.title,
+      topic: parsed.data.topic,
+      difficulty: parsed.data.difficulty,
+      length: parsed.data.length,
+      vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
+      grammarFocus: parsed.data.grammarFocus ?? undefined,
+      readingStyle: parsed.data.readingStyle,
+      koreanText: generated.koreanText,
+      summary: generated.summary,
+      sentences: generated.sentences,
+      tokens: null,
+      vocabulary: generated.vocabulary,
+      comprehensionQuestions: generated.comprehensionQuestions,
+      imageUrls: generated.imageUrls,
+      isBookmarked: false,
+      createdAt: new Date().toISOString(),
+    };
+  }
 
   res.json(GeneratePassageResponse.parse(passage));
 });
@@ -80,6 +129,7 @@ router.post("/passages", requireAuth, async (req, res): Promise<void> => {
   const [passage] = await db
     .insert(passagesTable)
     .values({
+      language: parsed.data.language ?? "ko",
       title: parsed.data.title,
       topic: parsed.data.topic,
       difficulty: parsed.data.difficulty,
@@ -89,9 +139,10 @@ router.post("/passages", requireAuth, async (req, res): Promise<void> => {
       readingStyle: parsed.data.readingStyle,
       koreanText: parsed.data.koreanText,
       summary: parsed.data.summary ?? null,
-      sentences: parsed.data.sentences as Array<{ korean: string; english: string }>,
-      vocabulary: parsed.data.vocabulary as Array<{ korean: string; romanization: string; english: string; partOfSpeech: string; exampleSentence?: string }>,
-      comprehensionQuestions: (parsed.data.comprehensionQuestions ?? null) as Array<{ question: string; answer: string }> | null,
+      sentences: parsed.data.sentences as any,
+      tokens: (parsed.data.tokens ?? null) as any,
+      vocabulary: parsed.data.vocabulary as any,
+      comprehensionQuestions: (parsed.data.comprehensionQuestions ?? null) as any,
       imageUrls: (parsed.data.imageUrls as string[]) ?? [],
       isBookmarked: parsed.data.isBookmarked ?? false,
       userId: req.session.userId,
@@ -178,11 +229,21 @@ router.post("/words/gloss", requireAuth, async (req, res): Promise<void> => {
     return;
   }
 
-  const gloss = await glossKoreanWord(
-    parsed.data.word,
-    parsed.data.context ?? undefined,
-    parsed.data.difficulty ?? undefined,
-  );
+  const lang = parsed.data.language ?? "ko";
+  let gloss: any;
+
+  if (lang === "zh") {
+    gloss = await glossChineseWord(
+      parsed.data.word,
+      parsed.data.context ?? undefined,
+    );
+  } else {
+    gloss = await glossKoreanWord(
+      parsed.data.word,
+      parsed.data.context ?? undefined,
+      parsed.data.difficulty ?? undefined,
+    );
+  }
 
   res.json(GlossWordResponse.parse(gloss));
 });
@@ -190,10 +251,12 @@ router.post("/words/gloss", requireAuth, async (req, res): Promise<void> => {
 function formatPassage(p: typeof passagesTable.$inferSelect) {
   return {
     ...p,
+    language: p.language ?? "ko",
     vocabularyFocus: p.vocabularyFocus ?? undefined,
     grammarFocus: p.grammarFocus ?? undefined,
     summary: p.summary ?? undefined,
-    comprehensionQuestions: (p.comprehensionQuestions as Array<{ question: string; answer: string }> | null) ?? undefined,
+    tokens: (p.tokens as any) ?? null,
+    comprehensionQuestions: (p.comprehensionQuestions as any) ?? undefined,
     imageUrls: p.imageUrls ?? [],
     createdAt: p.createdAt,
   };

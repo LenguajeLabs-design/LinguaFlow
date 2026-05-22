@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Sun, Moon, Type, Volume2, Eye } from 'lucide-react';
+import { Settings as SettingsIcon, Sun, Moon, Type, Volume2, Eye, Save } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { cn } from '@/components/layout/AppLayout';
 import { useThemeStore } from '@/hooks/use-theme';
@@ -8,19 +8,36 @@ type FontSize = 'normal' | 'large' | 'xlarge';
 
 export default function Settings() {
   const { theme, setTheme } = useThemeStore();
-  const { fontSize, setFontSize, showRomanization, setShowRomanization, ttsSpeed, setTtsSpeed } = useSettings();
+  const { fontSize, setFontSize, showRomanization, setShowRomanization, ttsSpeed, setTtsSpeed, autosave, setAutosave } = useSettings();
 
-  const fontSizes: { value: FontSize; label: string; preview: string }[] = [
-    { value: 'normal',  label: 'Normal',       preview: 'text-xl'   },
-    { value: 'large',   label: 'Large',        preview: 'text-2xl'  },
-    { value: 'xlarge',  label: 'Extra Large',  preview: 'text-3xl'  },
+  const fontSizes: { value: FontSize; label: string }[] = [
+    { value: 'normal',  label: 'Normal'      },
+    { value: 'large',   label: 'Large'       },
+    { value: 'xlarge',  label: 'Extra Large' },
   ];
 
   const speeds = [
-    { value: 0.7,  label: 'Slow'    },
-    { value: 0.85, label: 'Normal'  },
-    { value: 1.0,  label: 'Fast'    },
+    { value: 0.7,  label: 'Slow'   },
+    { value: 0.85, label: 'Normal' },
+    { value: 1.0,  label: 'Fast'   },
   ];
+
+  const Toggle = ({ checked, onChange }: { checked: boolean; onChange: () => void }) => (
+    <button
+      role="switch"
+      aria-checked={checked}
+      onClick={onChange}
+      className={cn(
+        'relative w-11 h-6 rounded-full transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring outline-none',
+        checked ? 'bg-primary' : 'bg-border'
+      )}
+    >
+      <span className={cn(
+        'absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200',
+        checked && 'translate-x-5'
+      )} />
+    </button>
+  );
 
   return (
     <AppLayout>
@@ -35,36 +52,29 @@ export default function Settings() {
           <section className="bg-card border border-border/60 rounded-2xl p-6 shadow-sm space-y-5">
             <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Appearance</h2>
 
-            {/* Theme */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-3">Color Theme</label>
               <div className="flex gap-3">
-                <button
-                  onClick={() => setTheme('light')}
-                  className={cn(
-                    'flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all',
-                    theme === 'light'
-                      ? 'bg-primary text-primary-foreground border-primary shadow-md'
-                      : 'border-border text-muted-foreground hover:border-primary/30 hover:text-foreground'
-                  )}
-                >
-                  <Sun className="w-4 h-4" /> Light
-                </button>
-                <button
-                  onClick={() => setTheme('dark')}
-                  className={cn(
-                    'flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all',
-                    theme === 'dark'
-                      ? 'bg-primary text-primary-foreground border-primary shadow-md'
-                      : 'border-border text-muted-foreground hover:border-primary/30 hover:text-foreground'
-                  )}
-                >
-                  <Moon className="w-4 h-4" /> Dark
-                </button>
+                {[
+                  { value: 'light', icon: Sun,  label: 'Light' },
+                  { value: 'dark',  icon: Moon, label: 'Dark'  },
+                ].map(({ value, icon: Icon, label }) => (
+                  <button
+                    key={value}
+                    onClick={() => setTheme(value as any)}
+                    className={cn(
+                      'flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all',
+                      theme === value
+                        ? 'bg-primary text-primary-foreground border-primary shadow-md'
+                        : 'border-border text-muted-foreground hover:border-primary/30 hover:text-foreground'
+                    )}
+                  >
+                    <Icon className="w-4 h-4" /> {label}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Font size */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-3">Reading Font Size</label>
               <div className="flex gap-3 flex-wrap">
@@ -84,15 +94,20 @@ export default function Settings() {
                   </button>
                 ))}
               </div>
-              <p className="mt-3 font-korean text-muted-foreground">
+              <p className="mt-3 text-muted-foreground">
                 <span className={cn(
+                  'font-korean',
                   fontSize === 'normal' && 'text-xl',
                   fontSize === 'large'  && 'text-2xl',
                   fontSize === 'xlarge' && 'text-3xl',
-                )}>
-                  한국어 미리보기
-                </span>
-                <span className="text-sm ml-2 font-sans">(Korean preview)</span>
+                )}>한국어 / </span>
+                <span className={cn(
+                  'font-chinese',
+                  fontSize === 'normal' && 'text-xl',
+                  fontSize === 'large'  && 'text-2xl',
+                  fontSize === 'xlarge' && 'text-3xl',
+                )}>中文</span>
+                <span className="text-sm ml-2 font-sans">(preview)</span>
               </p>
             </div>
           </section>
@@ -101,31 +116,26 @@ export default function Settings() {
           <section className="bg-card border border-border/60 rounded-2xl p-6 shadow-sm space-y-5">
             <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Reading</h2>
 
-            {/* Romanization */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Eye className="w-4 h-4 text-muted-foreground" />
                 <div>
-                  <p className="text-sm font-medium text-foreground">Show romanization</p>
-                  <p className="text-xs text-muted-foreground">Display romanized pronunciation in word popups</p>
+                  <p className="text-sm font-medium text-foreground">Show romanization/pinyin</p>
+                  <p className="text-xs text-muted-foreground">Display in Korean word popups</p>
                 </div>
               </div>
-              <button
-                role="switch"
-                aria-checked={showRomanization}
-                onClick={() => setShowRomanization(!showRomanization)}
-                className={cn(
-                  'relative w-11 h-6 rounded-full transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring outline-none',
-                  showRomanization ? 'bg-primary' : 'bg-border'
-                )}
-              >
-                <span
-                  className={cn(
-                    'absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200',
-                    showRomanization && 'translate-x-5'
-                  )}
-                />
-              </button>
+              <Toggle checked={showRomanization} onChange={() => setShowRomanization(!showRomanization)} />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Save className="w-4 h-4 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">Auto-save passages</p>
+                  <p className="text-xs text-muted-foreground">Automatically save to library after generation</p>
+                </div>
+              </div>
+              <Toggle checked={autosave} onChange={() => setAutosave(!autosave)} />
             </div>
           </section>
 

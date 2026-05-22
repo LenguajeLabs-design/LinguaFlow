@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Library, PlusCircle, LayoutDashboard, Heart, Settings, Sun, Moon, LogIn, LogOut, User } from 'lucide-react';
+import { Library, PlusCircle, LayoutDashboard, Heart, Settings, Sun, Moon, LogIn, LogOut, User, BookMarked } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useThemeStore, useThemeInit } from '@/hooks/use-theme';
 import { useAuthStore } from '@/hooks/use-auth';
+import { useLanguageStore, LANGUAGE_CONFIG } from '@/hooks/use-language';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { useQueryClient } from '@tanstack/react-query';
 import { getListPassagesQueryKey } from '@workspace/api-client-react';
@@ -15,17 +16,19 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 const navItems = [
-  { href: '/',          icon: LayoutDashboard, label: 'Home'      },
-  { href: '/generate',  icon: PlusCircle,      label: 'Generate'  },
-  { href: '/library',   icon: Library,         label: 'Library'   },
-  { href: '/favorites', icon: Heart,           label: 'Favorites' },
-  { href: '/settings',  icon: Settings,        label: 'Settings'  },
+  { href: '/',           icon: LayoutDashboard, label: 'Home'       },
+  { href: '/generate',   icon: PlusCircle,      label: 'Generate'   },
+  { href: '/library',    icon: Library,         label: 'Library'    },
+  { href: '/favorites',  icon: Heart,           label: 'Favorites'  },
+  { href: '/vocabulary', icon: BookMarked,      label: 'Vocabulary' },
+  { href: '/settings',   icon: Settings,        label: 'Settings'   },
 ];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { theme, toggle } = useThemeStore();
   const { user, isInitialized, init, logout } = useAuthStore();
+  const { language, setLanguage } = useLanguageStore();
   const [authModal, setAuthModal] = useState<'login' | 'signup' | null>(null);
   const queryClient = useQueryClient();
   useThemeInit();
@@ -39,20 +42,22 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     queryClient.clear();
   };
 
+  const langConfig = LANGUAGE_CONFIG[language];
+
   return (
     <div className="min-h-screen flex flex-col bg-background selection:bg-accent/20">
       <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/90 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg shrink-0">
             <img
               src={appIcon}
-              alt="Hangul Flow"
+              alt={langConfig.appName}
               className="w-8 h-8 rounded-xl shadow-sm group-hover:shadow-md transition-shadow duration-300 object-cover"
             />
             <span className="font-serif font-semibold text-lg tracking-tight text-foreground hidden sm:inline">
-              Hangul Flow
+              {langConfig.appName}
             </span>
           </Link>
 
@@ -81,7 +86,35 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </nav>
 
           {/* Right controls */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Language switcher */}
+            <div className="flex items-center p-0.5 bg-secondary/60 border border-border rounded-xl gap-0.5">
+              <button
+                onClick={() => setLanguage('ko')}
+                title="Korean — Hangul Flow"
+                className={cn(
+                  'px-2.5 py-1.5 rounded-[0.6rem] text-xs font-bold transition-all duration-200',
+                  language === 'ko'
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                한
+              </button>
+              <button
+                onClick={() => setLanguage('zh')}
+                title="Chinese — Hanzi Flow"
+                className={cn(
+                  'px-2.5 py-1.5 rounded-[0.6rem] text-xs font-bold transition-all duration-200',
+                  language === 'zh'
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                汉
+              </button>
+            </div>
+
             {/* Dark mode toggle */}
             <button
               onClick={toggle}
@@ -94,11 +127,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             {/* Auth controls */}
             {isInitialized && (
               user ? (
-                /* Logged in */
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/60 border border-border text-sm text-muted-foreground">
                     <User className="w-3.5 h-3.5 text-accent" />
-                    <span className="max-w-[140px] truncate text-xs font-medium">{user.email}</span>
+                    <span className="max-w-[120px] truncate text-xs font-medium">{user.email}</span>
                   </div>
                   <button
                     onClick={handleLogout}
@@ -109,14 +141,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   </button>
                 </div>
               ) : (
-                /* Logged out */
                 <button
                   onClick={() => setAuthModal('login')}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 text-white"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-300 text-white"
                   style={{ background: 'linear-gradient(135deg, hsl(174,62%,42%), hsl(200,68%,52%), hsl(255,52%,60%))' }}
                 >
                   <LogIn className="w-4 h-4" />
-                  <span>Sign in</span>
+                  <span className="hidden sm:inline">Sign in</span>
                 </button>
               )
             )}
@@ -129,7 +160,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur-md flex justify-around px-2 py-1">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur-md flex justify-around px-1 py-1">
         {navItems.map((item) => {
           const isActive =
             location === item.href ||
@@ -139,12 +170,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex flex-col items-center justify-center min-w-[52px] py-2 rounded-xl transition-colors duration-200 outline-none gap-0.5',
+                'flex flex-col items-center justify-center min-w-[44px] py-1.5 rounded-xl transition-colors duration-200 outline-none gap-0.5',
                 isActive ? 'text-accent' : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              <item.icon className={cn('w-5 h-5', isActive && 'fill-accent/15')} />
-              <span className="text-[9px] font-medium">{item.label}</span>
+              <item.icon className={cn('w-4 h-4', isActive && 'fill-accent/15')} />
+              <span className="text-[8px] font-medium">{item.label}</span>
             </Link>
           );
         })}
@@ -184,7 +215,6 @@ export function AuthGate({
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-center">
-        {/* Glow orb */}
         <div className="relative mb-8">
           <div className="absolute inset-0 rounded-full blur-2xl opacity-25"
             style={{ background: 'linear-gradient(135deg, hsl(174,60%,52%), hsl(255,52%,66%))' }} />

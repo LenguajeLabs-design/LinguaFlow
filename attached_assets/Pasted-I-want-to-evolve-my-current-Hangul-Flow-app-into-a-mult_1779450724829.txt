@@ -1,0 +1,331 @@
+I want to evolve my current Hangul Flow app into a multilingual graded reading platform that supports both Korean and Chinese.
+
+IMPORTANT:
+Do NOT rebuild the app from scratch.
+Do NOT duplicate the existing app.
+Refactor and expand the current architecture cleanly.
+
+The goal is:
+- one shared reading platform
+- multiple language modes
+- personalized comprehensible input
+- premium reading experience
+
+The Chinese mode will be called:
+“Hanzi Flow”
+
+==================================================
+CORE PRODUCT VISION
+==================================================
+
+This app should function like a personalized graded reader system.
+
+Users should be able to:
+- generate content at their level
+- choose topics they care about
+- choose the style of content
+- read comfortably
+- save vocabulary
+- export vocabulary to Anki
+- build long-term language acquisition through reading
+
+The app should feel inspired by Du Chinese, but more flexible and personalized.
+
+==================================================
+ARCHITECTURE REQUIREMENTS
+==================================================
+
+IMPORTANT:
+Refactor the app into a modular multilingual architecture.
+
+Do NOT create two completely separate apps.
+
+Create:
+1. Shared Core Systems
+2. Language Modules
+
+==================================================
+1. SHARED CORE SYSTEMS
+==================================================
+
+These systems should be shared across all languages:
+
+- authentication
+- user accounts
+- autosave
+- story library
+- bookmarks
+- favorites
+- vocabulary saving
+- vocabulary export
+- settings
+- themes
+- reading modes
+- UI components
+- story generation framework
+- topic selection
+- difficulty selection
+- content style selection
+
+==================================================
+2. LANGUAGE MODULES
+==================================================
+
+Create separate language modules:
+
+A. Korean Module (existing Hangul Flow)
+B. Chinese Module (new Hanzi Flow)
+
+Each module should contain:
+- tokenizer/segmentation logic
+- dictionary logic
+- grammar helpers
+- TTS logic
+- language-specific rendering
+- vocabulary processing
+
+==================================================
+LANGUAGE SWITCHING
+==================================================
+
+Add a clean language switcher in the navbar or settings.
+
+Supported languages:
+- Korean
+- Chinese
+
+Switching languages should:
+- update generation settings
+- update reading engine
+- update vocabulary logic
+- update TTS
+- preserve user library organization
+
+==================================================
+CHINESE MODE (HANZI FLOW)
+==================================================
+
+Create a Chinese reading mode with the following features:
+
+==================================================
+CONTENT GENERATION
+==================================================
+
+Users can generate:
+- stories
+- conversations
+- articles
+- reflections
+- summaries
+
+Users can choose:
+- HSK level
+- topic
+- style
+- length
+
+Example topics:
+- travel
+- philosophy
+- AI
+- language learning
+- life abroad
+- relationships
+- daily life
+- business
+- Chinese culture
+
+==================================================
+CHINESE READING MODES
+==================================================
+
+Add multiple reading modes:
+
+1. Hanzi Only
+2. Hanzi + Pinyin
+3. Hanzi + Translation
+4. Study Mode
+
+The user should be able to toggle these dynamically.
+
+==================================================
+CHINESE WORD SEGMENTATION
+==================================================
+
+IMPORTANT:
+Chinese does not contain spaces between words.
+
+Implement proper Chinese word segmentation.
+
+Example:
+我喜欢学习中文
+
+Should correctly segment:
+- 我
+- 喜欢
+- 学习
+- 中文
+
+Do NOT treat entire sentences as one token.
+
+Use a proper Chinese segmentation library or service.
+
+==================================================
+CLICKABLE VOCABULARY
+==================================================
+
+Chinese words should be clickable/tappable.
+
+When tapped:
+Show popup/modal with:
+- Hanzi
+- pinyin
+- English meaning
+- example sentence
+- optional grammar note
+- Save to Vocabulary button
+
+==================================================
+VOCABULARY SYSTEM
+==================================================
+
+Saved vocabulary should support:
+- Korean words
+- Chinese words
+
+Store:
+- language
+- word
+- pinyin (for Chinese)
+- meaning
+- source sentence
+- story title
+- topic
+- difficulty level
+- date saved
+- notes
+- reviewed status
+
+==================================================
+ANKI EXPORT
+==================================================
+
+Allow exporting vocabulary as CSV for Anki.
+
+Columns should include:
+- language
+- word
+- pinyin
+- meaning
+- example sentence
+- notes
+
+==================================================
+TEXT TO SPEECH
+==================================================
+
+Improve TTS architecture.
+
+Allow:
+- system voice
+- selectable voice
+- future external premium voices
+
+Add settings:
+- voice selection
+- speech speed
+- autoplay sentence audio
+
+Chinese TTS should support:
+- natural Mandarin pronunciation
+- sentence playback
+- optional slower playback
+
+==================================================
+AUTOSAVE
+==================================================
+
+Implement autosave.
+
+Requirements:
+- autosave generated stories automatically
+- autosave user notes
+- autosave reading progress
+- setting toggle:
+  ON/OFF
+
+Show:
+- Saving...
+- Saved ✓
+
+==================================================
+READING EXPERIENCE
+==================================================
+
+Highest priority:
+READABILITY.
+
+Maintain:
+- calm premium design
+- elegant typography
+- excellent spacing
+- distraction-free reading
+
+Do NOT overload the reading area with effects.
+
+The reading experience should feel:
+- thoughtful
+- calm
+- immersive
+- intelligent
+- beautiful
+
+==================================================
+VISUAL DESIGN
+==================================================
+
+Preserve current Hangul Flow branding:
+- dark premium UI
+- soft cream reading surfaces
+- subtle gradients
+- flowing accents
+- elegant minimalism
+
+Chinese mode should feel visually cohesive with Korean mode.
+
+==================================================
+DATABASE
+==================================================
+
+Refactor database structure to support:
+- multilingual stories
+- multilingual vocabulary
+- reading progress
+- user preferences
+- saved settings
+
+==================================================
+FUTURE-READY STRUCTURE
+==================================================
+
+Structure the app so future languages can later be added:
+- Japanese
+- Spanish
+- English learners
+
+The architecture should remain modular and maintainable.
+
+==================================================
+PLEASE ALSO:
+==================================================
+
+1. Explain the new folder structure
+2. Explain the multilingual architecture
+3. Explain where language-specific logic lives
+4. Explain how vocabulary is stored
+5. Explain how Chinese segmentation works
+6. Explain how to test language switching
+7. Keep code clean and maintainable
+
+IMPORTANT:
+This should feel like one premium multilingual reading platform, not multiple disconnected apps.

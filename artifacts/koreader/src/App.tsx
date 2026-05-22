@@ -9,6 +9,7 @@ import Library from "@/pages/Library";
 import Reader from "@/pages/Reader";
 import Favorites from "@/pages/Favorites";
 import Settings from "@/pages/Settings";
+import Vocabulary from "@/pages/Vocabulary";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/library/:id" component={Reader} />
       <Route path="/passage" component={Reader} />
       <Route path="/favorites" component={Favorites} />
+      <Route path="/vocabulary" component={Vocabulary} />
       <Route path="/settings" component={Settings} />
       <Route component={NotFound} />
     </Switch>
