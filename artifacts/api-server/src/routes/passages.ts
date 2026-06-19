@@ -109,7 +109,7 @@ router.post("/passages/generate", requireAuth, async (req, res): Promise<void> =
 });
 
 router.get("/passages", requireAuth, async (req, res): Promise<void> => {
-  const userId = req.session.userId;
+  const userId = req.userId;
   const passages = await db
     .select()
     .from(passagesTable)
@@ -145,7 +145,7 @@ router.post("/passages", requireAuth, async (req, res): Promise<void> => {
       comprehensionQuestions: (parsed.data.comprehensionQuestions ?? null) as any,
       imageUrls: (parsed.data.imageUrls as string[]) ?? [],
       isBookmarked: parsed.data.isBookmarked ?? false,
-      userId: req.session.userId,
+      userId: req.userId,
     })
     .returning();
 
@@ -163,7 +163,7 @@ router.get("/passages/:id", requireAuth, async (req, res): Promise<void> => {
   const [passage] = await db
     .select()
     .from(passagesTable)
-    .where(and(eq(passagesTable.id, params.data.id), eq(passagesTable.userId, req.session.userId)));
+    .where(and(eq(passagesTable.id, params.data.id), eq(passagesTable.userId, req.userId)));
 
   if (!passage) {
     res.status(404).json({ error: "Passage not found" });
@@ -183,7 +183,7 @@ router.delete("/passages/:id", requireAuth, async (req, res): Promise<void> => {
 
   const [deleted] = await db
     .delete(passagesTable)
-    .where(and(eq(passagesTable.id, params.data.id), eq(passagesTable.userId, req.session.userId)))
+    .where(and(eq(passagesTable.id, params.data.id), eq(passagesTable.userId, req.userId)))
     .returning();
 
   if (!deleted) {
@@ -211,7 +211,7 @@ router.put("/passages/:id/bookmark", requireAuth, async (req, res): Promise<void
   const [passage] = await db
     .update(passagesTable)
     .set({ isBookmarked: body.data.isBookmarked })
-    .where(and(eq(passagesTable.id, params.data.id), eq(passagesTable.userId, req.session.userId)))
+    .where(and(eq(passagesTable.id, params.data.id), eq(passagesTable.userId, req.userId)))
     .returning();
 
   if (!passage) {

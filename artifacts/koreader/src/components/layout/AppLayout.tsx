@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'wouter';
 import { Library, PlusCircle, LayoutDashboard, Heart, Settings, Sun, Moon, LogIn, LogOut, User, BookMarked, WifiOff } from 'lucide-react';
 import { useIsOnline } from '@/hooks/use-offline-library';
 import { cn } from '@/lib/utils';
 import { useThemeStore, useThemeInit } from '@/hooks/use-theme';
-import { useAuthStore } from '@/hooks/use-auth';
 import { useLanguageStore, LANGUAGE_CONFIG } from '@/hooks/use-language';
-import { AuthModal } from '@/components/auth/AuthModal';
+import { useUser, useClerk } from '@clerk/react';
 import { useQueryClient } from '@tanstack/react-query';
-import { getListPassagesQueryKey } from '@workspace/api-client-react';
 import appIcon from '/hangul-flow-icon.png';
 
 const navItems = [
@@ -20,22 +18,20 @@ const navItems = [
   { href: '/settings',   icon: Settings,        label: 'Settings'   },
 ];
 
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { theme, toggle } = useThemeStore();
-  const { user, isInitialized, init, logout } = useAuthStore();
   const { language, setLanguage } = useLanguageStore();
-  const [authModal, setAuthModal] = useState<'login' | 'signup' | null>(null);
+  const { user, isLoaded } = useUser();
+  const { signOut } = useClerk();
   const queryClient = useQueryClient();
   const isOnline = useIsOnline();
   useThemeInit();
 
-  useEffect(() => {
-    if (!isInitialized) init();
-  }, [isInitialized, init]);
-
   const handleLogout = async () => {
-    await logout();
+    await signOut();
     queryClient.clear();
   };
 
@@ -122,12 +118,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </button>
 
             {/* Auth controls */}
-            {isInitialized && (
+            {isLoaded && (
               user ? (
                 <div className="flex items-center gap-1.5">
                   <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/60 border border-border text-sm text-muted-foreground">
                     <User className="w-3.5 h-3.5 text-accent" />
-                    <span className="max-w-[120px] truncate text-xs font-medium">{user.email}</span>
+                    <span className="max-w-[120px] truncate text-xs font-medium">
+                      {user.primaryEmailAddress?.emailAddress}
+                    </span>
                   </div>
                   <button
                     onClick={handleLogout}
@@ -138,14 +136,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   </button>
                 </div>
               ) : (
-                <button
-                  onClick={() => setAuthModal('login')}
+                <Link
+                  href="/sign-in"
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-300 text-white"
                   style={{ background: 'linear-gradient(135deg, hsl(174,62%,42%), hsl(200,68%,52%), hsl(255,52%,60%))' }}
                 >
                   <LogIn className="w-4 h-4" />
                   <span className="hidden sm:inline">Sign in</span>
-                </button>
+                </Link>
               )
             )}
           </div>
@@ -184,16 +182,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           );
         })}
       </nav>
-
-      {/* Auth Modal */}
-      {authModal && (
-        <AuthModal
-          defaultMode={authModal}
-          onClose={() => setAuthModal(null)}
-          onSuccess={() => queryClient.invalidateQueries({ queryKey: getListPassagesQueryKey() })}
-        />
-      )}
     </div>
   );
 }
-

@@ -7,7 +7,7 @@ import { requireAuth } from "../middleware/requireAuth";
 const router: IRouter = Router();
 
 router.get("/vocabulary", requireAuth, async (req, res): Promise<void> => {
-  const userId = req.session.userId;
+  const userId = req.userId;
   const lang = req.query.language as string | undefined;
 
   const items = await db
@@ -24,7 +24,7 @@ router.get("/vocabulary", requireAuth, async (req, res): Promise<void> => {
 });
 
 router.get("/vocabulary/export.csv", requireAuth, async (req, res): Promise<void> => {
-  const userId = req.session.userId;
+  const userId = req.userId;
   const lang = req.query.language as string | undefined;
 
   const items = await db
@@ -65,7 +65,7 @@ router.post("/vocabulary", requireAuth, async (req, res): Promise<void> => {
   const [item] = await db
     .insert(vocabularyTable)
     .values({
-      userId: req.session.userId,
+      userId: req.userId,
       language: parsed.data.language,
       word: parsed.data.word,
       pinyin: parsed.data.pinyin ?? null,
@@ -98,7 +98,7 @@ router.patch("/vocabulary/:id", requireAuth, async (req, res): Promise<void> => 
   const [item] = await db
     .update(vocabularyTable)
     .set(updates)
-    .where(and(eq(vocabularyTable.id, id), eq(vocabularyTable.userId, req.session.userId)))
+    .where(and(eq(vocabularyTable.id, id), eq(vocabularyTable.userId, req.userId)))
     .returning();
 
   if (!item) { res.status(404).json({ error: "Not found" }); return; }
@@ -111,7 +111,7 @@ router.delete("/vocabulary/:id", requireAuth, async (req, res): Promise<void> =>
 
   const [deleted] = await db
     .delete(vocabularyTable)
-    .where(and(eq(vocabularyTable.id, params.data.id), eq(vocabularyTable.userId, req.session.userId)))
+    .where(and(eq(vocabularyTable.id, params.data.id), eq(vocabularyTable.userId, req.userId)))
     .returning();
 
   if (!deleted) { res.status(404).json({ error: "Not found" }); return; }

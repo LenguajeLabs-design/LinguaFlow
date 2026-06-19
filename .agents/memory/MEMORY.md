@@ -1,0 +1,1 @@
+- [Clerk Auth Migration](clerk-migration.md) — JIT email-linking, @clerk/shared/keys subpath workaround, CSS layer ordering required for Tailwind v4.

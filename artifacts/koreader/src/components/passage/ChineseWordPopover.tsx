@@ -4,7 +4,7 @@ import { X, BookMarked, Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ChineseToken } from '@workspace/api-client-react';
 import { vocabularyApi } from '@workspace/api-client-react';
-import { useAuthStore } from '@/hooks/use-auth';
+import { useUser } from '@clerk/react';
 
 interface ChineseWordPopoverProps {
   token: ChineseToken;
@@ -26,7 +26,7 @@ export function ChineseWordPopover({
   const popoverRef = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const { user } = useAuthStore();
+  const { user } = useUser();
 
   const [style, setStyle] = useState<React.CSSProperties>({ opacity: 0 });
 
