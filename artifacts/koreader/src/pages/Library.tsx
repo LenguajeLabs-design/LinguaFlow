@@ -1,37 +1,50 @@
-import { useState } from 'react';
-import { Search, Filter, BookOpen } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Filter, BookOpen, WifiOff, Download, Check } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AuthGate } from '@/components/auth/AuthGate';
 import { useListPassages } from '@workspace/api-client-react';
 import { PassageCard } from '@/components/passage/PassageCard';
 import { cn } from '@/lib/utils';
+import { useOfflineLibrary } from '@/hooks/use-offline-library';
 
 type FilterTab = 'all' | 'bookmarked';
 
 export default function Library() {
   const { data: passages, isLoading, isError } = useListPassages();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<FilterTab>('all');
+  const [searchQuery, setSearchQuery]         = useState('');
+  const [activeTab, setActiveTab]             = useState<FilterTab>('all');
   const [difficultyFilter, setDifficultyFilter] = useState<string>('all');
+  const [synced, setSynced]                   = useState(false);
 
-  // Filter logic
-  const filteredPassages = (passages || []).filter(passage => {
-    // Tab filter
+  const { offlinePassages, isOnline, syncAll, isSyncing } = useOfflineLibrary();
+
+  const activePassages = isOnline ? (passages ?? []) : offlinePassages;
+
+  useEffect(() => {
+    if (isOnline && passages && passages.length > 0) {
+      syncAll(passages);
+    }
+  }, [isOnline, passages]);
+
+  const handleManualSync = () => {
+    if (passages && passages.length > 0) {
+      syncAll(passages);
+      setSynced(true);
+      setTimeout(() => setSynced(false), 2500);
+    }
+  };
+
+  const filteredPassages = activePassages.filter(passage => {
     if (activeTab === 'bookmarked' && !passage.isBookmarked) return false;
-    
-    // Difficulty filter
     if (difficultyFilter !== 'all' && passage.difficulty !== difficultyFilter) return false;
-    
-    // Search filter
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       return (
-        passage.title.toLowerCase().includes(q) || 
+        passage.title.toLowerCase().includes(q) ||
         passage.topic.toLowerCase().includes(q) ||
         passage.koreanText.toLowerCase().includes(q)
       );
     }
-    
     return true;
   });
 
@@ -40,19 +53,48 @@ export default function Library() {
       <AuthGate message="Sign in to access your personal library and saved passages.">
       <div className="pb-12">
         <header className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-foreground mb-4">
-            Your Library
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Review your saved passages, revisit vocabulary, and track your progress.
-          </p>
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-serif font-bold text-foreground mb-4">
+                Your Library
+              </h1>
+              <p className="text-muted-foreground text-lg">
+                Review your saved passages, revisit vocabulary, and track your progress.
+              </p>
+            </div>
+
+            {isOnline ? (
+              <button
+                onClick={handleManualSync}
+                disabled={isSyncing || !passages?.length}
+                title="Save all passages for offline reading"
+                className={cn(
+                  'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-all shrink-0 mt-1',
+                  synced
+                    ? 'bg-green-500/10 text-green-600 border-green-500/30'
+                    : 'bg-card text-muted-foreground border-border hover:text-foreground hover:border-primary/30'
+                )}
+              >
+                {synced
+                  ? <><Check className="w-4 h-4" /> Synced!</>
+                  : isSyncing
+                  ? <><span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> Syncing…</>
+                  : <><Download className="w-4 h-4" /> Sync for offline</>}
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-amber-500/10 text-amber-600 border border-amber-500/30 shrink-0 mt-1">
+                <WifiOff className="w-4 h-4" />
+                Offline — showing {offlinePassages.length} cached {offlinePassages.length === 1 ? 'story' : 'stories'}
+              </div>
+            )}
+          </div>
         </header>
 
         {/* Filters & Search Bar */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <input 
+            <input
               type="text"
               placeholder="Search titles, topics, or words..."
               value={searchQuery}
@@ -60,7 +102,7 @@ export default function Library() {
               className="w-full pl-12 pr-4 py-3 rounded-xl bg-card border border-border shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
-          
+
           <div className="flex gap-2">
             <div className="flex bg-secondary/50 p-1 rounded-xl h-[50px]">
               <button
@@ -82,7 +124,7 @@ export default function Library() {
                 Bookmarks
               </button>
             </div>
-            
+
             <div className="relative h-[50px]">
               <select
                 value={difficultyFilter}
@@ -102,13 +144,13 @@ export default function Library() {
         </div>
 
         {/* Content */}
-        {isLoading ? (
+        {isOnline && isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map(i => (
               <div key={i} className="h-64 rounded-2xl bg-secondary/50 animate-pulse border border-border/50" />
             ))}
           </div>
-        ) : isError ? (
+        ) : isOnline && isError ? (
           <div className="p-8 text-center bg-destructive/10 text-destructive rounded-2xl border border-destructive/20">
             Failed to load library. Please try again.
           </div>
@@ -121,12 +163,18 @@ export default function Library() {
         ) : (
           <div className="text-center py-20 bg-card rounded-2xl border border-dashed border-border">
             <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="w-8 h-8 text-muted-foreground" />
+              {!isOnline
+                ? <WifiOff className="w-8 h-8 text-muted-foreground" />
+                : <BookOpen className="w-8 h-8 text-muted-foreground" />}
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-2">No passages found</h3>
+            <h3 className="text-xl font-bold text-foreground mb-2">
+              {!isOnline ? 'No offline stories found' : 'No passages found'}
+            </h3>
             <p className="text-muted-foreground">
-              {searchQuery || activeTab === 'bookmarked' || difficultyFilter !== 'all' 
-                ? "Try adjusting your filters or search query." 
+              {!isOnline
+                ? 'Use "Sync for offline" while connected to save stories for your trip.'
+                : searchQuery || activeTab === 'bookmarked' || difficultyFilter !== 'all'
+                ? "Try adjusting your filters or search query."
                 : "You haven't saved any passages yet."}
             </p>
           </div>

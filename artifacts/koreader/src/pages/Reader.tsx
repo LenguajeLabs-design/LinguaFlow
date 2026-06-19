@@ -7,6 +7,7 @@ import { usePassageStore } from '@/store/use-passage-store';
 import { useGetPassage } from '@workspace/api-client-react';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { Link } from 'wouter';
+import { savePassageOffline, getOfflinePassages, useIsOnline } from '@/hooks/use-offline-library';
 
 export default function Reader() {
   const [isLibraryRoute, params] = useRoute('/library/:id');
@@ -22,17 +23,27 @@ export default function Reader() {
     }
   }, [isTempRoute, generatedPassage, setLocation]);
 
+  const isOnline = useIsOnline();
   const passageId = isLibraryRoute ? Number(params.id) : 0;
   const { data: savedPassage, isLoading, isError } = useGetPassage(passageId, {
-    query: { enabled: isLibraryRoute && !!passageId }
+    query: { enabled: isOnline && isLibraryRoute && !!passageId }
   });
+
+  const offlinePassage = !isOnline && isLibraryRoute
+    ? getOfflinePassages().find(p => p.id === passageId)
+    : undefined;
+
+  useEffect(() => {
+    const p = savedPassage ?? offlinePassage;
+    if (p && p.id) savePassageOffline(p);
+  }, [savedPassage]);
 
   const handlePassageSaved = (saved: any) => {
     clearGeneratedPassage();
     setLocation(`/library/${saved.id}`);
   };
 
-  const passage = isLibraryRoute ? savedPassage : generatedPassage;
+  const passage = isLibraryRoute ? (savedPassage ?? offlinePassage) : generatedPassage;
   const isZh = passage?.language === 'zh';
 
   return (

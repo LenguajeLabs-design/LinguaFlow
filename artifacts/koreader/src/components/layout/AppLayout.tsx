@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Library, PlusCircle, LayoutDashboard, Heart, Settings, Sun, Moon, LogIn, LogOut, User, BookMarked } from 'lucide-react';
+import { Library, PlusCircle, LayoutDashboard, Heart, Settings, Sun, Moon, LogIn, LogOut, User, BookMarked, WifiOff } from 'lucide-react';
+import { useIsOnline } from '@/hooks/use-offline-library';
 import { cn } from '@/lib/utils';
 import { useThemeStore, useThemeInit } from '@/hooks/use-theme';
 import { useAuthStore } from '@/hooks/use-auth';
@@ -26,6 +27,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const { language, setLanguage } = useLanguageStore();
   const [authModal, setAuthModal] = useState<'login' | 'signup' | null>(null);
   const queryClient = useQueryClient();
+  const isOnline = useIsOnline();
   useThemeInit();
 
   useEffect(() => {
@@ -149,6 +151,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
+
+      {!isOnline && (
+        <div className="w-full bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 flex items-center justify-center gap-2 text-sm text-amber-600">
+          <WifiOff className="w-3.5 h-3.5 shrink-0" />
+          You're offline — showing cached stories
+        </div>
+      )}
 
       <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 pb-24 md:pb-8">
         {children}
