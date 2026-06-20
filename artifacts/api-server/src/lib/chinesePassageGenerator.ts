@@ -120,10 +120,10 @@ const hskProfiles: Record<string, {
   },
 };
 
-const lengthMap: Record<string, { sentences: string; chars: string }> = {
-  short:  { sentences: "8–12 sentences",  chars: "130–200 Chinese characters"    },
-  medium: { sentences: "15–20 sentences", chars: "280–400 Chinese characters"    },
-  long:   { sentences: "50–70 sentences", chars: "1,000–1,500 Chinese characters" },
+const lengthMap: Record<string, { sentences: string; chars: string; maxTokens: number }> = {
+  short:  { sentences: "8–12 sentences",  chars: "130–200 Chinese characters",    maxTokens: 4000  },
+  medium: { sentences: "15–20 sentences", chars: "280–400 Chinese characters",    maxTokens: 8000  },
+  long:   { sentences: "25–35 sentences", chars: "500–700 Chinese characters",    maxTokens: 12000 },
 };
 
 const styleMap: Record<string, string> = {
@@ -280,50 +280,44 @@ VOCABULARY: Include exactly 8–12 key words/phrases. Select words that are:
 
 COMPREHENSION QUESTIONS: Write exactly 3 questions in Chinese that test understanding.`;
 
-  try {
-    const response = await chatWithFallback({
-      model: MODEL,
-      max_tokens: 5000,
-      messages: [{ role: "user", content: prompt }],
-    });
+  const response = await chatWithFallback({
+    model: MODEL,
+    max_tokens: lengthSpec.maxTokens,
+    response_format: { type: "json_object" },
+    messages: [{ role: "user", content: prompt }],
+  });
 
-    const content = response.choices[0]?.message?.content ?? "";
-    const clean = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+  const content = response.choices[0]?.message?.content ?? "";
+  const clean = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
 
-    const parsed = JSON.parse(clean) as {
-      title: string;
-      summary: string;
-      tokens: ChineseToken[];
-      sentences: ChineseSentence[];
-      vocabulary: ChineseVocabItem[];
-      comprehensionQuestions: Array<{ question: string; answer: string }>;
-    };
+  const parsed = JSON.parse(clean) as {
+    title: string;
+    summary: string;
+    tokens: ChineseToken[];
+    sentences: ChineseSentence[];
+    vocabulary: ChineseVocabItem[];
+    comprehensionQuestions: Array<{ question: string; answer: string }>;
+  };
 
-    const PUNCT_TYPES = new Set(["punct", "punctuation", "punc", "symbol"]);
-    const normalizeTokens = (tokens: any[]): ChineseToken[] =>
-      tokens.map((t) => ({
-        ...t,
-        type: PUNCT_TYPES.has((t.type ?? "").toLowerCase()) ? "punct" : "word",
-      }));
+  const PUNCT_TYPES = new Set(["punct", "punctuation", "punc", "symbol"]);
+  const normalizeTokens = (tokens: any[]): ChineseToken[] =>
+    tokens.map((t) => ({
+      ...t,
+      type: PUNCT_TYPES.has((t.type ?? "").toLowerCase()) ? "punct" : "word",
+    }));
 
-    const chineseText = parsed.tokens
-      .map((t) => t.hanzi)
-      .join("");
+  const chineseText = parsed.tokens.map((t) => t.hanzi).join("");
 
-    return {
-      title: parsed.title || `${input.topic} 阅读`,
-      summary: parsed.summary || "",
-      chineseText,
-      tokens: normalizeTokens(parsed.tokens || []),
-      sentences: parsed.sentences || [],
-      vocabulary: (parsed.vocabulary || []).slice(0, 12),
-      comprehensionQuestions: (parsed.comprehensionQuestions || []).slice(0, 3),
-      imageUrls: getImagesForTopic(input.topic),
-    };
-  } catch (err) {
-    console.error("Chinese AI generation failed, using fallback:", err);
-    return getFallbackChinesePassage(input);
-  }
+  return {
+    title: parsed.title || `${input.topic} 阅读`,
+    summary: parsed.summary || "",
+    chineseText,
+    tokens: normalizeTokens(parsed.tokens || []),
+    sentences: parsed.sentences || [],
+    vocabulary: (parsed.vocabulary || []).slice(0, 12),
+    comprehensionQuestions: (parsed.comprehensionQuestions || []).slice(0, 3),
+    imageUrls: getImagesForTopic(input.topic),
+  };
 }
 
 export async function glossChineseWord(

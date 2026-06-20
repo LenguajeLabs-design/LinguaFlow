@@ -22,7 +22,7 @@ import { requireAuth } from "../middleware/requireAuth";
 
 const router: IRouter = Router();
 
-router.post("/passages/generate", requireAuth, async (req, res): Promise<void> => {
+router.post("/passages/generate", requireAuth, async (req, res, next): Promise<void> => {
   const parsed = GeneratePassageBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -33,6 +33,7 @@ router.post("/passages/generate", requireAuth, async (req, res): Promise<void> =
 
   let passage: any;
 
+  try {
   if (lang === "zh") {
     const generated = await generateChinesePassage({
       topic: parsed.data.topic,
@@ -106,6 +107,9 @@ router.post("/passages/generate", requireAuth, async (req, res): Promise<void> =
   }
 
   res.json(GeneratePassageResponse.parse(passage));
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.get("/passages", requireAuth, async (req, res): Promise<void> => {
