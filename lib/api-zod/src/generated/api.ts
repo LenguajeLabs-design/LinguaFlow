@@ -85,7 +85,7 @@ export const AuthUserResponse = zod.object({
  */
 export const GeneratePassageBody = zod.object({
   topic: zod.string(),
-  language: zod.enum(["ko", "zh"]).default("ko"),
+  language: zod.enum(["ko", "zh", "es"]).default("ko"),
   difficulty: zod.string(),
   length: zod.enum(["short", "medium", "long"]),
   vocabularyFocus: zod.string().nullable().optional(),
@@ -175,7 +175,7 @@ export const ToggleBookmarkResponse = zod.object(passageShape);
  */
 export const GlossWordBody = zod.object({
   word: zod.string(),
-  language: zod.enum(["ko", "zh"]).optional(),
+  language: zod.enum(["ko", "zh", "es"]).optional(),
   context: zod.string().optional(),
   difficulty: zod.string().optional(),
 });
@@ -194,7 +194,7 @@ export const GlossWordResponse = zod.object({
  * @summary Vocabulary — save a word
  */
 export const SaveVocabBody = zod.object({
-  language: zod.enum(["ko", "zh"]),
+  language: zod.enum(["ko", "zh", "es"]),
   word: zod.string(),
   pinyin: zod.string().nullable().optional(),
   meaning: zod.string(),

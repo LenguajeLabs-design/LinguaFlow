@@ -106,6 +106,18 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               >
                 汉
               </button>
+              <button
+                onClick={() => setLanguage('es')}
+                title="Spanish — LinguaFlow"
+                className={cn(
+                  'px-2.5 py-1.5 rounded-[0.6rem] text-xs font-bold transition-all duration-200',
+                  language === 'es'
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                Es
+              </button>
             </div>
 
             {/* Dark mode toggle */}

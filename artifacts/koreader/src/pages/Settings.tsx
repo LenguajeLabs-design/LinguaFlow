@@ -106,7 +106,12 @@ export default function Settings() {
                   fontSize === 'normal' && 'text-xl',
                   fontSize === 'large'  && 'text-2xl',
                   fontSize === 'xlarge' && 'text-3xl',
-                )}>中文</span>
+                )}>中文 / </span>
+                <span className={cn(
+                  fontSize === 'normal' && 'text-xl',
+                  fontSize === 'large'  && 'text-2xl',
+                  fontSize === 'xlarge' && 'text-3xl',
+                )}>Español</span>
                 <span className="text-sm ml-2 font-sans">(preview)</span>
               </p>
             </div>

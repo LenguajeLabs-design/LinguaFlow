@@ -14,6 +14,11 @@ const VOICE_CONFIG: Record<string, { voice: string; instructions: string }> = {
     instructions:
       "Speak in natural, clear Mandarin Chinese with standard Putonghua pronunciation. Use a warm, conversational tone with natural rhythm and intonation. Pronounce tones accurately and clearly.",
   },
+  es: {
+    voice: "nova",
+    instructions:
+      "Speak in natural, warm Latin American Spanish. Use a clear, conversational pace with authentic Spanish rhythm and intonation. Pronounce all vowels crisply, roll your r's naturally, and stress syllables correctly. Sound like an educated native speaker — warm and expressive, not robotic.",
+  },
 };
 
 router.post("/tts", async (req, res) => {
@@ -24,7 +29,7 @@ router.post("/tts", async (req, res) => {
     return;
   }
 
-  const lang = language === "zh" ? "zh" : "ko";
+  const lang = language === "zh" ? "zh" : language === "es" ? "es" : "ko";
   const { voice, instructions } = VOICE_CONFIG[lang];
 
   try {

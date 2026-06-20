@@ -18,6 +18,7 @@ import {
 } from "@workspace/api-zod";
 import { generateKoreanPassage, glossKoreanWord } from "../lib/passageGenerator";
 import { generateChinesePassage, glossChineseWord } from "../lib/chinesePassageGenerator";
+import { generateSpanishPassage, glossSpanishWord } from "../lib/spanishPassageGenerator";
 import { requireAuth } from "../middleware/requireAuth";
 
 const router: IRouter = Router();
@@ -238,6 +239,11 @@ router.post("/words/gloss", requireAuth, async (req, res): Promise<void> => {
 
   if (lang === "zh") {
     gloss = await glossChineseWord(
+      parsed.data.word,
+      parsed.data.context ?? undefined,
+    );
+  } else if (lang === "es") {
+    gloss = await glossSpanishWord(
       parsed.data.word,
       parsed.data.context ?? undefined,
     );

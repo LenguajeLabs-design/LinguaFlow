@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type AppLanguage = 'ko' | 'zh';
+export type AppLanguage = 'ko' | 'zh' | 'es';
 
 interface LanguageStore {
   language: AppLanguage;
@@ -76,5 +76,35 @@ export const LANGUAGE_CONFIG = {
     ],
     gradientFrom: 'hsl(0,70%,50%)',
     gradientTo: 'hsl(30,90%,55%)',
+  },
+  es: {
+    name: 'Spanish',
+    nativeName: 'Español',
+    label: 'Es',
+    flag: '🇪🇸',
+    appName: 'LinguaFlow',
+    difficultyLabel: 'CEFR Level',
+    difficulties: [
+      { value: 'a1', label: 'A1 – Beginner',           desc: '~500 words · Essential basics' },
+      { value: 'a2', label: 'A2 – Elementary',          desc: '~1,000 words · Simple daily life' },
+      { value: 'b1', label: 'B1 – Intermediate',        desc: '~2,000 words · Everyday topics' },
+      { value: 'b2', label: 'B2 – Upper Intermediate',  desc: '~4,000 words · Complex discourse' },
+      { value: 'c1', label: 'C1 – Advanced',            desc: '~8,000 words · Sophisticated prose' },
+      { value: 'c2', label: 'C2 – Mastery',             desc: '~16,000+ words · Near-native' },
+    ],
+    readingStyles: [
+      { value: 'story',      label: 'Story'                },
+      { value: 'article',    label: 'Article'              },
+      { value: 'dialogue',   label: 'Dialogue'             },
+      { value: 'reflection', label: 'Personal Reflection'  },
+      { value: 'summary',    label: 'Summary'              },
+    ],
+    topicSuggestions: [
+      'La vida en la ciudad', 'Comida latinoamericana', 'Familia y tradiciones',
+      'Viajes por España', 'Música y cultura', 'Historia y política',
+      'La naturaleza', 'Tecnología y el futuro',
+    ],
+    gradientFrom: 'hsl(355,80%,50%)',
+    gradientTo: 'hsl(45,95%,50%)',
   },
 } as const;
