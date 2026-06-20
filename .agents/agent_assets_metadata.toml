@@ -1,0 +1,14 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "Twe68_JRI3iBh8g6jHLjC"
+uri = "file://artifacts/linguaflow-video/public/images/korean_landscape.png"
+type = "image"
+title = "Minimalist korean landscape"
+
+[[generated]]
+id = "mwUwhDWLcgbbt18VSxZdP"
+uri = "file://artifacts/linguaflow-video/public/images/lingua_icon.png"
+type = "image"
+title = "LinguaFlow 語 icon"
