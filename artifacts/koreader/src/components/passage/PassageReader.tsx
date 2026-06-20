@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { Passage } from '@workspace/api-client-react';
 import { DifficultyBadge } from './DifficultyBadge';
 import { WordPopover } from './WordPopover';
-import { useTTS } from '@/hooks/use-tts';
+import { useOpenAITTS } from '@/hooks/use-openai-tts';
 import { cn } from '@/lib/utils';
 import { useSavePassage, useToggleBookmark } from '@workspace/api-client-react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -30,7 +30,7 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
   const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { toggle: toggleTTS, isPlaying, stop: stopTTS } = useTTS();
+  const { toggle: toggleTTS, isPlaying, stop: stopTTS } = useOpenAITTS(passage.language ?? 'ko');
   const { fontSize } = useSettings();
   const queryClient = useQueryClient();
 
@@ -406,6 +406,7 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
         word={activeWord?.word || ''}
         contextSentence={activeWord?.context || ''}
         difficulty={passage.difficulty}
+        language={passage.language}
         anchorRect={activeWord?.anchorRect || null}
         onClose={() => setActiveWord(null)}
       />

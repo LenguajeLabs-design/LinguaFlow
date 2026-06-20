@@ -35,7 +35,46 @@ router.post("/passages/generate", requireAuth, async (req, res, next): Promise<v
   let passage: any;
 
   try {
-  if (lang === "zh") {
+  if (lang === "es") {
+    const generated = await generateSpanishPassage({
+      topic: parsed.data.topic,
+      difficulty: parsed.data.difficulty,
+      length: parsed.data.length,
+      readingStyle: parsed.data.readingStyle,
+      vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
+      grammarFocus: parsed.data.grammarFocus ?? undefined,
+    });
+
+    passage = {
+      id: 0,
+      language: "es",
+      title: generated.title,
+      topic: parsed.data.topic,
+      difficulty: parsed.data.difficulty,
+      length: parsed.data.length,
+      vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
+      grammarFocus: parsed.data.grammarFocus ?? undefined,
+      readingStyle: parsed.data.readingStyle,
+      koreanText: generated.spanishText,
+      summary: generated.summary,
+      sentences: generated.sentences.map((s) => ({
+        korean: s.spanish,
+        english: s.english,
+      })),
+      tokens: null,
+      vocabulary: generated.vocabulary.map((v) => ({
+        korean: v.word,
+        romanization: "",
+        english: v.english,
+        partOfSpeech: v.partOfSpeech,
+        exampleSentence: v.exampleSentence,
+      })),
+      comprehensionQuestions: generated.comprehensionQuestions,
+      imageUrls: generated.imageUrls,
+      isBookmarked: false,
+      createdAt: new Date().toISOString(),
+    };
+  } else if (lang === "zh") {
     const generated = await generateChinesePassage({
       topic: parsed.data.topic,
       difficulty: parsed.data.difficulty,
