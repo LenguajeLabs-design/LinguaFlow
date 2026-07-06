@@ -7,7 +7,7 @@ import { useThemeStore, useThemeInit } from '@/hooks/use-theme';
 import { useLanguageStore, LANGUAGE_CONFIG } from '@/hooks/use-language';
 import { useUser, useClerk } from '@clerk/react';
 import { useQueryClient } from '@tanstack/react-query';
-import appIcon from '/hangul-flow-icon.png';
+import appIcon from '/linguaflow-logo.png';
 
 const navItems = [
   { href: '/',           icon: LayoutDashboard, label: 'Home'       },
@@ -43,15 +43,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg shrink-0">
+          <Link href="/" className="flex items-center gap-2 group outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg shrink-0">
             <img
               src={appIcon}
-              alt={langConfig.appName}
-              className="w-8 h-8 rounded-xl shadow-sm group-hover:shadow-md transition-shadow duration-300 object-cover"
+              alt="LinguaFlow"
+              className="h-9 w-auto object-contain group-hover:opacity-90 transition-opacity duration-300"
             />
-            <span className="font-serif font-semibold text-lg tracking-tight text-foreground hidden sm:inline">
-              {langConfig.appName}
-            </span>
           </Link>
 
           {/* Desktop Nav */}

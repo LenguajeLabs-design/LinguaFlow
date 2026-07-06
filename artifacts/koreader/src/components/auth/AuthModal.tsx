@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Mail, Lock, Eye, EyeOff, Loader2, Star } from 'lucide-react';
 import { useAuthStore } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
-import appIcon from '/hangul-flow-icon.png';
+import appIcon from '/linguaflow-logo.png';
 
 interface AuthModalProps {
   defaultMode?: 'login' | 'signup';
@@ -82,8 +82,7 @@ export function AuthModal({ defaultMode = 'login', onClose, onSuccess }: AuthMod
           {/* Brand */}
           <div className="flex flex-col items-center mb-8">
             <div className="relative mb-4">
-              <img src={appIcon} alt="LinguaFlow" className="w-14 h-14 rounded-2xl shadow-lg" />
-              <Star className="hf-sparkle absolute -top-1 -right-1 w-3 h-3 text-accent fill-accent" />
+              <img src={appIcon} alt="LinguaFlow" className="h-16 w-auto object-contain" />
             </div>
             <h2 className="text-xl font-serif font-bold text-foreground">
               {mode === 'login' ? 'Welcome back' : 'Create your account'}

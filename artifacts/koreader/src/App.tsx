@@ -40,7 +40,7 @@ const clerkAppearance = {
   options: {
     logoPlacement: "inside" as const,
     logoLinkUrl: basePath || "/",
-    logoImageUrl: `${window.location.origin}${basePath}/logo.svg`,
+    logoImageUrl: `${window.location.origin}${basePath}/linguaflow-logo.png`,
   },
   variables: {
     colorPrimary: "hsl(174, 62%, 42%)",
