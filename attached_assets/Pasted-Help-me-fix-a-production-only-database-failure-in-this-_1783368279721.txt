@@ -1,0 +1,52 @@
+Help me fix a production-only database failure in this Replit app.
+
+Context:
+- Dev works
+- Production app fails on any authenticated API request
+- Clerk login works
+- Library and passage generation fail in production
+- The failure happens in requireAuth on the first DB lookup
+- Production logs show DNS resolution failure for host "helium"
+- "helium" is the dev-only database host, so production appears to be using a dev DATABASE_URL or a missing/unprovisioned production database
+
+Goals:
+1. Verify there is no code-side hardcoded DB host or bad env var fallback.
+2. Add a startup-time database readiness check that fails loudly with a clear production-specific message if:
+   - DATABASE_URL points to host "helium" in production
+   - or production DB DNS resolution fails
+3. Do not add product features.
+4. Keep changes minimal and production-focused.
+
+Please make these code changes:
+
+A. In lib/db/src/index.ts
+- Keep using process.env.DATABASE_URL
+- Add:
+  - production detection via NODE_ENV
+  - a helper that parses the database host from DATABASE_URL
+  - an exported async function ensureDatabaseReady()
+- Behavior of ensureDatabaseReady():
+  - if NODE_ENV is production and host is "helium", throw:
+    "Production database is misconfigured: DATABASE_URL points to the dev-only host 'helium'. Provision a production database and update the production secret before serving traffic."
+  - run a simple `select 1`
+  - if it throws EAI_AGAIN or ENOTFOUND in production, throw:
+    "Production database is unreachable due to DNS resolution failure. Host: <host>. If this host is dev-only or Replit has not provisioned a production database yet, fix the production DATABASE_URL/PGHOST secret or complete database provisioning."
+
+B. In artifacts/api-server/src/index.ts
+- Import ensureDatabaseReady from @workspace/db
+- Before app.listen(), call await ensureDatabaseReady()
+- If startup fails, log:
+  - "Startup failed"
+  - plus the error message
+- Exit process with code 1
+
+C. Do not change route behavior otherwise.
+
+After editing:
+1. Show me the exact files changed
+2. Explain how to republish
+3. Tell me exactly what to check in Replit Secrets after deploy
+
+Important:
+- Do not investigate OpenAI or Clerk issues
+- Focus only on production DB readiness and diagnostics

@@ -1,4 +1,5 @@
 import app from "./app";
+import { ensureDatabaseReady } from "@workspace/db";
 
 const rawPort = process.env["PORT"];
 
@@ -14,6 +15,18 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
+async function start(): Promise<void> {
+  try {
+    await ensureDatabaseReady();
+  } catch (err) {
+    console.error("Startup failed");
+    console.error(err instanceof Error ? err.message : err);
+    process.exit(1);
+  }
+
+  app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+  });
+}
+
+start();
