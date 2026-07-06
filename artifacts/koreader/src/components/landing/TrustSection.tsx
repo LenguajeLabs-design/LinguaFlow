@@ -70,7 +70,7 @@ export function TrustSection() {
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
               </Link>
               <a
-                href="mailto:hello@linguaflow.app?subject=LinguaFlow%20feedback"
+                href="mailto:hello@linguaflow.app?subject=LinguaFlow%20feedback&body=I%20just%20tried%20LinguaFlow..."
                 className="text-[15px] font-medium text-white/60 hover:text-white transition-colors duration-300"
               >
                 Share feedback

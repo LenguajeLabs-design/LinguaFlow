@@ -55,6 +55,17 @@ export function WhySection() {
             </div>
           ))}
         </div>
+
+        <div className="flex flex-wrap gap-2.5 mt-10">
+          {['Korean reading journeys', 'Chinese text support', 'Spanish passage generation'].map((pill) => (
+            <span
+              key={pill}
+              className="px-3.5 py-2 rounded-full text-[13px] font-medium text-white/60 bg-white/[0.03] border border-white/[0.08]"
+            >
+              {pill}
+            </span>
+          ))}
+        </div>
       </div>
     </section>
   );

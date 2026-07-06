@@ -92,6 +92,17 @@ export function LandingHero({ language }: { language: AppLanguage }) {
             </a>
           </div>
 
+          <div className="flex flex-wrap gap-2.5 mb-10">
+            {['AI-personalized passages', 'Vocabulary that sticks', 'Built for real reading flow'].map((chip) => (
+              <span
+                key={chip}
+                className="px-3.5 py-2 rounded-full text-[13px] font-medium text-white/70 bg-white/[0.04] border border-white/[0.08]"
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
+
           <p className="text-xs uppercase tracking-[0.2em] text-white/30 font-medium">
             Read. Understand. Grow.
           </p>
