@@ -5,31 +5,36 @@ import * as schema from "./schema";
 
 const { Pool } = pg;
 
-if (!process.env.DATABASE_URL) {
+const isProduction = process.env.NODE_ENV === "production";
+
+const connectionString =
+  isProduction && process.env.SUPABASE_DATABASE_URL
+    ? process.env.SUPABASE_DATABASE_URL
+    : process.env.DATABASE_URL;
+
+if (!connectionString) {
   throw new Error(
     "DATABASE_URL must be set. Did you forget to provision a database?",
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export const pool = new Pool({ connectionString });
 export const db = drizzle(pool, { schema });
 
-const isProduction = process.env.NODE_ENV === "production";
-
-function getDatabaseHost(connectionString: string): string {
+function getDatabaseHost(url: string): string {
   try {
-    return new URL(connectionString).hostname;
+    return new URL(url).hostname;
   } catch {
     return "unknown";
   }
 }
 
 export async function ensureDatabaseReady(): Promise<void> {
-  const host = getDatabaseHost(process.env.DATABASE_URL as string);
+  const host = getDatabaseHost(connectionString as string);
 
   if (isProduction && host === "helium") {
     throw new Error(
-      "Production database is misconfigured: DATABASE_URL points to the dev-only host 'helium'. Provision a production database and update the production secret before serving traffic.",
+      "Production database is misconfigured: DATABASE_URL points to the dev-only host 'helium'. Provision a production database (or set SUPABASE_DATABASE_URL) before serving traffic.",
     );
   }
 
