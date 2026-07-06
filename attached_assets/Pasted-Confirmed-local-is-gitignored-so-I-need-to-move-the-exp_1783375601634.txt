@@ -1,0 +1,27 @@
+Confirmed: .local/ is gitignored, so I need to move the export to a real repo location. Let me copy it into a proper folder and commit/push it.
+
+
+Ran mkdir
+The file is now in exports/linguaflow_passages_export.json, a tracked path in the repo (not gitignored). This will be committed automatically as part of this task's checkpoint, and since your repo is connected to GitHub (LenguajeLabs-design/LinguaFlow), it will sync there through Replit's normal Git sync flow.
+
+Here are clear instructions you can hand to the agent on your other Replit account:
+
+
+Ran git log
+The export file is committed on master and pushed to your GitHub backup remote already. Here are the instructions for the agent on your other Replit account:
+
+Where to find the exported stories:
+
+GitHub repo: https://github.com/LenguajeLabs-design/LinguaFlow
+File path: exports/linguaflow_passages_export.json
+Commit: 93f6bb9 — "Add file export for all user stories to JSON format"
+What's in the file:
+A JSON array of 38 passage objects (18 Korean, 16 Chinese, 4 Spanish) with these fields per passage: id, language, title, topic, difficulty, length, vocabulary_focus, grammar_focus, reading_style, korean_text, summary, sentences, tokens, vocabulary, comprehension_questions, image_urls, user_id, is_bookmarked, created_at.
+
+How to import it (for the other agent):
+
+Pull/clone the LenguajeLabs-design/LinguaFlow repo (or just fetch the raw file from GitHub) to get exports/linguaflow_passages_export.json.
+This app's schema lives in lib/db/src/schema/passages.ts (Drizzle ORM, Postgres) — the JSON field names map 1:1 to that table's columns (just convert snake_case → camelCase for Drizzle's passagesTable, e.g. korean_text → koreanText).
+Write a small script that reads the JSON file and does a Drizzle insert(passagesTable).values(...) for each record — set id to undefined/omit it so Postgres assigns fresh IDs, and set userId to null or the correct user in the new account's users table (the exported user_id values won't exist in a fresh database).
+Run it once against the new account's DATABASE_URL.
+Let me know if you'd like me to write that import script directly instead of just describing it.
