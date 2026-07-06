@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LinguaFlow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --flow-teal: #2dd4bf;
+        --wave-blue: #60a5fa;
+        --flow-purple: #a78bfa;
+        --deep-indigo: #1e1b4b;
+        --night: #0b0f17;
+        --cream: #f7f5ee;
+        --mist: rgba(247, 245, 238, 0.72);
+        --panel: rgba(11, 15, 23, 0.72);
+        --panel-border: rgba(255, 255, 255, 0.12);
+        --text-main: #f8fafc;
+        --text-soft: rgba(226, 232, 240, 0.74);
+        --shadow: 0 28px 80px rgba(4, 8, 20, 0.42);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Inter", sans-serif;
+        color: var(--text-main);
+        background:
+          radial-gradient(circle at 15% 20%, rgba(96, 165, 250, 0.18), transparent 28%),
+          radial-gradient(circle at 80% 22%, rgba(167, 139, 250, 0.18), transparent 28%),
+          radial-gradient(circle at 52% 60%, rgba(45, 212, 191, 0.12), transparent 24%),
+          linear-gradient(145deg, #060912 0%, #0b1020 42%, #151434 70%, #0b0f17 100%);
+        min-height: 100vh;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .page-shell {
+        width: min(1200px, calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(18px);
+        background: rgba(7, 10, 18, 0.42);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 18px 0;
+      }
+
+      .brand-lockup {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .brand-lockup img {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        box-shadow: 0 10px 24px rgba(96, 165, 250, 0.18);
+      }
+
+      .brand-name {
+        font-family: "Playfair Display", serif;
+        font-size: 1.5rem;
+        letter-spacing: -0.03em;
+      }
+
+      .brand-tag {
+        color: var(--text-soft);
+        font-size: 0.8rem;
+        margin-top: 2px;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        color: var(--text-soft);
+        font-size: 0.95rem;
+      }
+
+      .nav-links a:hover {
+        color: var(--text-main);
+      }
+
+      .cta-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        padding: 0 20px;
+        border-radius: 999px;
+        font-weight: 700;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: linear-gradient(135deg, rgba(45, 212, 191, 0.14), rgba(96, 165, 250, 0.16), rgba(167, 139, 250, 0.16));
+        box-shadow: 0 10px 26px rgba(59, 130, 246, 0.16);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.08fr 0.92fr;
+        gap: 34px;
+        padding: 62px 0 34px;
+        align-items: center;
+      }
+
+      .hero-copy {
+        padding: 8px 0;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 0.84rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #d7def1;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--flow-teal), var(--wave-blue), var(--flow-purple));
+      }
+
+      h1 {
+        margin: 24px 0 18px;
+        font-family: "Playfair Display", serif;
+        font-size: clamp(3.4rem, 6vw, 6rem);
+        line-height: 0.96;
+        letter-spacing: -0.055em;
+      }
+
+      .hero-gradient {
+        display: block;
+        background: linear-gradient(90deg, #ffffff 0%, #dbebff 30%, #b8c5ff 58%, #d9c0ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .hero-subtitle {
+        width: min(640px, 100%);
+        font-size: 1.24rem;
+        line-height: 1.75;
+        color: var(--text-soft);
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 28px;
+      }
+
+      .button-primary,
+      .button-secondary {
+        min-height: 54px;
+        padding: 0 22px;
+        border-radius: 999px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .button-primary {
+        color: #0b0f17;
+        background: linear-gradient(135deg, var(--flow-teal), var(--wave-blue) 56%, #d9c0ff);
+        box-shadow: 0 20px 34px rgba(96, 165, 250, 0.28);
+      }
+
+      .button-secondary {
+        color: var(--text-main);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .trust-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      .trust-chip {
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #dce4f5;
+        font-size: 0.92rem;
+      }
+
+      .hero-visual {
+        position: relative;
+      }
+
+      .visual-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 34px;
+        padding: 20px;
+        background:
+          linear-gradient(180deg, rgba(19, 25, 42, 0.92), rgba(12, 15, 24, 0.94)),
+          linear-gradient(135deg, rgba(96, 165, 250, 0.16), rgba(167, 139, 250, 0.12));
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: var(--shadow);
+      }
+
+      .visual-card::after {
+        content: "";
+        position: absolute;
+        inset: auto -20% -30% 20%;
+        height: 50%;
+        background: radial-gradient(circle, rgba(167, 139, 250, 0.24), transparent 60%);
+        pointer-events: none;
+      }
+
+      .visual-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+        color: #dbe4f8;
+        font-size: 0.84rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .visual-screen {
+        width: 100%;
+        border-radius: 24px;
+        display: block;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .floating-note {
+        position: absolute;
+        right: -18px;
+        bottom: 24px;
+        width: min(260px, 48vw);
+        border-radius: 24px;
+        padding: 16px 18px;
+        background: rgba(11, 15, 23, 0.82);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 18px 36px rgba(4, 8, 20, 0.38);
+        backdrop-filter: blur(14px);
+      }
+
+      .floating-note strong {
+        display: block;
+        margin-bottom: 6px;
+        color: #f7fbff;
+      }
+
+      .floating-note p {
+        margin: 0;
+        color: var(--text-soft);
+        line-height: 1.5;
+        font-size: 0.95rem;
+      }
+
+      .section {
+        padding: 34px 0;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        align-items: end;
+        margin-bottom: 24px;
+      }
+
+      .section-kicker {
+        color: #7dd3fc;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-size: 0.8rem;
+        margin-bottom: 10px;
+      }
+
+      .section-title {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(2rem, 3vw, 3.2rem);
+        margin: 0;
+        letter-spacing: -0.04em;
+      }
+
+      .section-description {
+        color: var(--text-soft);
+        max-width: 560px;
+        line-height: 1.7;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .feature-card,
+      .story-card,
+      .quote-card,
+      .cta-panel {
+        border-radius: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        box-shadow: var(--shadow);
+      }
+
+      .feature-card {
+        padding: 22px;
+      }
+
+      .feature-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+        color: #ffffff;
+        background: linear-gradient(145deg, rgba(45, 212, 191, 0.28), rgba(96, 165, 250, 0.3), rgba(167, 139, 250, 0.3));
+      }
+
+      .feature-card h3,
+      .story-card h3,
+      .cta-panel h3 {
+        margin: 0 0 10px;
+        font-size: 1.2rem;
+      }
+
+      .feature-card p,
+      .story-card p,
+      .cta-panel p {
+        margin: 0;
+        color: var(--text-soft);
+        line-height: 1.7;
+      }
+
+      .story-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 18px;
+      }
+
+      .story-card {
+        padding: 28px;
+      }
+
+      .reading-preview {
+        margin-top: 18px;
+        border-radius: 24px;
+        padding: 20px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(17, 24, 39, 0.42));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .reading-preview .meta {
+        display: flex;
+        justify-content: space-between;
+        color: #b6c5de;
+        font-size: 0.86rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      .reading-preview .body {
+        margin-top: 14px;
+        font-size: 1.06rem;
+        line-height: 1.9;
+        color: #f8fbff;
+      }
+
+      .language-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .language-pills span {
+        border-radius: 999px;
+        padding: 10px 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #dbe7f8;
+        font-size: 0.92rem;
+      }
+
+      .quote-card {
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .quote-text {
+        font-family: "Playfair Display", serif;
+        font-size: 1.8rem;
+        line-height: 1.3;
+      }
+
+      .mini-stack {
+        display: grid;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      .mini-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .mini-row strong {
+        font-size: 0.95rem;
+      }
+
+      .mini-row span {
+        color: var(--text-soft);
+        font-size: 0.88rem;
+      }
+
+      .cta-panel {
+        margin: 28px 0 60px;
+        padding: 30px;
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 24px;
+        align-items: center;
+        background:
+          radial-gradient(circle at top right, rgba(167, 139, 250, 0.24), transparent 36%),
+          radial-gradient(circle at bottom left, rgba(45, 212, 191, 0.22), transparent 34%),
+          rgba(255, 255, 255, 0.05);
+      }
+
+      .cta-badge {
+        width: min(100%, 240px);
+        justify-self: end;
+        filter: drop-shadow(0 18px 30px rgba(3, 7, 18, 0.35));
+      }
+
+      .footer-note {
+        color: rgba(226, 232, 240, 0.58);
+        font-size: 0.88rem;
+        padding-bottom: 34px;
+      }
+
+      @media (max-width: 1024px) {
+        .hero,
+        .story-grid,
+        .cta-panel {
+          grid-template-columns: 1fr;
+        }
+
+        .feature-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .cta-badge {
+          justify-self: start;
+          width: 180px;
+        }
+
+        .nav-links {
+          display: none;
+        }
+
+        .floating-note {
+          position: static;
+          width: 100%;
+          margin-top: 16px;
+        }
+      }
+
+      @media (max-width: 700px) {
+        .page-shell {
+          width: min(100% - 24px, 1200px);
+        }
+
+        .topbar-inner {
+          padding: 16px 0;
+        }
+
+        .hero {
+          padding-top: 38px;
+          gap: 24px;
+        }
+
+        h1 {
+          margin-top: 18px;
+          font-size: 3rem;
+        }
+
+        .hero-subtitle {
+          font-size: 1.04rem;
+        }
+
+        .feature-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .section-header {
+          flex-direction: column;
+          align-items: start;
+          margin-bottom: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="page-shell topbar-inner">
+        <div class="brand-lockup">
+          <img src="./linguaflow-badge.png" alt="LinguaFlow badge" />
+          <div>
+            <div class="brand-name">LinguaFlow</div>
+            <div class="brand-tag">Read. Understand. Grow.</div>
+          </div>
+        </div>
+        <nav class="nav-links">
+          <a href="#experience">Experience</a>
+          <a href="#why">Why it works</a>
+          <a href="#languages">Languages</a>
+          <a class="cta-pill" href="https://linguaflow-app.replit.app/">Try the beta</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">Personalized reading for language learners</div>
+          <h1>
+            <span class="hero-gradient">Read beautifully.</span>
+            <span class="hero-gradient">Learn naturally.</span>
+          </h1>
+          <p class="hero-subtitle">
+            LinguaFlow turns language practice into a calm daily ritual. Generate passages at the right level,
+            save vocabulary as you go, and keep momentum with reading that actually feels like you.
+          </p>
+          <div class="hero-actions">
+            <a class="button-primary" href="https://linguaflow-app.replit.app/">Start the beta</a>
+            <a class="button-secondary" href="#experience">See the experience</a>
+          </div>
+          <div class="trust-strip">
+            <div class="trust-chip">AI-personalized passages</div>
+            <div class="trust-chip">Vocabulary that sticks</div>
+            <div class="trust-chip">Built for real reading flow</div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="visual-card">
+            <div class="visual-head">
+              <span>LinguaFlow Preview</span>
+              <span>Beta access open</span>
+            </div>
+            <img class="visual-screen" src="./linguaflow-vision.png" alt="LinguaFlow brand and product vision board" />
+          </div>
+          <div class="floating-note">
+            <strong>Designed for calm progress</strong>
+            <p>
+              A focused reading space with gentle gradients, strong hierarchy, and just enough intelligence to keep learners moving.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="why">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">Why it feels different</div>
+            <h2 class="section-title">A reading app that treats focus like a feature.</h2>
+          </div>
+          <p class="section-description">
+            LinguaFlow is not built around random drills or noisy gamification. It is built around sustained attention,
+            meaningful content, and the small daily wins that create language growth.
+          </p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-icon">~</div>
+            <h3>Content at the right level</h3>
+            <p>Generate passages matched to learner proficiency so reading feels engaging instead of discouraging.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">+</div>
+            <h3>Vocabulary in context</h3>
+            <p>Save the words that matter while they are still connected to story, tone, and meaning.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">*</div>
+            <h3>Quietly intelligent design</h3>
+            <p>A visual system shaped around clarity, flow, and reflection rather than clutter and cognitive overload.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="experience">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">Product experience</div>
+            <h2 class="section-title">From “I should practice” to “I want one more passage.”</h2>
+          </div>
+          <p class="section-description">
+            The product loop is simple: choose a topic, generate something readable, learn naturally, and come back tomorrow with momentum.
+          </p>
+        </div>
+
+        <div class="story-grid">
+          <article class="story-card">
+            <h3>Generate reading that feels personal</h3>
+            <p>
+              Choose a language, topic, level, and style. LinguaFlow shapes a passage around your interests so practice feels less like homework and more like discovery.
+            </p>
+            <div class="reading-preview">
+              <div class="meta">
+                <span>Preview</span>
+                <span>Spanish · Story</span>
+              </div>
+              <div class="body">
+                En una calle tranquila de Sevilla, Lucia abría su pequeña librería cada mañana con la misma esperanza:
+                encontrar al lector exacto para cada libro.
+              </div>
+            </div>
+            <div class="language-pills" id="languages">
+              <span>Korean reading journeys</span>
+              <span>Chinese text support</span>
+              <span>Spanish passage generation</span>
+            </div>
+          </article>
+
+          <aside class="quote-card">
+            <div class="quote-text">“The best language practice doesn’t feel forced. It feels magnetic.”</div>
+            <div class="mini-stack">
+              <div class="mini-row">
+                <strong>Generate</strong>
+                <span>Topic-based passages</span>
+              </div>
+              <div class="mini-row">
+                <strong>Save</strong>
+                <span>Vocabulary that matters</span>
+              </div>
+              <div class="mini-row">
+                <strong>Return</strong>
+                <span>Build a daily reading rhythm</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="cta-panel">
+        <div>
+          <div class="section-kicker">Now in beta</div>
+          <h3>Help shape the first beautiful version of LinguaFlow.</h3>
+          <p>
+            Test the live app, generate passages, explore the reading flow, and tell us what feels effortless and what still needs work.
+          </p>
+          <div class="hero-actions">
+            <a class="button-primary" href="https://linguaflow-app.replit.app/">Open LinguaFlow</a>
+            <a class="button-secondary" href="mailto:?subject=LinguaFlow%20Beta&body=I%20just%20tried%20LinguaFlow...">Share feedback</a>
+          </div>
+        </div>
+        <img class="cta-badge" src="./linguaflow-badge.png" alt="LinguaFlow badge icon" />
+      </section>
+
+      <div class="footer-note">
+        LinguaFlow beta concept landing page · calm, immersive, premium direction
+      </div>
+    </main>
+  </body>
+</html>
