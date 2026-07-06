@@ -15,18 +15,11 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-async function start(): Promise<void> {
-  try {
-    await ensureDatabaseReady();
-  } catch (err) {
-    console.error("Startup failed");
-    console.error(err instanceof Error ? err.message : err);
-    process.exit(1);
-  }
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
 
-  app.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
-  });
-}
-
-start();
+ensureDatabaseReady().catch((err) => {
+  console.error("Startup database check failed");
+  console.error(err instanceof Error ? err.message : err);
+});
