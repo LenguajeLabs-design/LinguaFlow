@@ -103,7 +103,7 @@ export function LandingHero({ language }: { language: AppLanguage }) {
           </div>
 
           {/* ── Right: brand vision visual ── */}
-          <div className="relative hidden md:block">
+          <div className="hidden md:flex flex-col gap-4">
             <div
               className="relative rounded-[28px] overflow-hidden border border-white/[0.12]"
               style={{
@@ -130,9 +130,9 @@ export function LandingHero({ language }: { language: AppLanguage }) {
               />
             </div>
 
-            {/* Floating note */}
+            {/* Note below image */}
             <div
-              className="absolute -right-5 bottom-8 w-[220px] rounded-2xl px-4 py-3.5 border border-white/[0.12] backdrop-blur-md"
+              className="rounded-2xl px-4 py-3.5 border border-white/[0.12] backdrop-blur-md"
               style={{ background: 'rgba(11,15,23,0.82)', boxShadow: '0 18px 36px rgba(4,8,20,0.38)' }}
             >
               <p className="text-[13px] font-semibold text-white mb-1">Designed for calm progress</p>
