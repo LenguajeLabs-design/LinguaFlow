@@ -1,7 +1,6 @@
 import { Link } from 'wouter';
 import { ArrowRight, PlayCircle, Sparkles } from 'lucide-react';
 import type { AppLanguage } from '@/hooks/use-language';
-import visionImg from '/linguaflow-vision.png';
 
 const HEADLINES: Record<AppLanguage, { eyebrow: string; title: JSX.Element; subtitle: string }> = {
   ko: {
@@ -122,11 +121,22 @@ export function LandingHero({ language }: { language: AppLanguage }) {
                 <span>LinguaFlow Preview</span>
                 <span className="text-[#7DEBD9]">Beta access open</span>
               </div>
-              <img
-                src={visionImg}
-                alt="LinguaFlow brand and product overview"
-                className="w-full block rounded-2xl"
-              />
+              <picture>
+                <source
+                  type="image/webp"
+                  srcSet="/linguaflow-vision-400.webp 400w, /linguaflow-vision-560.webp 560w, /linguaflow-vision-1120.webp 1120w"
+                  sizes="(max-width: 767px) 400px, (max-width: 1199px) 560px, 560px"
+                />
+                <img
+                  src="/linguaflow-vision-560.webp"
+                  alt="LinguaFlow brand and product overview"
+                  className="w-full block rounded-2xl"
+                  width={560}
+                  height={449}
+                  loading="eager"
+                  decoding="async"
+                />
+              </picture>
             </div>
 
             {/* Floating note */}

@@ -5,15 +5,17 @@ import { Switch, Route, Redirect, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { lazy, Suspense } from "react";
 
 import Home from "@/pages/Home";
-import Generate from "@/pages/Generate";
-import Library from "@/pages/Library";
-import Reader from "@/pages/Reader";
-import Favorites from "@/pages/Favorites";
-import Settings from "@/pages/Settings";
-import Vocabulary from "@/pages/Vocabulary";
-import NotFound from "@/pages/not-found";
+
+const Generate = lazy(() => import("@/pages/Generate"));
+const Library = lazy(() => import("@/pages/Library"));
+const Reader = lazy(() => import("@/pages/Reader"));
+const Favorites = lazy(() => import("@/pages/Favorites"));
+const Settings = lazy(() => import("@/pages/Settings"));
+const Vocabulary = lazy(() => import("@/pages/Vocabulary"));
+const NotFound = lazy(() => import("@/pages/not-found"));
 
 const clerkPubKey = publishableKeyFromHost(
   window.location.hostname,
@@ -94,33 +96,35 @@ function HomeRedirect() {
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={HomeRedirect} />
-      <Route path="/generate" component={Generate} />
-      <Route path="/library" component={Library} />
-      <Route path="/library/:id" component={Reader} />
-      <Route path="/passage" component={Reader} />
-      <Route path="/favorites" component={Favorites} />
-      <Route path="/vocabulary" component={Vocabulary} />
-      <Route path="/settings" component={Settings} />
-      <Route
-        path="/sign-in/*?"
-        component={() => (
-          <div className="min-h-screen flex items-center justify-center bg-background p-4">
-            <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} />
-          </div>
-        )}
-      />
-      <Route
-        path="/sign-up/*?"
-        component={() => (
-          <div className="min-h-screen flex items-center justify-center bg-background p-4">
-            <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />
-          </div>
-        )}
-      />
-      <Route component={NotFound} />
-    </Switch>
+    <Suspense fallback={null}>
+      <Switch>
+        <Route path="/" component={HomeRedirect} />
+        <Route path="/generate" component={Generate} />
+        <Route path="/library" component={Library} />
+        <Route path="/library/:id" component={Reader} />
+        <Route path="/passage" component={Reader} />
+        <Route path="/favorites" component={Favorites} />
+        <Route path="/vocabulary" component={Vocabulary} />
+        <Route path="/settings" component={Settings} />
+        <Route
+          path="/sign-in/*?"
+          component={() => (
+            <div className="min-h-screen flex items-center justify-center bg-background p-4">
+              <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} />
+            </div>
+          )}
+        />
+        <Route
+          path="/sign-up/*?"
+          component={() => (
+            <div className="min-h-screen flex items-center justify-center bg-background p-4">
+              <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />
+            </div>
+          )}
+        />
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 
