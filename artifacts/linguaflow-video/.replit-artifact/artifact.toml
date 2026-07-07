@@ -1,0 +1,31 @@
+kind = "video"
+previewPath = "/linguaflow-video/"
+title = "LinguaFlow Promo Video"
+version = "1.0.0"
+id = "artifacts/linguaflow-video"
+router = "path"
+
+[[integratedSkills]]
+name = "video-js"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/linguaflow-video/" ]
+localPort = 19148
+
+[services.development]
+run = "pnpm --filter @workspace/linguaflow-video run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/linguaflow-video", "run", "build" ]
+publicDir = "artifacts/linguaflow-video/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19148"
+BASE_PATH = "/linguaflow-video/"

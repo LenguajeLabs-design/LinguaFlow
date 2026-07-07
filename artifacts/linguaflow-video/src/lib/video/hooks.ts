@@ -1,43 +1,104 @@
-import { useEffect, useState } from 'react';
+// Video player hook - handles recording lifecycle, scene advancement, and looping
+
+import { useState, useEffect, useRef } from 'react';
 
 declare global {
   interface Window {
-    startRecording?: () => void;
+    startRecording?: () => Promise<void>;
     stopRecording?: () => void;
   }
 }
 
-export function useVideoPlayer({ durations }: { durations: Record<string, number> }) {
-  const [currentScene, setCurrentScene] = useState(0);
-  const [hasStarted, setHasStarted] = useState(false);
-  
-  useEffect(() => {
-    if (!hasStarted) {
-      setHasStarted(true);
-      if (window.startRecording) {
-        window.startRecording();
-      }
-    }
-  }, [hasStarted]);
+export interface SceneDurations {
+  [key: string]: number;
+}
 
+export interface UseVideoPlayerOptions {
+  durations: SceneDurations;
+  onVideoEnd?: () => void;
+  loop?: boolean;
+}
+
+export interface UseVideoPlayerReturn {
+  currentScene: number;
+  totalScenes: number;
+  currentSceneKey: string;
+  hasEnded: boolean;
+}
+
+export function useVideoPlayer(options: UseVideoPlayerOptions): UseVideoPlayerReturn {
+  const { durations, onVideoEnd, loop = true } = options;
+
+  // Captured once on mount -- durations must be a static object
+  const sceneKeys = useRef(Object.keys(durations)).current;
+  const totalScenes = sceneKeys.length;
+  const durationsArray = useRef(Object.values(durations)).current;
+
+  const [currentScene, setCurrentScene] = useState(0);
+  const [hasEnded, setHasEnded] = useState(false);
+
+  // Start recording on mount
   useEffect(() => {
-    const sceneKeys = Object.keys(durations);
-    const duration = durations[sceneKeys[currentScene]];
+    window.startRecording?.();
+  }, []);
+
+  // Scene advancement -- loops independently of recording
+  useEffect(() => {
+    if (hasEnded && !loop) return;
+
+    const currentDuration = durationsArray[currentScene];
 
     const timer = setTimeout(() => {
-      const nextScene = currentScene + 1;
-      if (nextScene >= sceneKeys.length) {
-        if (window.stopRecording) {
-          window.stopRecording();
+      // Last scene just finished playing
+      if (currentScene >= totalScenes - 1) {
+        if (!hasEnded) {
+          window.stopRecording?.();
+          setHasEnded(true);
+          onVideoEnd?.();
         }
-        setCurrentScene(0);
+        if (loop) {
+          setCurrentScene(0);
+        }
       } else {
-        setCurrentScene(nextScene);
+        setCurrentScene(prev => prev + 1);
       }
-    }, duration);
+    }, currentDuration);
 
     return () => clearTimeout(timer);
-  }, [currentScene, durations]);
+  }, [currentScene, totalScenes, durationsArray, hasEnded, loop, onVideoEnd]);
 
-  return { currentScene };
+  return {
+    currentScene,
+    totalScenes,
+    currentSceneKey: sceneKeys[currentScene],
+    hasEnded,
+  };
+}
+
+export function useSceneTimer(events: Array<{ time: number; callback: () => void }>) {
+  const firedRef = useRef<Set<number>>(new Set());
+  const callbacksRef = useRef<Array<() => void>>([]);
+
+  useEffect(() => {
+    callbacksRef.current = events.map(e => e.callback);
+  }, [events]);
+
+  const scheduleKey = events.map((event, i) => `${i}:${event.time}`).join('|');
+
+  useEffect(() => {
+    firedRef.current = new Set();
+
+    const timers = events.map(({ time }, index) => {
+      return setTimeout(() => {
+        if (!firedRef.current.has(index)) {
+          firedRef.current.add(index);
+          callbacksRef.current[index]?.();
+        }
+      }, time);
+    });
+
+    return () => {
+      timers.forEach(timer => clearTimeout(timer));
+    };
+  }, [scheduleKey]);
 }
