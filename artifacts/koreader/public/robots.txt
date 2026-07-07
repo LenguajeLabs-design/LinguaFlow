@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /library
+Disallow: /generate
+Disallow: /favorites
+Disallow: /vocabulary
+Disallow: /settings
+Disallow: /passage
+
+Sitemap: https://linguaflow.replit.app/sitemap.xml
