@@ -27,6 +27,16 @@ export const sceneTransitions = {
   }
 };
 
+export const transitions = {
+  ...sceneTransitions,
+  fadeScale: {
+    initial: { opacity: 0, scale: 0.95 },
+    animate: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 1.05 },
+    transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] }
+  }
+};
+
 export const textReveal = {
   initial: { y: 100, opacity: 0, rotateX: -20 },
   animate: { y: 0, opacity: 1, rotateX: 0 },

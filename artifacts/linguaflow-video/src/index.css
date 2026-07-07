@@ -9,12 +9,19 @@
     --brand-violet: #818cf8;
     --background: #030712;
     --foreground: #ffffff;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-sans: 'Inter', sans-serif;
   }
 
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
+    overflow: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
   }
 }
 
@@ -22,5 +29,5 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-image: linear-gradient(to right, var(--brand-teal), var(--brand-sky), var(--brand-violet));
+  background-image: linear-gradient(to right, #facc15, #fef08a);
 }
