@@ -138,44 +138,6 @@ const styleMap: Record<string, string> = {
   summary:    "a concise informational summary about the topic",
 };
 
-const topicImages: Record<string, string[]> = {
-  default: [
-    "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800&q=80",
-    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
-  ],
-  "ciudad": [
-    "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800&q=80",
-  ],
-  "comida": [
-    "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=800&q=80",
-  ],
-  "familia": [
-    "https://images.unsplash.com/photo-1511895426328-dc8714191011?w=800&q=80",
-  ],
-  "viaje": [
-    "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80",
-  ],
-  "travel": [
-    "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80",
-  ],
-  "food": [
-    "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=800&q=80",
-  ],
-  "música": [
-    "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80",
-  ],
-  "nature": [
-    "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80",
-  ],
-};
-
-function getImagesForTopic(topic: string): string[] {
-  const lower = topic.toLowerCase();
-  for (const [key, urls] of Object.entries(topicImages)) {
-    if (key !== "default" && lower.includes(key)) return urls;
-  }
-  return topicImages.default;
-}
 
 function getFallbackSpanishPassage(input: { difficulty: string; topic: string }): GeneratedSpanishPassage {
   return {
@@ -201,7 +163,7 @@ function getFallbackSpanishPassage(input: { difficulty: string; topic: string })
       { question: "¿Cómo está el café?", answer: "El café está rico." },
       { question: "¿Cómo es la camarera?", answer: "La camarera es amable." },
     ],
-    imageUrls: topicImages.default,
+    imageUrls: [],
   };
 }
 
@@ -304,7 +266,7 @@ COMPREHENSION QUESTIONS: Write exactly 3 questions in Spanish that test reading 
     sentences: parsed.sentences || [],
     vocabulary: (parsed.vocabulary || []).slice(0, 12),
     comprehensionQuestions: (parsed.comprehensionQuestions || []).slice(0, 3),
-    imageUrls: getImagesForTopic(input.topic),
+    imageUrls: [],
   };
 }
 

@@ -123,47 +123,6 @@ const styleMap: Record<string, string> = {
   reflection: "a personal reflection or journal entry written in first person",
 };
 
-const topicImages: Record<string, string[]> = {
-  default: [
-    "https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=800&q=80",
-    "https://images.unsplash.com/photo-1538485399081-7191377e8241?w=800&q=80",
-  ],
-  "korean cinema": [
-    "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&q=80",
-  ],
-  "temple": [
-    "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80",
-  ],
-  "seoul": [
-    "https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=800&q=80",
-  ],
-  "travel": [
-    "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&q=80",
-  ],
-  "food": [
-    "https://images.unsplash.com/photo-1498654077810-12c21d4d6dc3?w=800&q=80",
-  ],
-  "coffee": [
-    "https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=800&q=80",
-  ],
-  "school": [
-    "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&q=80",
-  ],
-  "family": [
-    "https://images.unsplash.com/photo-1511895426328-dc8714191011?w=800&q=80",
-  ],
-  "market": [
-    "https://images.unsplash.com/photo-1542640244-7e672d6cef4e?w=800&q=80",
-  ],
-};
-
-function getImagesForTopic(topic: string): string[] {
-  const lower = topic.toLowerCase();
-  for (const [key, urls] of Object.entries(topicImages)) {
-    if (key !== "default" && lower.includes(key)) return urls;
-  }
-  return topicImages.default;
-}
 
 // ─── Fallback sample content ─────────────────────────────────────────
 function getFallbackPassage(input: PassageInput): GeneratedPassage {
@@ -194,7 +153,7 @@ function getFallbackPassage(input: PassageInput): GeneratedPassage {
         { question: "직원이 어때요?", answer: "직원이 친절해요." },
         { question: "또 오고 싶어요?", answer: "네, 또 오고 싶어요." },
       ],
-      imageUrls: topicImages.coffee,
+      imageUrls: [],
     },
     lower_intermediate: {
       title: "지하철 | Taking the Subway",
@@ -224,7 +183,7 @@ function getFallbackPassage(input: PassageInput): GeneratedPassage {
         { question: "지하철 안에서 무엇을 했어요?", answer: "음악을 들었어요." },
         { question: "역에서 내린 후 무엇을 했어요?", answer: "친구를 만나서 같이 점심을 먹었어요." },
       ],
-      imageUrls: topicImages.default,
+      imageUrls: [],
     },
     intermediate: {
       title: "한강 공원 | Han River Park",
@@ -252,7 +211,7 @@ function getFallbackPassage(input: PassageInput): GeneratedPassage {
         { question: "사람이 왜 많았어요?", answer: "날씨가 맑아서 사람이 많았어요." },
         { question: "아이들이 한강 공원에서 무엇을 했어요?", answer: "자전거를 탔어요." },
       ],
-      imageUrls: topicImages.default,
+      imageUrls: [],
     },
     upper_intermediate: {
       title: "계절의 변화 | Changing Seasons",
@@ -282,7 +241,7 @@ function getFallbackPassage(input: PassageInput): GeneratedPassage {
         { question: "글쓴이에게 가을은 어떤 계절입니까?", answer: "독서와 사색의 계절입니다." },
         { question: "계절이 바뀔 때마다 글쓴이는 무엇을 합니까?", answer: "지난 시간을 돌아보며 새로운 다짐을 합니다." },
       ],
-      imageUrls: topicImages.default,
+      imageUrls: [],
     },
     advanced: {
       title: "도시의 고독 | Urban Solitude",
@@ -310,7 +269,7 @@ function getFallbackPassage(input: PassageInput): GeneratedPassage {
         { question: "현대 도시의 삶을 어떻게 설명합니까?", answer: "끊임없는 연결 속에서 역설적으로 단절을 경험하는 것이라고 설명합니다." },
         { question: "글쓴이에게 서울이 주는 선물은 무엇입니까?", answer: "소음 속에서 발견하는 침묵과 군중 속에서 만나는 자기 자신입니다." },
       ],
-      imageUrls: topicImages.default,
+      imageUrls: [],
     },
   };
 
@@ -412,7 +371,7 @@ COMPREHENSION QUESTIONS: Write exactly 3 questions in Korean that test understan
       sentences: parsed.sentences,
       vocabulary: (parsed.vocabulary || []).slice(0, 12),
       comprehensionQuestions: (parsed.comprehensionQuestions || []).slice(0, 3),
-      imageUrls: getImagesForTopic(input.topic),
+      imageUrls: [],
     };
   } catch (err) {
     console.error("AI generation failed, using fallback:", err);

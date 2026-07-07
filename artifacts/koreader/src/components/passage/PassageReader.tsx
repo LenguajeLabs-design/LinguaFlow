@@ -221,26 +221,6 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
         )}
       </header>
 
-      {/* ── Images ── */}
-      {passage.imageUrls && passage.imageUrls.length > 0 && (
-        <div className={cn(
-          'mb-10 overflow-hidden rounded-2xl shadow-sm',
-          passage.imageUrls.length > 1 ? 'grid grid-cols-2 gap-3' : ''
-        )}>
-          {passage.imageUrls.map((url, i) => (
-            <img
-              key={i}
-              src={url}
-              alt="Passage illustration"
-              className={cn(
-                'w-full object-cover',
-                passage.imageUrls.length === 1 ? 'h-64 sm:h-72 rounded-2xl' : 'h-44 rounded-xl'
-              )}
-            />
-          ))}
-        </div>
-      )}
-
       {/* ── Study mode show/hide all ── */}
       {viewMode === 'study' && (
         <div className="flex justify-end mb-3">

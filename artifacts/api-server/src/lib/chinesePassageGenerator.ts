@@ -134,38 +134,6 @@ const styleMap: Record<string, string> = {
   summary:    "a concise informational summary about the topic",
 };
 
-const topicImages: Record<string, string[]> = {
-  default: [
-    "https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=800&q=80",
-    "https://images.unsplash.com/photo-1508804185872-173bbaa4c82e?w=800&q=80",
-  ],
-  "travel": [
-    "https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=800&q=80",
-  ],
-  "food": [
-    "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800&q=80",
-  ],
-  "beijing": [
-    "https://images.unsplash.com/photo-1508804185872-173bbaa4c82e?w=800&q=80",
-  ],
-  "shanghai": [
-    "https://images.unsplash.com/photo-1537970641620-dae74a25e7e7?w=800&q=80",
-  ],
-  "culture": [
-    "https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=800&q=80",
-  ],
-  "business": [
-    "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&q=80",
-  ],
-};
-
-function getImagesForTopic(topic: string): string[] {
-  const lower = topic.toLowerCase();
-  for (const [key, urls] of Object.entries(topicImages)) {
-    if (key !== "default" && lower.includes(key)) return urls;
-  }
-  return topicImages.default;
-}
 
 function getFallbackChinesePassage(input: { difficulty: string; topic: string }): GeneratedChinesePassage {
   return {
@@ -199,7 +167,7 @@ function getFallbackChinesePassage(input: { difficulty: string; topic: string })
       { question: "咖啡怎么样？", answer: "咖啡很好喝。" },
       { question: "他心情怎么样？", answer: "他很高兴。" },
     ],
-    imageUrls: topicImages.default,
+    imageUrls: [],
   };
 }
 
@@ -316,7 +284,7 @@ COMPREHENSION QUESTIONS: Write exactly 3 questions in Chinese that test understa
     sentences: parsed.sentences || [],
     vocabulary: (parsed.vocabulary || []).slice(0, 12),
     comprehensionQuestions: (parsed.comprehensionQuestions || []).slice(0, 3),
-    imageUrls: getImagesForTopic(input.topic),
+    imageUrls: [],
   };
 }
 
