@@ -4,6 +4,7 @@ import passagesRouter from "./passages";
 import authRouter from "./auth";
 import vocabularyRouter from "./vocabulary";
 import ttsRouter from "./tts";
+import adminRouter from "./admin";
 
 const router: IRouter = Router();
 
@@ -12,5 +13,6 @@ router.use(healthRouter);
 router.use(passagesRouter);
 router.use(vocabularyRouter);
 router.use(ttsRouter);
+router.use(adminRouter);
 
 export default router;

@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express";
 import { sql } from "drizzle-orm";
-import { db } from "@workspace/db";
+import { db, quotaEventsTable } from "@workspace/db";
 
 export type QuotaType = "generate" | "gloss" | "tts";
 
@@ -75,6 +75,12 @@ export function quotaCheck(type: QuotaType): RequestHandler {
         res.setHeader("X-Quota-Limit", limit);
         res.setHeader("X-Quota-Used", count);
         res.setHeader("X-Quota-Reset", Math.floor(resetMs / 1000));
+
+        db.insert(quotaEventsTable)
+          .values({ userId: req.userId, feature: type })
+          .execute()
+          .catch((err) => console.error("[quota] Failed to log limit event:", err));
+
         res
           .status(429)
           .json({

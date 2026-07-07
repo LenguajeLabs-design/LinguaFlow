@@ -56,6 +56,17 @@ export async function ensureDatabaseReady(): Promise<void> {
         PRIMARY KEY (user_id, date)
       )
     `);
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS quota_events (
+        id         SERIAL PRIMARY KEY,
+        user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        feature    TEXT    NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
+    await db.execute(sql`
+      CREATE INDEX IF NOT EXISTS quota_events_user_id_idx ON quota_events (user_id)
+    `);
   } catch (err) {
     const code = (err as { code?: string; cause?: { code?: string } })?.code
       ?? (err as { cause?: { code?: string } })?.cause?.code;

@@ -15,6 +15,7 @@ const Reader = lazy(() => import("@/pages/Reader"));
 const Favorites = lazy(() => import("@/pages/Favorites"));
 const Settings = lazy(() => import("@/pages/Settings"));
 const Vocabulary = lazy(() => import("@/pages/Vocabulary"));
+const Admin = lazy(() => import("@/pages/Admin"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 const clerkPubKey = publishableKeyFromHost(
@@ -106,6 +107,7 @@ function Router() {
         <Route path="/favorites" component={Favorites} />
         <Route path="/vocabulary" component={Vocabulary} />
         <Route path="/settings" component={Settings} />
+        <Route path="/admin" component={Admin} />
         <Route
           path="/sign-in/*?"
           component={() => (
