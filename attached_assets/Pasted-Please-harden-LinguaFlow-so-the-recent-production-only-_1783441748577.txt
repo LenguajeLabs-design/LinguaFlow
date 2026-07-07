@@ -1,0 +1,59 @@
+Please harden LinguaFlow so the recent production-only Clerk key mismatch does not happen again.
+
+What happened:
+- In development, auth worked.
+- In production, the frontend used the correct live Clerk publishable key.
+- The backend used a static publishable key from env.
+- Replit swapped the frontend to a live key at publish time, but the backend still validated against the wrong key.
+- Result: login looked fine, but all authenticated API requests returned 401.
+
+What I want:
+Add guardrails so this kind of production auth mismatch is prevented or caught immediately.
+
+Please do these things:
+
+1. Centralize Clerk key resolution
+- Make frontend and backend use the same host-based Clerk publishable key resolution approach.
+- Avoid any split where one side is static and the other is dynamic.
+
+2. Add startup-time auth diagnostics
+- On server startup, log a safe, production-appropriate message showing:
+  - detected host strategy
+  - whether Clerk key resolution is host-based
+  - whether required Clerk env vars are present
+- Do not log secrets.
+- If configuration is clearly invalid, fail fast with a clear error.
+
+3. Add clearer auth failure logging
+- When auth fails on protected routes, log whether the reason appears to be:
+  - missing token
+  - token validation failure
+  - Clerk key mismatch
+  - user lookup failure after successful auth
+- Keep logs production-safe and do not expose secrets or token contents.
+
+4. Add a lightweight protected health check or verification path
+- Create a minimal way to verify after publish that:
+  - login works
+  - authenticated API requests validate correctly
+- This can be a tiny protected endpoint or an equivalent minimal mechanism.
+- Keep it safe and minimal.
+
+5. Add deployment notes
+- Document in the repo that Replit can swap Clerk publishable keys between dev and production.
+- Document that backend auth must resolve keys by host, not assume one static publishable key.
+- Add a short post-publish smoke test checklist:
+  - sign in
+  - open Library
+  - confirm authenticated API returns 200
+  - generate/save/load a passage
+
+Important:
+- Do not redesign auth.
+- Do not add product features.
+- Only add the minimum reliability and observability improvements needed to prevent or quickly detect this exact class of production mismatch.
+
+Please report back with:
+- files changed
+- what protections were added
+- the exact post-publish test steps

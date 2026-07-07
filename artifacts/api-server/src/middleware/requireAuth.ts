@@ -16,7 +16,20 @@ const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY 
 
 export async function requireAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
   const auth = getAuth(req);
+
   if (!auth.userId) {
+    const rawCookie = req.headers.cookie ?? "";
+    const hasSessionCookie = rawCookie.includes("__session=");
+    const hasAuthHeader = !!req.headers.authorization;
+
+    if (hasSessionCookie || hasAuthHeader) {
+      console.warn(
+        "[auth] 401: token present but Clerk validation failed — " +
+        "possible key mismatch (test vs live) or expired/malformed token. " +
+        `source=${hasAuthHeader ? "Authorization header" : "__session cookie"}`,
+      );
+    }
+
     res.status(401).json({ error: "Unauthorized" });
     return;
   }
@@ -28,10 +41,20 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
       .where(eq(usersTable.clerkId, auth.userId));
 
     if (!user) {
-      const clerkUser = await clerkClient.users.getUser(auth.userId);
-      const email = clerkUser.emailAddresses[0]?.emailAddress ?? `${auth.userId}@clerk.local`;
+      let email: string;
+      try {
+        const clerkUser = await clerkClient.users.getUser(auth.userId);
+        email = clerkUser.emailAddresses[0]?.emailAddress ?? `${auth.userId}@clerk.local`;
+      } catch (clerkErr) {
+        console.error(
+          "[auth] 500: Clerk user lookup failed after token validated — " +
+          "possible CLERK_SECRET_KEY mismatch or Clerk API unavailable. " +
+          `clerkId=${auth.userId}`,
+        );
+        res.status(500).json({ error: "Authentication error" });
+        return;
+      }
 
-      // Try to link an existing bcrypt account by matching email
       [user] = await db
         .select()
         .from(usersTable)
@@ -54,7 +77,8 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     req.userId = user.id;
     next();
   } catch (err) {
-    console.error("requireAuth error:", err);
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[auth] 500: DB user lookup/provision failed after Clerk auth succeeded:", message);
     res.status(500).json({ error: "Authentication error" });
   }
 }
