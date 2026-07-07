@@ -47,7 +47,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <img
               src={appIcon}
               alt="LinguaFlow"
-              className="h-12 w-auto object-contain group-hover:opacity-90 transition-opacity duration-300"
+              className="h-14 w-auto object-contain group-hover:opacity-90 transition-opacity duration-300"
             />
           </Link>
 
