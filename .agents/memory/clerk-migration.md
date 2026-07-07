@@ -7,11 +7,11 @@ description: How LinguaFlow migrated from bcrypt/express-session to Clerk, and k
 
 **JIT provisioning by email**: When a Clerk user first hits a protected API route, `requireAuth` looks them up by `clerkId`. If not found, fetches email from Clerk backend and does an email-match against existing bcrypt users — linking accounts automatically. This preserves integer `userId` for all existing FK relationships.
 
-**`@clerk/shared/keys` subpath unavailable in tsx**: When `@clerk/express` is installed but `@clerk/shared` is not a direct dep, `import { publishableKeyFromHost } from "@clerk/shared/keys"` fails at runtime. Fix: use `clerkMiddleware({ publishableKey: process.env.CLERK_PUBLISHABLE_KEY })` directly — sufficient for single-domain apps.
+**`@clerk/shared` must be a direct dep of api-server**: `publishableKeyFromHost` from `@clerk/shared/keys` is required in the backend `clerkMiddleware` — even for single-domain apps. In production, Replit swaps test→live Clerk keys; the static `CLERK_PUBLISHABLE_KEY` stays as `pk_test_*` on the server. Without `publishableKeyFromHost((req)=>...)`, the backend can't validate tokens issued by the live key → 401 on all authenticated requests in production.
 
-**Why:** The shared package is a peer dep of @clerk/express, not automatically hoisted to api-server's scope.
+**Why:** `@clerk/shared` is a peer dep of `@clerk/express`, not auto-hoisted. Must be installed explicitly: `pnpm --filter @workspace/api-server add @clerk/shared`.
 
-**How to apply:** If publishableKeyFromHost is needed in future (multi-domain), add `@clerk/shared` as a direct dep of api-server first.
+**How to apply:** Use canonical `clerkMiddleware((req) => ({ publishableKey: publishableKeyFromHost(getClerkProxyHost(req) ?? "", process.env.CLERK_PUBLISHABLE_KEY) }))` — this is required for all deployments, not just multi-domain.
 
 ## DB schema change
 - `users.clerk_id TEXT UNIQUE` (nullable) — Clerk user ID
