@@ -18,7 +18,13 @@ if (!connectionString) {
   );
 }
 
-export const pool = new Pool({ connectionString });
+export const pool = new Pool({
+  connectionString,
+  ssl: connectionString?.includes("supabase") ? { rejectUnauthorized: false } : undefined,
+  max: 10,
+  connectionTimeoutMillis: 10_000,
+  idleTimeoutMillis: 30_000,
+});
 export const db = drizzle(pool, { schema });
 
 function getDatabaseHost(url: string): string {
