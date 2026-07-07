@@ -21,10 +21,11 @@ import { generateChinesePassage, glossChineseWord } from "../lib/chinesePassageG
 import { generateSpanishPassage, glossSpanishWord } from "../lib/spanishPassageGenerator";
 import { requireAuth } from "../middleware/requireAuth";
 import { generateLimiter, glossLimiter } from "../middleware/rateLimiter";
+import { quotaCheck } from "../middleware/quotaMiddleware";
 
 const router: IRouter = Router();
 
-router.post("/passages/generate", requireAuth, generateLimiter, async (req, res, next): Promise<void> => {
+router.post("/passages/generate", requireAuth, generateLimiter, quotaCheck("generate"), async (req, res, next): Promise<void> => {
   const parsed = GeneratePassageBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -267,7 +268,7 @@ router.put("/passages/:id/bookmark", requireAuth, async (req, res): Promise<void
   res.json(ToggleBookmarkResponse.parse(formatPassage(passage)));
 });
 
-router.post("/words/gloss", requireAuth, glossLimiter, async (req, res): Promise<void> => {
+router.post("/words/gloss", requireAuth, glossLimiter, quotaCheck("gloss"), async (req, res): Promise<void> => {
   const parsed = GlossWordBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });

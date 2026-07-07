@@ -46,6 +46,16 @@ export async function ensureDatabaseReady(): Promise<void> {
 
   try {
     await db.execute(sql`select 1`);
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS daily_usage (
+        user_id   INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        date      DATE    NOT NULL DEFAULT CURRENT_DATE,
+        generate_count INTEGER NOT NULL DEFAULT 0,
+        gloss_count    INTEGER NOT NULL DEFAULT 0,
+        tts_count      INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (user_id, date)
+      )
+    `);
   } catch (err) {
     const code = (err as { code?: string; cause?: { code?: string } })?.code
       ?? (err as { cause?: { code?: string } })?.cause?.code;

@@ -8,9 +8,17 @@ declare global {
   namespace Express {
     interface Request {
       userId: number;
+      isAdmin: boolean;
     }
   }
 }
+
+const ADMIN_EMAILS: Set<string> = new Set(
+  (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean),
+);
 
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 
@@ -75,6 +83,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     }
 
     req.userId = user.id;
+    req.isAdmin = ADMIN_EMAILS.size > 0 && ADMIN_EMAILS.has(user.email.toLowerCase());
     next();
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
