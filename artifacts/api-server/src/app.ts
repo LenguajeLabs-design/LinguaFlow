@@ -6,6 +6,7 @@ import {
   clerkProxyMiddleware,
 } from "./middlewares/clerkProxyMiddleware";
 import router from "./routes";
+import { globalLimiter } from "./middleware/rateLimiter";
 
 const app: Express = express();
 
@@ -13,9 +14,24 @@ app.set("trust proxy", 1);
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
-app.use(cors({ credentials: true, origin: true }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN;
+const REPLIT_PATTERN = /^https:\/\/[a-z0-9-]+\.(replit\.dev|repl\.co|replit\.app)(\/.*)?$/i;
+
+app.use(cors({
+  credentials: true,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (ALLOWED_ORIGIN && origin === ALLOWED_ORIGIN) return callback(null, true);
+    if (REPLIT_PATTERN.test(origin)) return callback(null, true);
+    if (process.env.NODE_ENV !== "production") return callback(null, true);
+    callback(new Error("CORS: origin not allowed"));
+  },
+}));
+
+app.use(express.json({ limit: "64kb" }));
+app.use(express.urlencoded({ extended: true, limit: "64kb" }));
+
+app.use(globalLimiter);
 
 app.use(
   clerkMiddleware({
@@ -26,9 +42,13 @@ app.use(
 app.use("/api", router);
 
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error("Unhandled error:", err?.message ?? err);
   const status = err?.status ?? err?.statusCode ?? 500;
-  res.status(status).json({ error: err?.message ?? "Internal server error" });
+  if (status >= 500) {
+    console.error("Unhandled error:", err?.message ?? err);
+    res.status(status).json({ error: "Internal server error" });
+  } else {
+    res.status(status).json({ error: err?.message ?? "Request error" });
+  }
 });
 
 export default app;

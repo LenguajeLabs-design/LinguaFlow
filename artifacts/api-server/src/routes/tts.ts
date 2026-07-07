@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { openai } from "../lib/openai";
+import { requireAuth } from "../middleware/requireAuth";
+import { ttsLimiter } from "../middleware/rateLimiter";
 
 const router = Router();
 
@@ -21,7 +23,7 @@ const VOICE_CONFIG: Record<string, { voice: string; instructions: string }> = {
   },
 };
 
-router.post("/tts", async (req, res) => {
+router.post("/tts", requireAuth, ttsLimiter, async (req, res) => {
   const { text, language } = req.body as { text?: string; language?: string };
 
   if (!text || typeof text !== "string" || text.trim().length === 0) {
