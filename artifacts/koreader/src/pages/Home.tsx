@@ -1,21 +1,28 @@
+import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { useLanguageStore } from '@/hooks/use-language';
-import { LandingHero } from '@/components/landing/LandingHero';
-import { WhySection } from '@/components/landing/WhySection';
-import { HowItWorks } from '@/components/landing/HowItWorks';
-import { TrustSection } from '@/components/landing/TrustSection';
+import { GuestGenerateForm } from '@/components/guest/GuestGenerateForm';
+import { GuestReader } from '@/components/guest/GuestReader';
 
 export default function Home() {
-  const { language } = useLanguageStore();
+  const [passage, setPassage] = useState<any>(null);
+
+  const handleGenerated = (p: any) => {
+    setPassage(p);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleBack = () => {
+    setPassage(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <AppLayout>
-      <div className="-mt-8 -mb-24 md:-mb-8">
-        <LandingHero language={language} />
-        <WhySection />
-        <HowItWorks />
-        <TrustSection />
-      </div>
+      {passage ? (
+        <GuestReader passage={passage} onBack={handleBack} />
+      ) : (
+        <GuestGenerateForm onGenerated={handleGenerated} />
+      )}
     </AppLayout>
   );
 }

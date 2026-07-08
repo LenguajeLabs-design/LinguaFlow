@@ -36,3 +36,17 @@ export const ttsLimiter = rateLimit({
   legacyHeaders: false,
   handler: json429,
 });
+
+export const guestGenerateLimiter = rateLimit({
+  windowMs: 24 * 60 * 60 * 1000,
+  max: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip ?? "unknown",
+  handler: (_req, res) => {
+    res.status(429).json({
+      error: "Guest generation limit reached. Create a free account to keep reading.",
+      code: "GUEST_LIMIT",
+    });
+  },
+});

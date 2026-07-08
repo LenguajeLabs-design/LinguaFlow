@@ -5,11 +5,13 @@ import authRouter from "./auth";
 import vocabularyRouter from "./vocabulary";
 import ttsRouter from "./tts";
 import adminRouter from "./admin";
+import guestRouter from "./guest";
 
 const router: IRouter = Router();
 
 router.use(authRouter);
 router.use(healthRouter);
+router.use(guestRouter);
 router.use(passagesRouter);
 router.use(vocabularyRouter);
 router.use(ttsRouter);
