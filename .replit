@@ -69,3 +69,4 @@ channel = "stable-25_05"
 
 [userenv.shared]
 ADMIN_EMAILS = "forozc1@gmail.com"
+ALLOWED_ORIGIN = "https://readlinguaflow.com,https://www.readlinguaflow.com"

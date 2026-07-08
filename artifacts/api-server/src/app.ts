@@ -16,14 +16,17 @@ app.set("trust proxy", 1);
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN;
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGIN ?? "")
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
 const REPLIT_PATTERN = /^https:\/\/[a-z0-9-]+\.(replit\.dev|repl\.co|replit\.app)(\/.*)?$/i;
 
 app.use(cors({
   credentials: true,
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    if (ALLOWED_ORIGIN && origin === ALLOWED_ORIGIN) return callback(null, true);
+    if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
     if (REPLIT_PATTERN.test(origin)) return callback(null, true);
     if (process.env.NODE_ENV !== "production") return callback(null, true);
     callback(new Error("CORS: origin not allowed"));
