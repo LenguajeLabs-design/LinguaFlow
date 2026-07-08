@@ -61,16 +61,12 @@ async function incrementAndGet(userId: number, type: QuotaType): Promise<number>
 
 export function quotaCheck(type: QuotaType): RequestHandler {
   return async (req, res, next) => {
-    if (req.isAdmin) {
-      return next();
-    }
-
     const limit = getDailyLimit(type);
 
     try {
       const count = await incrementAndGet(req.userId, type);
 
-      if (count > limit) {
+      if (!req.isAdmin && count > limit) {
         const resetMs = utcMidnightTimestamp();
         res.setHeader("X-Quota-Limit", limit);
         res.setHeader("X-Quota-Used", count);
