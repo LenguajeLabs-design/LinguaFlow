@@ -8,6 +8,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { lazy, Suspense } from "react";
 
 import Home from "@/pages/Home";
+import { Onboarding } from "@/components/onboarding/Onboarding";
+import { useOnboardingStore } from "@/hooks/use-onboarding";
+import { AppLayout } from "@/components/layout/AppLayout";
 
 const Generate = lazy(() => import("@/pages/Generate"));
 const Library = lazy(() => import("@/pages/Library"));
@@ -85,11 +88,29 @@ const queryClient = new QueryClient({
   },
 });
 
+function AuthedHomeGate() {
+  const { hasOnboarded, completeOnboarding, skipOnboarding } = useOnboardingStore();
+
+  if (!hasOnboarded) {
+    return (
+      <AppLayout>
+        <Onboarding
+          variant="auth"
+          onSkip={skipOnboarding}
+          onComplete={() => completeOnboarding()}
+        />
+      </AppLayout>
+    );
+  }
+
+  return <Redirect to="/library" />;
+}
+
 function HomeRedirect() {
   return (
     <>
       <Show when="signed-in">
-        <Redirect to="/library" />
+        <AuthedHomeGate />
       </Show>
       <Show when="signed-out">
         <Home />
