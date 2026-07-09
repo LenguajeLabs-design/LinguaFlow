@@ -6,14 +6,18 @@ import { useListPassages } from '@workspace/api-client-react';
 import { PassageCard } from '@/components/passage/PassageCard';
 import { cn } from '@/lib/utils';
 import { useOfflineLibrary } from '@/hooks/use-offline-library';
+import { LANGUAGE_CONFIG, type AppLanguage } from '@/hooks/use-language';
 
 type FilterTab = 'all' | 'bookmarked';
+
+const LANGUAGE_ORDER: AppLanguage[] = ['ko', 'zh', 'es', 'en'];
 
 export default function Library() {
   const { data: passages, isLoading, isError } = useListPassages();
   const [searchQuery, setSearchQuery]         = useState('');
   const [activeTab, setActiveTab]             = useState<FilterTab>('all');
   const [difficultyFilter, setDifficultyFilter] = useState<string>('all');
+  const [languageFilter, setLanguageFilter]   = useState<string>('all');
   const [synced, setSynced]                   = useState(false);
 
   const { offlinePassages, isOnline, syncAll, isSyncing } = useOfflineLibrary();
@@ -37,6 +41,7 @@ export default function Library() {
   const filteredPassages = activePassages.filter(passage => {
     if (activeTab === 'bookmarked' && !passage.isBookmarked) return false;
     if (difficultyFilter !== 'all' && passage.difficulty !== difficultyFilter) return false;
+    if (languageFilter !== 'all' && passage.language !== languageFilter) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       return (
@@ -127,6 +132,22 @@ export default function Library() {
 
             <div className="relative h-[50px]">
               <select
+                value={languageFilter}
+                onChange={(e) => setLanguageFilter(e.target.value)}
+                className="h-full appearance-none pl-4 pr-10 rounded-xl bg-card border border-border text-foreground text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
+              >
+                <option value="all">All Languages</option>
+                {LANGUAGE_ORDER.map((lang) => (
+                  <option key={lang} value={lang}>
+                    {LANGUAGE_CONFIG[lang].flag} {LANGUAGE_CONFIG[lang].name}
+                  </option>
+                ))}
+              </select>
+              <Filter className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+            </div>
+
+            <div className="relative h-[50px]">
+              <select
                 value={difficultyFilter}
                 onChange={(e) => setDifficultyFilter(e.target.value)}
                 className="h-full appearance-none pl-4 pr-10 rounded-xl bg-card border border-border text-foreground text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
@@ -137,6 +158,18 @@ export default function Library() {
                 <option value="intermediate">Intermediate</option>
                 <option value="upper_intermediate">Upper Int.</option>
                 <option value="advanced">Advanced</option>
+                <option value="hsk1">HSK 1</option>
+                <option value="hsk2">HSK 2</option>
+                <option value="hsk3">HSK 3</option>
+                <option value="hsk4">HSK 4</option>
+                <option value="hsk5">HSK 5</option>
+                <option value="hsk6">HSK 6</option>
+                <option value="a1">A1</option>
+                <option value="a2">A2</option>
+                <option value="b1">B1</option>
+                <option value="b2">B2</option>
+                <option value="c1">C1</option>
+                <option value="c2">C2</option>
               </select>
               <Filter className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
             </div>
@@ -173,7 +206,7 @@ export default function Library() {
             <p className="text-muted-foreground">
               {!isOnline
                 ? 'Use "Sync for offline" while connected to save stories for your trip.'
-                : searchQuery || activeTab === 'bookmarked' || difficultyFilter !== 'all'
+                : searchQuery || activeTab === 'bookmarked' || difficultyFilter !== 'all' || languageFilter !== 'all'
                 ? "Try adjusting your filters or search query."
                 : "You haven't saved any passages yet."}
             </p>
