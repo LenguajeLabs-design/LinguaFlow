@@ -1,2 +1,3 @@
 - [Clerk Auth Migration](clerk-migration.md) — JIT email-linking, @clerk/shared/keys subpath workaround, CSS layer ordering required for Tailwind v4.
 - [No-Prod-DB Provisioning Gotcha](prod-db-provisioning.md) — Replit doesn't always auto-provision a prod Postgres; verify prod DB exists before debugging "auth/data broken in prod".
+- [Target vs Support Language](language-vs-support-language.md) — keep learning-target language separate from explanation language; default support to 'en', store client-side only.
