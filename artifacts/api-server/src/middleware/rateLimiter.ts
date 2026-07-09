@@ -1,4 +1,4 @@
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 
 const json429 = (_req: any, res: any) => {
   res.status(429).json({ error: "Too many requests. Please wait and try again." });
@@ -42,7 +42,7 @@ export const guestGenerateLimiter = rateLimit({
   max: 3,
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => req.ip ?? "unknown",
+  keyGenerator: (req) => ipKeyGenerator(req.ip ?? "unknown"),
   handler: (_req, res) => {
     res.status(429).json({
       error: "Guest generation limit reached. Create a free account to keep reading.",
