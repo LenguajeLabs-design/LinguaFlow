@@ -30,7 +30,7 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
   const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { toggle: toggleTTS, isPlaying, stop: stopTTS } = useOpenAITTS(passage.language ?? 'ko');
+  const { toggle: toggleTTS, isPlaying, isLoading: ttsLoading, stop: stopTTS } = useOpenAITTS(passage.language ?? 'ko');
   const { fontSize } = useSettings();
   const queryClient = useQueryClient();
 
@@ -159,15 +159,26 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
             {/* TTS */}
             <button
               onClick={() => toggleTTS(passage.koreanText)}
+              disabled={ttsLoading}
               className={cn(
                 'flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium border transition-all',
-                isPlaying
-                  ? 'bg-accent/10 text-accent border-accent/30'
-                  : 'bg-card text-foreground border-border hover:border-primary/30'
+                ttsLoading
+                  ? 'bg-card text-muted-foreground border-border opacity-70 cursor-wait'
+                  : isPlaying
+                    ? 'bg-accent/10 text-accent border-accent/30'
+                    : 'bg-card text-foreground border-border hover:border-primary/30'
               )}
             >
-              {isPlaying ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              <span className="hidden sm:inline">{isPlaying ? 'Stop' : 'Listen'}</span>
+              {ttsLoading ? (
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              ) : isPlaying ? (
+                <VolumeX className="w-4 h-4" />
+              ) : (
+                <Volume2 className="w-4 h-4" />
+              )}
+              <span className="hidden sm:inline">
+                {ttsLoading ? 'Loading…' : isPlaying ? 'Stop' : 'Listen'}
+              </span>
             </button>
 
             {/* Save / Bookmark */}
