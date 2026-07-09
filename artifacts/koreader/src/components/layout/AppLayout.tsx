@@ -8,6 +8,7 @@ import { useLanguageStore, LANGUAGE_CONFIG } from '@/hooks/use-language';
 import { useUser, useClerk } from '@clerk/react';
 import { useQueryClient } from '@tanstack/react-query';
 import appIcon from '/linguaflow-logo.png';
+import { Footer } from '@/components/layout/Footer';
 
 const navItems = [
   { href: '/',           icon: LayoutDashboard, label: 'Home'       },
@@ -181,6 +182,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 pb-24 md:pb-8">
         {children}
       </main>
+
+      <div className="pb-16 md:pb-0">
+        <Footer />
+      </div>
 
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur-md flex justify-around px-1 py-1">
