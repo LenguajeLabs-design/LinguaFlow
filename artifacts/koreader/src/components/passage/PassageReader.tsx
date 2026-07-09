@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  Volume2, VolumeX, Eye, EyeOff, BookOpen, Layout, Bookmark,
+  Volume2, Pause, Square, Eye, EyeOff, BookOpen, Layout, Bookmark,
   Type, ChevronDown, ChevronUp, List, FileText, HelpCircle, CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,7 +30,7 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
   const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { toggle: toggleTTS, isPlaying, isLoading: ttsLoading, stop: stopTTS } = useOpenAITTS(passage.language ?? 'ko');
+  const { toggle: toggleTTS, isPlaying, isLoading: ttsLoading, hasAudio: ttsHasAudio, stop: stopTTS } = useOpenAITTS(passage.language ?? 'ko');
   const { fontSize } = useSettings();
   const queryClient = useQueryClient();
 
@@ -172,14 +172,23 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
               {ttsLoading ? (
                 <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
               ) : isPlaying ? (
-                <VolumeX className="w-4 h-4" />
+                <Pause className="w-4 h-4" />
               ) : (
                 <Volume2 className="w-4 h-4" />
               )}
               <span className="hidden sm:inline">
-                {ttsLoading ? 'Loading…' : isPlaying ? 'Stop' : 'Listen'}
+                {ttsLoading ? 'Loading…' : isPlaying ? 'Pause' : ttsHasAudio ? 'Resume' : 'Listen'}
               </span>
             </button>
+            {ttsHasAudio && (
+              <button
+                onClick={stopTTS}
+                title="Stop"
+                className="p-2 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all"
+              >
+                <Square className="w-4 h-4 fill-current" />
+              </button>
+            )}
 
             {/* Save / Bookmark */}
             {isUnsaved ? (
