@@ -6,6 +6,7 @@ import {
 import { generateKoreanPassage } from "../lib/passageGenerator";
 import { generateChinesePassage } from "../lib/chinesePassageGenerator";
 import { generateSpanishPassage } from "../lib/spanishPassageGenerator";
+import { generateEnglishPassage } from "../lib/englishPassageGenerator";
 import { guestGenerateLimiter } from "../middleware/rateLimiter";
 
 const router: IRouter = Router();
@@ -18,11 +19,52 @@ router.post("/guest/generate", guestGenerateLimiter, async (req, res, next): Pro
   }
 
   const lang = parsed.data.language ?? "ko";
+  const supportLanguage = parsed.data.supportLanguage ?? "en";
 
   let passage: any;
 
   try {
-    if (lang === "es") {
+    if (lang === "en") {
+      const generated = await generateEnglishPassage({
+        topic: parsed.data.topic,
+        difficulty: parsed.data.difficulty,
+        length: parsed.data.length,
+        readingStyle: parsed.data.readingStyle,
+        vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
+        grammarFocus: parsed.data.grammarFocus ?? undefined,
+        supportLanguage,
+      });
+      passage = {
+        id: 0,
+        language: "en",
+        supportLanguage,
+        title: generated.title,
+        topic: parsed.data.topic,
+        difficulty: parsed.data.difficulty,
+        length: parsed.data.length,
+        vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
+        grammarFocus: parsed.data.grammarFocus ?? undefined,
+        readingStyle: parsed.data.readingStyle,
+        koreanText: generated.englishText,
+        summary: generated.summary,
+        sentences: generated.sentences.map((s) => ({
+          korean: s.english,
+          english: s.translation,
+        })),
+        tokens: null,
+        vocabulary: generated.vocabulary.map((v) => ({
+          korean: v.word,
+          romanization: "",
+          english: v.translation,
+          partOfSpeech: v.partOfSpeech,
+          exampleSentence: v.exampleSentence,
+        })),
+        comprehensionQuestions: generated.comprehensionQuestions,
+        imageUrls: generated.imageUrls,
+        isBookmarked: false,
+        createdAt: new Date().toISOString(),
+      };
+    } else if (lang === "es") {
       const generated = await generateSpanishPassage({
         topic: parsed.data.topic,
         difficulty: parsed.data.difficulty,
@@ -30,10 +72,12 @@ router.post("/guest/generate", guestGenerateLimiter, async (req, res, next): Pro
         readingStyle: parsed.data.readingStyle,
         vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
         grammarFocus: parsed.data.grammarFocus ?? undefined,
+        supportLanguage,
       });
       passage = {
         id: 0,
         language: "es",
+        supportLanguage,
         title: generated.title,
         topic: parsed.data.topic,
         difficulty: parsed.data.difficulty,
@@ -68,10 +112,12 @@ router.post("/guest/generate", guestGenerateLimiter, async (req, res, next): Pro
         readingStyle: parsed.data.readingStyle,
         vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
         grammarFocus: parsed.data.grammarFocus ?? undefined,
+        supportLanguage,
       });
       passage = {
         id: 0,
         language: "zh",
+        supportLanguage,
         title: generated.title,
         topic: parsed.data.topic,
         difficulty: parsed.data.difficulty,
@@ -107,10 +153,12 @@ router.post("/guest/generate", guestGenerateLimiter, async (req, res, next): Pro
         vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
         grammarFocus: parsed.data.grammarFocus ?? undefined,
         readingStyle: parsed.data.readingStyle,
+        supportLanguage,
       });
       passage = {
         id: 0,
         language: "ko",
+        supportLanguage,
         title: generated.title,
         topic: parsed.data.topic,
         difficulty: parsed.data.difficulty,

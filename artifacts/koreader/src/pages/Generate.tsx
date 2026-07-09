@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { useGeneratePassage, useSavePassage, getListPassagesQueryKey } from '@workspace/api-client-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { usePassageStore } from '@/store/use-passage-store';
-import { useLanguageStore, LANGUAGE_CONFIG } from '@/hooks/use-language';
+import { useLanguageStore, LANGUAGE_CONFIG, SUPPORT_LANGUAGE_OPTIONS } from '@/hooks/use-language';
 import { useSettings } from '@/hooks/use-settings';
 
 export default function Generate() {
@@ -17,7 +17,7 @@ export default function Generate() {
   const generateMutation = useGeneratePassage();
   const saveMutation = useSavePassage();
   const queryClient = useQueryClient();
-  const { language } = useLanguageStore();
+  const { language, supportLanguage, setSupportLanguage } = useLanguageStore();
   const { autosave } = useSettings();
   const langConfig = LANGUAGE_CONFIG[language];
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
@@ -56,11 +56,12 @@ export default function Generate() {
         data: {
           ...formData,
           language: language as any,
+          supportLanguage: supportLanguage as any,
         }
       },
       {
         onSuccess: (data) => {
-          const passageWithLang = { ...data, language };
+          const passageWithLang = { ...data, language, supportLanguage };
           setGeneratedPassage(passageWithLang as any);
 
           if (autosave) {
@@ -87,6 +88,7 @@ export default function Generate() {
   const isLoading = generateMutation.isPending || (autosave && saveMutation.isPending);
   const isZh = language === 'zh';
   const isEs = language === 'es';
+  const isEn = language === 'en';
 
   return (
     <AppLayout>
@@ -105,11 +107,41 @@ export default function Generate() {
               ? 'Generate Chinese passages calibrated to your HSK level on any topic you care about.'
               : isEs
               ? 'Generate Spanish passages calibrated to your CEFR level — perfect for heritage learners and advanced students.'
+              : isEn
+              ? 'Generate English passages calibrated to your CEFR level on any topic you care about.'
               : 'Tell the AI what you want to read about, and it will craft a passage perfect for your level.'}
           </p>
         </header>
 
         <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Support language */}
+          <div className="bg-card border border-border p-6 sm:p-8 rounded-2xl shadow-sm">
+            <label className="block text-lg font-bold text-foreground mb-4">
+              What language helps you learn?
+            </label>
+            <p className="text-sm text-muted-foreground mb-4">
+              Vocabulary meanings, translations, and grammar notes will be shown in this language.
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {SUPPORT_LANGUAGE_OPTIONS.map(({ value, label, flag }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setSupportLanguage(value)}
+                  className={cn(
+                    'flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all duration-200 font-medium',
+                    supportLanguage === value
+                      ? 'border-primary bg-primary/5 text-foreground shadow-sm'
+                      : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                  )}
+                >
+                  <span className="text-xl">{flag}</span>
+                  <span className="text-xs font-semibold">{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Topic */}
           <div className="bg-card border border-border p-6 sm:p-8 rounded-2xl shadow-sm">
             <label className="block text-lg font-bold text-foreground mb-4">
@@ -281,7 +313,7 @@ export default function Generate() {
             ) : (
               <>
                 <Sparkles className="w-6 h-6" />
-                <span>Generate {isZh ? 'Chinese' : isEs ? 'Spanish' : 'Korean'} Passage</span>
+                <span>Generate {isZh ? 'Chinese' : isEs ? 'Spanish' : isEn ? 'English' : 'Korean'} Passage</span>
               </>
             )}
           </button>

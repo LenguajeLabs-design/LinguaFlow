@@ -199,6 +199,12 @@ components:
       properties:
         topic:
           type: string
+        language:
+          type: string
+          enum: [ko, zh, es, en]
+        supportLanguage:
+          type: string
+          enum: [ko, zh, es, en]
         difficulty:
           type: string
           enum: [beginner, lower_intermediate, intermediate, upper_intermediate, advanced]
@@ -274,6 +280,10 @@ components:
       properties:
         id:
           type: integer
+        language:
+          type: string
+        supportLanguage:
+          type: string
         title:
           type: string
         topic:

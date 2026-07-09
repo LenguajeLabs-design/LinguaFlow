@@ -8,6 +8,7 @@ export const vocabularyTable = pgTable("vocabulary", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
   language: text("language").notNull().default("ko"),
+  supportLanguage: text("support_language").notNull().default("en"),
   word: text("word").notNull(),
   pinyin: text("pinyin"),
   meaning: text("meaning").notNull(),

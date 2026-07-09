@@ -387,6 +387,7 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
         contextSentence={activeWord?.context || ''}
         difficulty={passage.difficulty}
         language={passage.language}
+        supportLanguage={(passage as any).supportLanguage}
         anchorRect={activeWord?.anchorRect || null}
         onClose={() => setActiveWord(null)}
       />

@@ -1,4 +1,5 @@
 import { chatWithFallback, MODEL } from "./openai";
+import { glossInstruction } from "./supportLanguage";
 
 export interface ChineseToken {
   hanzi: string;
@@ -178,6 +179,7 @@ export async function generateChinesePassage(input: {
   readingStyle: string;
   vocabularyFocus?: string;
   grammarFocus?: string;
+  supportLanguage?: string;
 }): Promise<GeneratedChinesePassage> {
   const profile = hskProfiles[input.difficulty] ?? hskProfiles.hsk3;
   const lengthSpec = lengthMap[input.length] ?? lengthMap.medium;
@@ -204,6 +206,9 @@ ${grammarInstruction}
 SENTENCES: ${profile.sentenceGuidance}
 VOCABULARY: ${profile.vocabularyGuidance}
 GRAMMAR: ${profile.grammarGuidance}
+
+=== SUPPORT LANGUAGE ===
+${glossInstruction(input.supportLanguage)}
 
 === WORD SEGMENTATION REQUIREMENT ===
 You MUST segment the passage into individual words/tokens. Chinese has no spaces — you must identify word boundaries.

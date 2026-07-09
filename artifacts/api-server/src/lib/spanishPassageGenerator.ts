@@ -1,4 +1,5 @@
 import { chatWithFallback, MODEL } from "./openai";
+import { glossInstruction } from "./supportLanguage";
 
 export interface SpanishSentence {
   spanish: string;
@@ -174,6 +175,7 @@ export async function generateSpanishPassage(input: {
   readingStyle: string;
   vocabularyFocus?: string;
   grammarFocus?: string;
+  supportLanguage?: string;
 }): Promise<GeneratedSpanishPassage> {
   const profile = cefrProfiles[input.difficulty] ?? cefrProfiles.b1;
   const lengthSpec = lengthMap[input.length] ?? lengthMap.medium;
@@ -200,6 +202,9 @@ ${grammarInstruction}
 SENTENCES: ${profile.sentenceGuidance}
 VOCABULARY: ${profile.vocabularyGuidance}
 GRAMMAR: ${profile.grammarGuidance}
+
+=== SUPPORT LANGUAGE ===
+${glossInstruction(input.supportLanguage)}
 
 === HERITAGE LEARNER FOCUS ===
 - Write formal, standard written Spanish with correct accent marks (á, é, í, ó, ú, ñ, ü, ¡, ¿)

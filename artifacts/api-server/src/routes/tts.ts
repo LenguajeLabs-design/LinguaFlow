@@ -22,6 +22,11 @@ const VOICE_CONFIG: Record<string, { voice: string; instructions: string }> = {
     instructions:
       "Speak in natural, warm Latin American Spanish. Use a clear, conversational pace with authentic Spanish rhythm and intonation. Pronounce all vowels crisply, roll your r's naturally, and stress syllables correctly. Sound like an educated native speaker — warm and expressive, not robotic.",
   },
+  en: {
+    voice: "nova",
+    instructions:
+      "Speak in natural, warm American English. Use a clear, conversational pace with authentic rhythm and intonation. Sound like an educated native speaker — warm and expressive, not robotic.",
+  },
 };
 
 router.post("/tts", requireAuth, ttsLimiter, quotaCheck("tts"), async (req, res) => {
@@ -32,7 +37,7 @@ router.post("/tts", requireAuth, ttsLimiter, quotaCheck("tts"), async (req, res)
     return;
   }
 
-  const lang = language === "zh" ? "zh" : language === "es" ? "es" : "ko";
+  const lang = language === "zh" ? "zh" : language === "es" ? "es" : language === "en" ? "en" : "ko";
   const { voice, instructions } = VOICE_CONFIG[lang];
 
   try {

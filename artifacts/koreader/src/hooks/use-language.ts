@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type AppLanguage = 'ko' | 'zh' | 'es';
+export type AppLanguage = 'ko' | 'zh' | 'es' | 'en';
 
 interface LanguageStore {
   language: AppLanguage;
   setLanguage: (lang: AppLanguage) => void;
+  supportLanguage: AppLanguage;
+  setSupportLanguage: (lang: AppLanguage) => void;
 }
 
 export const useLanguageStore = create<LanguageStore>()(
@@ -13,6 +15,8 @@ export const useLanguageStore = create<LanguageStore>()(
     (set) => ({
       language: 'ko',
       setLanguage: (language) => set({ language }),
+      supportLanguage: 'en',
+      setSupportLanguage: (supportLanguage) => set({ supportLanguage }),
     }),
     { name: 'linguaflow-language' }
   )
@@ -107,4 +111,41 @@ export const LANGUAGE_CONFIG = {
     gradientFrom: 'hsl(355,80%,50%)',
     gradientTo: 'hsl(45,95%,50%)',
   },
+  en: {
+    name: 'English',
+    nativeName: 'English',
+    label: 'En',
+    flag: '🇺🇸',
+    appName: 'LinguaFlow',
+    difficultyLabel: 'CEFR Level',
+    difficulties: [
+      { value: 'a1', label: 'A1 – Beginner',           desc: '~500 words · Essential basics' },
+      { value: 'a2', label: 'A2 – Elementary',          desc: '~1,000 words · Simple daily life' },
+      { value: 'b1', label: 'B1 – Intermediate',        desc: '~2,000 words · Everyday topics' },
+      { value: 'b2', label: 'B2 – Upper Intermediate',  desc: '~4,000 words · Complex discourse' },
+      { value: 'c1', label: 'C1 – Advanced',            desc: '~8,000 words · Sophisticated prose' },
+      { value: 'c2', label: 'C2 – Mastery',             desc: '~16,000+ words · Near-native' },
+    ],
+    readingStyles: [
+      { value: 'story',      label: 'Story'                },
+      { value: 'article',    label: 'Article'              },
+      { value: 'dialogue',   label: 'Dialogue'             },
+      { value: 'reflection', label: 'Personal Reflection'  },
+      { value: 'summary',    label: 'Summary'              },
+    ],
+    topicSuggestions: [
+      'Life in a big city', 'Travel around the world', 'Food and cooking',
+      'Technology and the future', 'Music and culture', 'History and politics',
+      'Nature and the environment', 'Learning new skills',
+    ],
+    gradientFrom: 'hsl(217,90%,55%)',
+    gradientTo: 'hsl(190,80%,50%)',
+  },
 } as const;
+
+export const SUPPORT_LANGUAGE_OPTIONS: Array<{ value: AppLanguage; label: string; flag: string }> = [
+  { value: 'en', label: 'English', flag: '🇺🇸' },
+  { value: 'ko', label: 'Korean', flag: '🇰🇷' },
+  { value: 'zh', label: 'Chinese', flag: '🇨🇳' },
+  { value: 'es', label: 'Spanish', flag: '🇪🇸' },
+];

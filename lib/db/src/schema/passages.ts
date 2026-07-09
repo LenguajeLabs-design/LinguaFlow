@@ -32,6 +32,7 @@ export interface ChineseToken {
 export const passagesTable = pgTable("passages", {
   id: serial("id").primaryKey(),
   language: text("language").notNull().default("ko"),
+  supportLanguage: text("support_language").notNull().default("en"),
   title: text("title").notNull(),
   topic: text("topic").notNull(),
   difficulty: text("difficulty").notNull(),

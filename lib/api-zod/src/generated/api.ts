@@ -17,6 +17,7 @@ const chineseTokenSchema = zod.object({
 const passageShape = {
   id: zod.number(),
   language: zod.string().default("ko"),
+  supportLanguage: zod.string().default("en"),
   title: zod.string(),
   topic: zod.string(),
   difficulty: zod.string(),
@@ -85,7 +86,8 @@ export const AuthUserResponse = zod.object({
  */
 export const GeneratePassageBody = zod.object({
   topic: zod.string(),
-  language: zod.enum(["ko", "zh", "es"]).default("ko"),
+  language: zod.enum(["ko", "zh", "es", "en"]).default("ko"),
+  supportLanguage: zod.enum(["ko", "zh", "es", "en"]).default("en"),
   difficulty: zod.string(),
   length: zod.enum(["short", "medium", "long"]),
   vocabularyFocus: zod.string().nullable().optional(),
@@ -106,6 +108,7 @@ export const ListPassagesResponse = zod.array(ListPassagesResponseItem);
  */
 export const SavePassageBody = zod.object({
   language: zod.string().default("ko"),
+  supportLanguage: zod.string().default("en"),
   title: zod.string(),
   topic: zod.string(),
   difficulty: zod.string(),
@@ -175,7 +178,8 @@ export const ToggleBookmarkResponse = zod.object(passageShape);
  */
 export const GlossWordBody = zod.object({
   word: zod.string(),
-  language: zod.enum(["ko", "zh", "es"]).optional(),
+  language: zod.enum(["ko", "zh", "es", "en"]).optional(),
+  supportLanguage: zod.enum(["ko", "zh", "es", "en"]).optional(),
   context: zod.string().optional(),
   difficulty: zod.string().optional(),
 });
@@ -194,7 +198,8 @@ export const GlossWordResponse = zod.object({
  * @summary Vocabulary — save a word
  */
 export const SaveVocabBody = zod.object({
-  language: zod.enum(["ko", "zh", "es"]),
+  language: zod.enum(["ko", "zh", "es", "en"]),
+  supportLanguage: zod.enum(["ko", "zh", "es", "en"]).optional(),
   word: zod.string(),
   pinyin: zod.string().nullable().optional(),
   meaning: zod.string(),
@@ -207,6 +212,7 @@ export const SaveVocabBody = zod.object({
 export const VocabItemResponse = zod.object({
   id: zod.number(),
   language: zod.string(),
+  supportLanguage: zod.string().default("en"),
   word: zod.string(),
   pinyin: zod.string().nullable().optional(),
   meaning: zod.string(),

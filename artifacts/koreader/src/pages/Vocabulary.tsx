@@ -174,6 +174,8 @@ function VocabCard({
   isDeleting: boolean;
 }) {
   const isZh = item.language === 'zh';
+  const isEs = item.language === 'es';
+  const isEn = item.language === 'en';
 
   return (
     <div className={cn(
@@ -186,9 +188,13 @@ function VocabCard({
           'shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-bold mt-0.5',
           isZh
             ? 'bg-red-500/10 text-red-600'
+            : isEs
+            ? 'bg-amber-500/10 text-amber-600'
+            : isEn
+            ? 'bg-emerald-500/10 text-emerald-600'
             : 'bg-blue-500/10 text-blue-600'
         )}>
-          {isZh ? '汉' : '한'}
+          {isZh ? '汉' : isEs ? 'Es' : isEn ? 'En' : '한'}
         </span>
 
         {/* Content */}
@@ -196,7 +202,7 @@ function VocabCard({
           <div className="flex items-baseline gap-2 flex-wrap">
             <span className={cn(
               'font-bold text-foreground text-xl leading-none',
-              isZh ? 'font-chinese' : 'font-korean'
+              isZh ? 'font-chinese' : isEs || isEn ? '' : 'font-korean'
             )}>
               {item.word}
             </span>
@@ -213,7 +219,7 @@ function VocabCard({
           {item.exampleSentence && (
             <p className={cn(
               'text-xs text-muted-foreground/60 mt-1.5 leading-relaxed',
-              isZh ? 'font-chinese' : 'font-korean'
+              isZh ? 'font-chinese' : isEs || isEn ? '' : 'font-korean'
             )}>
               {item.exampleSentence}
             </p>

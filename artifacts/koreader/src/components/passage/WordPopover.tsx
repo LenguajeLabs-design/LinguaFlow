@@ -11,6 +11,7 @@ interface WordPopoverProps {
   contextSentence: string;
   difficulty: string;
   language?: string;
+  supportLanguage?: string;
   anchorRect: DOMRect | null;
   onClose: () => void;
 }
@@ -41,7 +42,7 @@ function computePosition(rect: DOMRect): { top?: string; bottom?: string; left: 
   };
 }
 
-export function WordPopover({ word, contextSentence, difficulty, language, anchorRect, onClose }: WordPopoverProps) {
+export function WordPopover({ word, contextSentence, difficulty, language, supportLanguage, anchorRect, onClose }: WordPopoverProps) {
   const { showRomanization } = useSettings();
   const glossMutation = useGlossWord();
   const prevWordRef = useRef('');
@@ -49,7 +50,15 @@ export function WordPopover({ word, contextSentence, difficulty, language, ancho
   useEffect(() => {
     if (word && anchorRect && word !== prevWordRef.current) {
       prevWordRef.current = word;
-      glossMutation.mutate({ data: { word, context: contextSentence, difficulty, ...(language ? { language: language as any } : {}) } });
+      glossMutation.mutate({
+        data: {
+          word,
+          context: contextSentence,
+          difficulty,
+          ...(language ? { language: language as any } : {}),
+          ...(supportLanguage ? { supportLanguage: supportLanguage as any } : {}),
+        }
+      });
     }
   }, [word, anchorRect]);
 

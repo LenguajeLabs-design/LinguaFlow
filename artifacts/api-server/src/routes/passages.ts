@@ -19,6 +19,7 @@ import {
 import { generateKoreanPassage, glossKoreanWord } from "../lib/passageGenerator";
 import { generateChinesePassage, glossChineseWord } from "../lib/chinesePassageGenerator";
 import { generateSpanishPassage, glossSpanishWord } from "../lib/spanishPassageGenerator";
+import { generateEnglishPassage, glossEnglishWord } from "../lib/englishPassageGenerator";
 import { requireAuth } from "../middleware/requireAuth";
 import { generateLimiter, glossLimiter } from "../middleware/rateLimiter";
 import { quotaCheck } from "../middleware/quotaMiddleware";
@@ -33,11 +34,53 @@ router.post("/passages/generate", requireAuth, generateLimiter, quotaCheck("gene
   }
 
   const lang = parsed.data.language ?? "ko";
+  const supportLanguage = parsed.data.supportLanguage ?? "en";
 
   let passage: any;
 
   try {
-  if (lang === "es") {
+  if (lang === "en") {
+    const generated = await generateEnglishPassage({
+      topic: parsed.data.topic,
+      difficulty: parsed.data.difficulty,
+      length: parsed.data.length,
+      readingStyle: parsed.data.readingStyle,
+      vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
+      grammarFocus: parsed.data.grammarFocus ?? undefined,
+      supportLanguage,
+    });
+
+    passage = {
+      id: 0,
+      language: "en",
+      supportLanguage,
+      title: generated.title,
+      topic: parsed.data.topic,
+      difficulty: parsed.data.difficulty,
+      length: parsed.data.length,
+      vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
+      grammarFocus: parsed.data.grammarFocus ?? undefined,
+      readingStyle: parsed.data.readingStyle,
+      koreanText: generated.englishText,
+      summary: generated.summary,
+      sentences: generated.sentences.map((s) => ({
+        korean: s.english,
+        english: s.translation,
+      })),
+      tokens: null,
+      vocabulary: generated.vocabulary.map((v) => ({
+        korean: v.word,
+        romanization: "",
+        english: v.translation,
+        partOfSpeech: v.partOfSpeech,
+        exampleSentence: v.exampleSentence,
+      })),
+      comprehensionQuestions: generated.comprehensionQuestions,
+      imageUrls: generated.imageUrls,
+      isBookmarked: false,
+      createdAt: new Date().toISOString(),
+    };
+  } else if (lang === "es") {
     const generated = await generateSpanishPassage({
       topic: parsed.data.topic,
       difficulty: parsed.data.difficulty,
@@ -45,11 +88,13 @@ router.post("/passages/generate", requireAuth, generateLimiter, quotaCheck("gene
       readingStyle: parsed.data.readingStyle,
       vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
       grammarFocus: parsed.data.grammarFocus ?? undefined,
+      supportLanguage,
     });
 
     passage = {
       id: 0,
       language: "es",
+      supportLanguage,
       title: generated.title,
       topic: parsed.data.topic,
       difficulty: parsed.data.difficulty,
@@ -84,11 +129,13 @@ router.post("/passages/generate", requireAuth, generateLimiter, quotaCheck("gene
       readingStyle: parsed.data.readingStyle,
       vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
       grammarFocus: parsed.data.grammarFocus ?? undefined,
+      supportLanguage,
     });
 
     passage = {
       id: 0,
       language: "zh",
+      supportLanguage,
       title: generated.title,
       topic: parsed.data.topic,
       difficulty: parsed.data.difficulty,
@@ -124,11 +171,13 @@ router.post("/passages/generate", requireAuth, generateLimiter, quotaCheck("gene
       vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
       grammarFocus: parsed.data.grammarFocus ?? undefined,
       readingStyle: parsed.data.readingStyle,
+      supportLanguage,
     });
 
     passage = {
       id: 0,
       language: "ko",
+      supportLanguage,
       title: generated.title,
       topic: parsed.data.topic,
       difficulty: parsed.data.difficulty,
@@ -176,6 +225,7 @@ router.post("/passages", requireAuth, async (req, res): Promise<void> => {
     .insert(passagesTable)
     .values({
       language: parsed.data.language ?? "ko",
+      supportLanguage: parsed.data.supportLanguage ?? "en",
       title: parsed.data.title,
       topic: parsed.data.topic,
       difficulty: parsed.data.difficulty,
@@ -276,9 +326,16 @@ router.post("/words/gloss", requireAuth, glossLimiter, quotaCheck("gloss"), asyn
   }
 
   const lang = parsed.data.language ?? "ko";
+  const supportLanguage = parsed.data.supportLanguage ?? "en";
   let gloss: any;
 
-  if (lang === "zh") {
+  if (lang === "en") {
+    gloss = await glossEnglishWord(
+      parsed.data.word,
+      parsed.data.context ?? undefined,
+      supportLanguage,
+    );
+  } else if (lang === "zh") {
     gloss = await glossChineseWord(
       parsed.data.word,
       parsed.data.context ?? undefined,
@@ -303,6 +360,7 @@ function formatPassage(p: typeof passagesTable.$inferSelect) {
   return {
     ...p,
     language: p.language ?? "ko",
+    supportLanguage: p.supportLanguage ?? "en",
     vocabularyFocus: p.vocabularyFocus ?? undefined,
     grammarFocus: p.grammarFocus ?? undefined,
     summary: p.summary ?? undefined,

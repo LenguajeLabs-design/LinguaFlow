@@ -1,4 +1,5 @@
 import { chatWithFallback, MODEL } from "./openai";
+import { glossInstruction } from "./supportLanguage";
 
 export interface PassageInput {
   topic: string;
@@ -7,6 +8,7 @@ export interface PassageInput {
   vocabularyFocus?: string;
   grammarFocus?: string;
   readingStyle: string;
+  supportLanguage?: string;
 }
 
 export interface Sentence {
@@ -308,6 +310,9 @@ ${grammarInstruction}
 SENTENCES: ${profile.sentenceGuidance}
 VOCABULARY: ${profile.vocabularyGuidance}
 GRAMMAR: ${profile.grammarGuidance}
+
+=== SUPPORT LANGUAGE ===
+${glossInstruction(input.supportLanguage)}
 
 === CONTENT QUALITY ===
 - Make the content genuinely interesting and culturally authentic — NOT like a generic textbook

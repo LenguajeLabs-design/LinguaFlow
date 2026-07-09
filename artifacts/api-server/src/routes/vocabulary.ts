@@ -67,6 +67,7 @@ router.post("/vocabulary", requireAuth, async (req, res): Promise<void> => {
     .values({
       userId: req.userId,
       language: parsed.data.language,
+      supportLanguage: parsed.data.supportLanguage ?? "en",
       word: parsed.data.word,
       pinyin: parsed.data.pinyin ?? null,
       meaning: parsed.data.meaning,
@@ -121,6 +122,7 @@ router.delete("/vocabulary/:id", requireAuth, async (req, res): Promise<void> =>
 function formatVocab(v: typeof vocabularyTable.$inferSelect) {
   return {
     ...v,
+    supportLanguage: v.supportLanguage ?? "en",
     pinyin: v.pinyin ?? undefined,
     exampleSentence: v.exampleSentence ?? undefined,
     sourcePassageId: v.sourcePassageId ?? undefined,

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Sparkles, Loader2, Hash, BookType } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { LANGUAGE_CONFIG, type AppLanguage, useLanguageStore } from '@/hooks/use-language';
+import { LANGUAGE_CONFIG, SUPPORT_LANGUAGE_OPTIONS, type AppLanguage, useLanguageStore } from '@/hooks/use-language';
 
 interface GuestGenerateFormProps {
   onGenerated: (passage: any) => void;
@@ -11,10 +11,11 @@ const LANGUAGES: { key: AppLanguage; label: string; native: string; flag: string
   { key: 'ko', label: 'Korean', native: '한국어', flag: '🇰🇷' },
   { key: 'zh', label: 'Chinese', native: '普通话', flag: '🇨🇳' },
   { key: 'es', label: 'Spanish', native: 'Español', flag: '🇪🇸' },
+  { key: 'en', label: 'English', native: 'English', flag: '🇺🇸' },
 ];
 
 export function GuestGenerateForm({ onGenerated }: GuestGenerateFormProps) {
-  const { language: storedLanguage, setLanguage } = useLanguageStore();
+  const { language: storedLanguage, setLanguage, supportLanguage, setSupportLanguage } = useLanguageStore();
   const [language, setLocalLanguage] = useState<AppLanguage>(storedLanguage);
   const langConfig = LANGUAGE_CONFIG[language];
 
@@ -51,7 +52,7 @@ export function GuestGenerateForm({ onGenerated }: GuestGenerateFormProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ ...formData, language }),
+        body: JSON.stringify({ ...formData, language, supportLanguage }),
       });
 
       if (!res.ok) {
@@ -65,7 +66,7 @@ export function GuestGenerateForm({ onGenerated }: GuestGenerateFormProps) {
       }
 
       const passage = await res.json();
-      onGenerated({ ...passage, language });
+      onGenerated({ ...passage, language, supportLanguage });
     } catch {
       setError('Unable to generate right now. Please try again.');
     } finally {
@@ -75,6 +76,7 @@ export function GuestGenerateForm({ onGenerated }: GuestGenerateFormProps) {
 
   const isZh = language === 'zh';
   const isEs = language === 'es';
+  const isEn = language === 'en';
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
@@ -88,7 +90,7 @@ export function GuestGenerateForm({ onGenerated }: GuestGenerateFormProps) {
       </header>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {LANGUAGES.map(({ key, label, native, flag }) => (
             <button
               key={key}
@@ -108,6 +110,30 @@ export function GuestGenerateForm({ onGenerated }: GuestGenerateFormProps) {
           ))}
         </div>
 
+        <div className="bg-card border border-border p-6 rounded-2xl shadow-sm space-y-4">
+          <label className="block text-sm font-semibold text-foreground">
+            What language helps you learn?
+          </label>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {SUPPORT_LANGUAGE_OPTIONS.map(({ value, label, flag }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setSupportLanguage(value)}
+                className={cn(
+                  'flex flex-col items-center gap-1 p-2.5 rounded-xl border-2 transition-all duration-200 font-medium',
+                  supportLanguage === value
+                    ? 'border-primary bg-primary/5 text-foreground shadow-sm'
+                    : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                )}
+              >
+                <span className="text-lg">{flag}</span>
+                <span className="text-xs font-semibold">{label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="bg-card border border-border p-6 rounded-2xl shadow-sm space-y-6">
           <div>
             <label className="block text-sm font-semibold text-foreground mb-3">
@@ -119,6 +145,7 @@ export function GuestGenerateForm({ onGenerated }: GuestGenerateFormProps) {
               placeholder={
                 isZh ? 'e.g. Life in Shanghai, Chinese New Year…'
                 : isEs ? 'e.g. La vida en Buenos Aires, comida mexicana…'
+                : isEn ? 'e.g. Life in a big city, learning a new skill…'
                 : 'e.g. Buying a train ticket to Busan, Korean café culture…'
               }
               value={formData.topic}
