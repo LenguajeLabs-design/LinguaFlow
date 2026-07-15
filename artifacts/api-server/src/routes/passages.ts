@@ -20,6 +20,7 @@ import { generateKoreanPassage, glossKoreanWord } from "../lib/passageGenerator"
 import { generateChinesePassage, glossChineseWord } from "../lib/chinesePassageGenerator";
 import { generateSpanishPassage, glossSpanishWord } from "../lib/spanishPassageGenerator";
 import { generateEnglishPassage, glossEnglishWord } from "../lib/englishPassageGenerator";
+import { generateItalianPassage, glossItalianWord } from "../lib/italianPassageGenerator";
 import { requireAuth } from "../middleware/requireAuth";
 import { generateLimiter, glossLimiter } from "../middleware/rateLimiter";
 import { quotaCheck } from "../middleware/quotaMiddleware";
@@ -106,6 +107,47 @@ router.post("/passages/generate", requireAuth, generateLimiter, quotaCheck("gene
       summary: generated.summary,
       sentences: generated.sentences.map((s) => ({
         korean: s.spanish,
+        english: s.english,
+      })),
+      tokens: null,
+      vocabulary: generated.vocabulary.map((v) => ({
+        korean: v.word,
+        romanization: "",
+        english: v.english,
+        partOfSpeech: v.partOfSpeech,
+        exampleSentence: v.exampleSentence,
+      })),
+      comprehensionQuestions: generated.comprehensionQuestions,
+      imageUrls: generated.imageUrls,
+      isBookmarked: false,
+      createdAt: new Date().toISOString(),
+    };
+  } else if (lang === "it") {
+    const generated = await generateItalianPassage({
+      topic: parsed.data.topic,
+      difficulty: parsed.data.difficulty,
+      length: parsed.data.length,
+      readingStyle: parsed.data.readingStyle,
+      vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
+      grammarFocus: parsed.data.grammarFocus ?? undefined,
+      supportLanguage,
+    });
+
+    passage = {
+      id: 0,
+      language: "it",
+      supportLanguage,
+      title: generated.title,
+      topic: parsed.data.topic,
+      difficulty: parsed.data.difficulty,
+      length: parsed.data.length,
+      vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
+      grammarFocus: parsed.data.grammarFocus ?? undefined,
+      readingStyle: parsed.data.readingStyle,
+      koreanText: generated.italianText,
+      summary: generated.summary,
+      sentences: generated.sentences.map((s) => ({
+        korean: s.italian,
         english: s.english,
       })),
       tokens: null,
@@ -342,6 +384,11 @@ router.post("/words/gloss", requireAuth, glossLimiter, quotaCheck("gloss"), asyn
     );
   } else if (lang === "es") {
     gloss = await glossSpanishWord(
+      parsed.data.word,
+      parsed.data.context ?? undefined,
+    );
+  } else if (lang === "it") {
+    gloss = await glossItalianWord(
       parsed.data.word,
       parsed.data.context ?? undefined,
     );

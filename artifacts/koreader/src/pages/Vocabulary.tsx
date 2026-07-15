@@ -7,7 +7,7 @@ import { vocabularyApi } from '@workspace/api-client-react';
 import type { SavedVocab } from '@workspace/api-client-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-type LangFilter = 'all' | 'ko' | 'zh';
+type LangFilter = 'all' | 'ko' | 'zh' | 'es' | 'it' | 'en';
 
 export default function Vocabulary() {
   const [langFilter, setLangFilter] = useState<LangFilter>('all');
@@ -60,6 +60,9 @@ export default function Vocabulary() {
     { value: 'all', label: 'All',     flag: '🌐' },
     { value: 'ko',  label: 'Korean',  flag: '🇰🇷' },
     { value: 'zh',  label: 'Chinese', flag: '🇨🇳' },
+    { value: 'es',  label: 'Spanish', flag: '🇪🇸' },
+    { value: 'it',  label: 'Italian', flag: '🇮🇹' },
+    { value: 'en',  label: 'English', flag: '🇺🇸' },
   ];
 
   return (
@@ -175,6 +178,7 @@ function VocabCard({
 }) {
   const isZh = item.language === 'zh';
   const isEs = item.language === 'es';
+  const isIt = item.language === 'it';
   const isEn = item.language === 'en';
 
   return (
@@ -190,11 +194,13 @@ function VocabCard({
             ? 'bg-red-500/10 text-red-600'
             : isEs
             ? 'bg-amber-500/10 text-amber-600'
+            : isIt
+            ? 'bg-green-700/10 text-green-700'
             : isEn
             ? 'bg-emerald-500/10 text-emerald-600'
             : 'bg-blue-500/10 text-blue-600'
         )}>
-          {isZh ? '汉' : isEs ? 'Es' : isEn ? 'En' : '한'}
+          {isZh ? '汉' : isEs ? 'Es' : isIt ? 'It' : isEn ? 'En' : '한'}
         </span>
 
         {/* Content */}
@@ -202,7 +208,7 @@ function VocabCard({
           <div className="flex items-baseline gap-2 flex-wrap">
             <span className={cn(
               'font-bold text-foreground text-xl leading-none',
-              isZh ? 'font-chinese' : isEs || isEn ? '' : 'font-korean'
+              isZh ? 'font-chinese' : isEs || isIt || isEn ? '' : 'font-korean'
             )}>
               {item.word}
             </span>
@@ -219,7 +225,7 @@ function VocabCard({
           {item.exampleSentence && (
             <p className={cn(
               'text-xs text-muted-foreground/60 mt-1.5 leading-relaxed',
-              isZh ? 'font-chinese' : isEs || isEn ? '' : 'font-korean'
+              isZh ? 'font-chinese' : isEs || isIt || isEn ? '' : 'font-korean'
             )}>
               {item.exampleSentence}
             </p>

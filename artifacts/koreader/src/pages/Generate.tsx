@@ -89,6 +89,7 @@ export default function Generate() {
   const isZh = language === 'zh';
   const isEs = language === 'es';
   const isEn = language === 'en';
+  const isIt = language === 'it';
 
   return (
     <AppLayout>
@@ -109,6 +110,8 @@ export default function Generate() {
               ? 'Generate Spanish passages calibrated to your CEFR level — perfect for heritage learners and advanced students.'
               : isEn
               ? 'Generate English passages calibrated to your CEFR level on any topic you care about.'
+              : isIt
+              ? 'Generate Italian passages calibrated to your CEFR level — ideal for learners who want natural, meaningful reading practice.'
               : 'Tell the AI what you want to read about, and it will craft a passage perfect for your level.'}
           </p>
         </header>
@@ -154,6 +157,8 @@ export default function Generate() {
                 ? 'e.g. Life in Shanghai, Chinese New Year, AI technology…'
                 : isEs
                 ? 'e.g. La vida en Buenos Aires, comida mexicana, música latina…'
+                : isIt
+                ? 'e.g. Un weekend a Firenze, pasta fatta in casa, cinema italiano…'
                 : 'e.g. Buying a train ticket to Busan, Korean café culture…'}
               value={formData.topic}
               onChange={(e) => setFormData(prev => ({ ...prev, topic: e.target.value }))}
@@ -275,7 +280,7 @@ export default function Generate() {
                       </label>
                       <input
                         type="text"
-                        placeholder={isZh ? 'e.g. 旅行, 美食, 文化' : isEs ? 'e.g. viaje, cocina, familia' : 'e.g. 기차, 예매, 역무원'}
+                        placeholder={isZh ? 'e.g. 旅行, 美食, 文化' : isEs ? 'e.g. viaje, cocina, familia' : isIt ? 'e.g. viaggio, cucina, famiglia' : 'e.g. 기차, 예매, 역무원'}
                         value={formData.vocabularyFocus}
                         onChange={(e) => setFormData(prev => ({ ...prev, vocabularyFocus: e.target.value }))}
                         className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
@@ -287,7 +292,7 @@ export default function Generate() {
                       </label>
                       <input
                         type="text"
-                        placeholder={isZh ? 'e.g. 把字句, 被动句, 结果补语' : isEs ? 'e.g. subjuntivo, pretérito vs imperfecto, ser/estar' : 'e.g. ~(으)면 좋겠다, ~기 때문에'}
+                        placeholder={isZh ? 'e.g. 把字句, 被动句, 结果补语' : isEs ? 'e.g. subjuntivo, pretérito vs imperfecto, ser/estar' : isIt ? 'e.g. congiuntivo, passato prossimo vs imperfetto, articoli' : 'e.g. ~(으)면 좋겠다, ~기 때문에'}
                         value={formData.grammarFocus}
                         onChange={(e) => setFormData(prev => ({ ...prev, grammarFocus: e.target.value }))}
                         className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
@@ -313,7 +318,7 @@ export default function Generate() {
             ) : (
               <>
                 <Sparkles className="w-6 h-6" />
-                <span>Generate {isZh ? 'Chinese' : isEs ? 'Spanish' : isEn ? 'English' : 'Korean'} Passage</span>
+                <span>Generate {isZh ? 'Chinese' : isEs ? 'Spanish' : isEn ? 'English' : isIt ? 'Italian' : 'Korean'} Passage</span>
               </>
             )}
           </button>

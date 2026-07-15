@@ -43,6 +43,16 @@ const HEADLINES: Record<AppLanguage, { eyebrow: string; title: JSX.Element; subt
     subtitle:
       'LinguaFlow turns any topic you love into an English story calibrated to your CEFR level — so reading feels less like studying, and more like falling into a good book.',
   },
+  it: {
+    eyebrow: 'Now generating Italian stories',
+    title: (
+      <>
+        Fluency, written<br />just for you.
+      </>
+    ),
+    subtitle:
+      'LinguaFlow turns any topic you love into an Italian story calibrated to your CEFR level — so reading feels less like studying, and more like falling into a good book.',
+  },
 };
 
 export function LandingHero({ language }: { language: AppLanguage }) {

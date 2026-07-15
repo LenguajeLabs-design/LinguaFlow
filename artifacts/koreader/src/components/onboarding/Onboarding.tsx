@@ -21,6 +21,7 @@ const LEVEL_MAP: Record<AppLanguage, Record<Level, string>> = {
   zh: { beginner: 'hsk2', intermediate: 'hsk4', advanced: 'hsk6' },
   es: { beginner: 'a1', intermediate: 'b1', advanced: 'c1' },
   en: { beginner: 'a1', intermediate: 'b1', advanced: 'c1' },
+  it: { beginner: 'a1', intermediate: 'b1', advanced: 'c1' },
 };
 
 const LANGUAGE_OPTIONS: { key: AppLanguage; label: string; native: string; flag: string }[] = [
@@ -28,6 +29,7 @@ const LANGUAGE_OPTIONS: { key: AppLanguage; label: string; native: string; flag:
   { key: 'zh', label: 'Chinese', native: '普通话', flag: '🇨🇳' },
   { key: 'es', label: 'Spanish', native: 'Español', flag: '🇪🇸' },
   { key: 'en', label: 'English', native: 'English', flag: '🇺🇸' },
+  { key: 'it', label: 'Italian', native: 'Italiano', flag: '🇮🇹' },
 ];
 
 const LEVELS: { key: Level; title: string; tagline: string }[] = [
@@ -202,7 +204,7 @@ export function Onboarding({ variant, onSkip, onComplete }: OnboardingProps) {
                 <p className="text-muted-foreground text-center mb-8">
                   We'll tailor readings to this language.
                 </p>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-10">
                   {LANGUAGE_OPTIONS.map(({ key, label, native, flag }) => (
                     <button
                       key={key}
@@ -233,7 +235,7 @@ export function Onboarding({ variant, onSkip, onComplete }: OnboardingProps) {
                 <p className="text-muted-foreground text-center mb-8 max-w-md mx-auto">
                   We use this for vocabulary, translations, and explanations.
                 </p>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-10">
                   {SUPPORT_LANGUAGE_OPTIONS.map(({ value, label, flag }) => (
                     <button
                       key={value}

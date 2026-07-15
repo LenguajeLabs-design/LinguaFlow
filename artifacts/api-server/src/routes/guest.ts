@@ -7,6 +7,7 @@ import { generateKoreanPassage } from "../lib/passageGenerator";
 import { generateChinesePassage } from "../lib/chinesePassageGenerator";
 import { generateSpanishPassage } from "../lib/spanishPassageGenerator";
 import { generateEnglishPassage } from "../lib/englishPassageGenerator";
+import { generateItalianPassage } from "../lib/italianPassageGenerator";
 import { guestGenerateLimiter } from "../middleware/rateLimiter";
 
 const router: IRouter = Router();
@@ -89,6 +90,46 @@ router.post("/guest/generate", guestGenerateLimiter, async (req, res, next): Pro
         summary: generated.summary,
         sentences: generated.sentences.map((s) => ({
           korean: s.spanish,
+          english: s.english,
+        })),
+        tokens: null,
+        vocabulary: generated.vocabulary.map((v) => ({
+          korean: v.word,
+          romanization: "",
+          english: v.english,
+          partOfSpeech: v.partOfSpeech,
+          exampleSentence: v.exampleSentence,
+        })),
+        comprehensionQuestions: generated.comprehensionQuestions,
+        imageUrls: generated.imageUrls,
+        isBookmarked: false,
+        createdAt: new Date().toISOString(),
+      };
+    } else if (lang === "it") {
+      const generated = await generateItalianPassage({
+        topic: parsed.data.topic,
+        difficulty: parsed.data.difficulty,
+        length: parsed.data.length,
+        readingStyle: parsed.data.readingStyle,
+        vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
+        grammarFocus: parsed.data.grammarFocus ?? undefined,
+        supportLanguage,
+      });
+      passage = {
+        id: 0,
+        language: "it",
+        supportLanguage,
+        title: generated.title,
+        topic: parsed.data.topic,
+        difficulty: parsed.data.difficulty,
+        length: parsed.data.length,
+        vocabularyFocus: parsed.data.vocabularyFocus ?? undefined,
+        grammarFocus: parsed.data.grammarFocus ?? undefined,
+        readingStyle: parsed.data.readingStyle,
+        koreanText: generated.italianText,
+        summary: generated.summary,
+        sentences: generated.sentences.map((s) => ({
+          korean: s.italian,
           english: s.english,
         })),
         tokens: null,

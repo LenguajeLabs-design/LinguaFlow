@@ -101,7 +101,7 @@ export function WordPopover({ word, contextSentence, difficulty, language, suppo
             {/* Header */}
             <div className="flex items-start justify-between px-4 pt-4 pb-3 border-b border-border/40 bg-secondary/20">
               <div>
-                <h3 className="text-xl font-korean font-bold text-foreground leading-tight">{word}</h3>
+                <h3 className={cn('text-xl font-bold text-foreground leading-tight', language === 'ko' ? 'font-korean' : language === 'zh' ? 'font-chinese' : '')}>{word}</h3>
                 {showRomanization && glossMutation.data?.romanization && (
                   <p className="text-xs text-muted-foreground mt-0.5 font-mono tracking-wide">
                     {glossMutation.data.romanization}
@@ -159,7 +159,7 @@ export function WordPopover({ word, contextSentence, difficulty, language, suppo
                   {/* Example */}
                   {glossMutation.data.exampleSentence && (
                     <div className="border-t border-border/40 pt-3 space-y-1">
-                      <p className="font-korean text-sm text-foreground leading-relaxed">
+                      <p className={cn('text-sm text-foreground leading-relaxed', language === 'ko' ? 'font-korean' : language === 'zh' ? 'font-chinese' : '')}>
                         {glossMutation.data.exampleSentence}
                       </p>
                       <p className="text-xs font-serif text-muted-foreground leading-relaxed">

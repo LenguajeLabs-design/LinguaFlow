@@ -1,0 +1,105 @@
+Please add a first working Italian language pass to LinguaFlow.
+
+Goal:
+Add Italian as a selectable language alongside Korean, Chinese, and Spanish, using the existing architecture and patterns already used for Spanish where possible.
+
+What I want included:
+1. Frontend language support
+- Add `it` to the app language type/store.
+- Add Italian to the language switcher in the header.
+- Add Italian config in the language config object:
+  - name: Italian
+  - nativeName: Italiano
+  - label: It
+  - flag: 🇮🇹
+  - difficultyLabel: CEFR Level
+  - CEFR levels A1–C2
+  - reading styles matching Spanish
+  - Italian topic suggestions
+  - Italian-themed gradient colors
+
+2. Generator page
+- Add Italian-specific hero/subtitle copy.
+- Add Italian placeholder examples for:
+  - topic
+  - vocabulary focus
+  - grammar focus
+- Make the submit button say `Generate Italian Passage` when Italian is selected.
+
+Suggested Italian copy:
+- Subtitle: `Generate Italian passages calibrated to your CEFR level — ideal for learners who want natural, meaningful reading practice.`
+- Topic placeholder: `e.g. Un weekend a Firenze, pasta fatta in casa, cinema italiano…`
+- Vocabulary placeholder: `e.g. viaggio, cucina, famiglia`
+- Grammar placeholder: `e.g. congiuntivo, passato prossimo vs imperfetto, articoli`
+
+3. Home page
+- Add Italian-specific homepage hero copy and empty-state copy.
+- Keep the current Chinese logic intact.
+- For Italian, use:
+  - Hero title: `Master Italian through elegant, level-based stories.`
+  - Hero description: `Generate Italian passages tailored to your CEFR level and interests. Build vocabulary naturally with instant translations and authentic context.`
+  - Empty library copy: `Start your journey by generating your first personalized Italian reading passage.`
+
+4. Backend generation
+- Add Italian support to the passage generation route.
+- Create a new Italian generator file similar in shape to the Spanish generator:
+  - `artifacts/api-server/src/lib/italianPassageGenerator.ts`
+- It should export:
+  - `generateItalianPassage(...)`
+  - `glossItalianWord(...)`
+- Use CEFR-based difficulty handling similar to Spanish.
+- Return passage data in the same normalized app shape used elsewhere:
+  - `language: "it"`
+  - `koreanText` field should carry the actual Italian full text, same way Spanish currently reuses that field
+  - `sentences` should map to `{ korean: italianSentence, english: englishTranslation }`
+  - vocabulary should map into the shared vocabulary structure
+
+5. Word glossing
+- Add Italian to `/words/gloss` routing.
+- Italian gloss should return the same schema used by the other languages:
+  - word
+  - romanization (empty string for Italian)
+  - englishMeaning
+  - partOfSpeech
+  - grammarNote optional
+  - exampleSentence optional
+  - exampleTranslation optional
+
+6. TTS
+- Add Italian TTS support in the TTS route.
+- Add an Italian voice config entry.
+- Route language `"it"` correctly instead of falling back to Korean.
+
+7. Shared API contract
+- Update the shared zod/api contract so Italian is accepted anywhere language enums are defined:
+  - generate passage body
+  - gloss body
+  - save vocab body
+- Update generated/consumed frontend language types too if needed.
+
+8. Vocabulary page
+- Add Italian as a filter tab.
+- Also make sure Spanish appears too if it is missing there.
+- Update language badge rendering so:
+  - Korean shows `한`
+  - Chinese shows `汉`
+  - Spanish shows `Es`
+  - Italian shows `It`
+- Do not force Korean/Chinese fonts onto Italian/Spanish entries.
+
+9. Reader / popover polish
+- Make sure non-Korean languages do not inherit Korean-only font classes in obvious places like:
+  - passage title
+  - vocabulary item display
+  - example sentence display
+  - word popover title/example
+- Keep Chinese-specific reader behavior separate as it already is.
+
+Important constraints:
+- Do not remove or break current Korean, Chinese, or Spanish behavior.
+- Reuse existing architecture and naming patterns.
+- Keep this a clean first pass, not a full redesign.
+- Do not add migrations or unrelated features.
+- After editing, run the project checks available in Replit and fix any type/runtime issues caused by the Italian addition.
+
+If helpful, mirror the implementation style of the Spanish flow as closely as possible.

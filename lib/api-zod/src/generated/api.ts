@@ -86,8 +86,8 @@ export const AuthUserResponse = zod.object({
  */
 export const GeneratePassageBody = zod.object({
   topic: zod.string(),
-  language: zod.enum(["ko", "zh", "es", "en"]).default("ko"),
-  supportLanguage: zod.enum(["ko", "zh", "es", "en"]).default("en"),
+  language: zod.enum(["ko", "zh", "es", "en", "it"]).default("ko"),
+  supportLanguage: zod.enum(["ko", "zh", "es", "en", "it"]).default("en"),
   difficulty: zod.string(),
   length: zod.enum(["short", "medium", "long"]),
   vocabularyFocus: zod.string().nullable().optional(),
@@ -178,8 +178,8 @@ export const ToggleBookmarkResponse = zod.object(passageShape);
  */
 export const GlossWordBody = zod.object({
   word: zod.string(),
-  language: zod.enum(["ko", "zh", "es", "en"]).optional(),
-  supportLanguage: zod.enum(["ko", "zh", "es", "en"]).optional(),
+  language: zod.enum(["ko", "zh", "es", "en", "it"]).optional(),
+  supportLanguage: zod.enum(["ko", "zh", "es", "en", "it"]).optional(),
   context: zod.string().optional(),
   difficulty: zod.string().optional(),
 });
@@ -198,8 +198,8 @@ export const GlossWordResponse = zod.object({
  * @summary Vocabulary — save a word
  */
 export const SaveVocabBody = zod.object({
-  language: zod.enum(["ko", "zh", "es", "en"]),
-  supportLanguage: zod.enum(["ko", "zh", "es", "en"]).optional(),
+  language: zod.enum(["ko", "zh", "es", "en", "it"]),
+  supportLanguage: zod.enum(["ko", "zh", "es", "en", "it"]).optional(),
   word: zod.string(),
   pinyin: zod.string().nullable().optional(),
   meaning: zod.string(),

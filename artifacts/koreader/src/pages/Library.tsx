@@ -10,7 +10,7 @@ import { LANGUAGE_CONFIG, type AppLanguage } from '@/hooks/use-language';
 
 type FilterTab = 'all' | 'bookmarked';
 
-const LANGUAGE_ORDER: AppLanguage[] = ['ko', 'zh', 'es', 'en'];
+const LANGUAGE_ORDER: AppLanguage[] = ['ko', 'zh', 'es', 'it', 'en'];
 
 export default function Library() {
   const { data: passages, isLoading, isError } = useListPassages();

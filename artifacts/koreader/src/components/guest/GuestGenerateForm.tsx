@@ -12,6 +12,7 @@ const LANGUAGES: { key: AppLanguage; label: string; native: string; flag: string
   { key: 'zh', label: 'Chinese', native: '普通话', flag: '🇨🇳' },
   { key: 'es', label: 'Spanish', native: 'Español', flag: '🇪🇸' },
   { key: 'en', label: 'English', native: 'English', flag: '🇺🇸' },
+  { key: 'it', label: 'Italian', native: 'Italiano', flag: '🇮🇹' },
 ];
 
 export function GuestGenerateForm({ onGenerated }: GuestGenerateFormProps) {
@@ -77,6 +78,7 @@ export function GuestGenerateForm({ onGenerated }: GuestGenerateFormProps) {
   const isZh = language === 'zh';
   const isEs = language === 'es';
   const isEn = language === 'en';
+  const isIt = language === 'it';
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
@@ -90,7 +92,7 @@ export function GuestGenerateForm({ onGenerated }: GuestGenerateFormProps) {
       </header>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
           {LANGUAGES.map(({ key, label, native, flag }) => (
             <button
               key={key}
@@ -146,6 +148,7 @@ export function GuestGenerateForm({ onGenerated }: GuestGenerateFormProps) {
                 isZh ? 'e.g. Life in Shanghai, Chinese New Year…'
                 : isEs ? 'e.g. La vida en Buenos Aires, comida mexicana…'
                 : isEn ? 'e.g. Life in a big city, learning a new skill…'
+                : isIt ? 'e.g. Un weekend a Firenze, cucina italiana…'
                 : 'e.g. Buying a train ticket to Busan, Korean café culture…'
               }
               value={formData.topic}

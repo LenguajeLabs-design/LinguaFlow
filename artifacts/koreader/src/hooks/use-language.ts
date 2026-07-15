@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type AppLanguage = 'ko' | 'zh' | 'es' | 'en';
+export type AppLanguage = 'ko' | 'zh' | 'es' | 'en' | 'it';
 
 interface LanguageStore {
   language: AppLanguage;
@@ -141,6 +141,36 @@ export const LANGUAGE_CONFIG = {
     gradientFrom: 'hsl(217,90%,55%)',
     gradientTo: 'hsl(190,80%,50%)',
   },
+  it: {
+    name: 'Italian',
+    nativeName: 'Italiano',
+    label: 'It',
+    flag: '🇮🇹',
+    appName: 'LinguaFlow',
+    difficultyLabel: 'CEFR Level',
+    difficulties: [
+      { value: 'a1', label: 'A1 – Beginner',           desc: '~500 parole · Basi essenziali' },
+      { value: 'a2', label: 'A2 – Elementary',          desc: '~1,000 parole · Vita quotidiana' },
+      { value: 'b1', label: 'B1 – Intermediate',        desc: '~2,000 parole · Argomenti comuni' },
+      { value: 'b2', label: 'B2 – Upper Intermediate',  desc: '~4,000 parole · Discorso complesso' },
+      { value: 'c1', label: 'C1 – Advanced',            desc: '~8,000 parole · Prosa sofisticata' },
+      { value: 'c2', label: 'C2 – Mastery',             desc: '~16,000+ parole · Quasi nativo' },
+    ],
+    readingStyles: [
+      { value: 'story',      label: 'Story'                },
+      { value: 'article',    label: 'Article'              },
+      { value: 'dialogue',   label: 'Dialogue'             },
+      { value: 'reflection', label: 'Personal Reflection'  },
+      { value: 'summary',    label: 'Summary'              },
+    ],
+    topicSuggestions: [
+      'Un weekend a Firenze', 'La cucina italiana', 'Il cinema italiano',
+      'La famiglia e le tradizioni', 'Arte e storia', 'La moda italiana',
+      'Viaggiare in Italia', 'La musica e la cultura',
+    ],
+    gradientFrom: 'hsl(7,80%,50%)',
+    gradientTo: 'hsl(45,95%,50%)',
+  },
 } as const;
 
 export const SUPPORT_LANGUAGE_OPTIONS: Array<{ value: AppLanguage; label: string; flag: string }> = [
@@ -148,4 +178,5 @@ export const SUPPORT_LANGUAGE_OPTIONS: Array<{ value: AppLanguage; label: string
   { value: 'ko', label: 'Korean', flag: '🇰🇷' },
   { value: 'zh', label: 'Chinese', flag: '🇨🇳' },
   { value: 'es', label: 'Spanish', flag: '🇪🇸' },
+  { value: 'it', label: 'Italian', flag: '🇮🇹' },
 ];

@@ -128,6 +128,18 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               >
                 En
               </button>
+              <button
+                onClick={() => setLanguage('it')}
+                title="Italian — LinguaFlow"
+                className={cn(
+                  'px-2.5 py-1.5 rounded-[0.6rem] text-xs font-bold transition-all duration-200',
+                  language === 'it'
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                It
+              </button>
             </div>
 
             {/* Dark mode toggle */}

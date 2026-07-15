@@ -107,7 +107,14 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
     { id: 'full',    label: 'Full',    icon: Layout,   tooltip: 'All translations always visible' },
   ] as const;
 
-  const koreanFontClass = cn('korean-reading-text font-korean text-foreground', fontSizeMap[fontSize]);
+  const lang = passage.language ?? 'ko';
+  const isKo = lang === 'ko';
+  const isZh = lang === 'zh';
+  const koreanFontClass = cn(
+    'korean-reading-text text-foreground',
+    isKo ? 'font-korean' : isZh ? 'font-chinese' : '',
+    fontSizeMap[fontSize],
+  );
   const comprehensionQuestions = (passage as any).comprehensionQuestions as Array<{ question: string; answer: string }> | undefined;
   const summary = (passage as any).summary as string | undefined;
 
@@ -229,7 +236,7 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
             {passage.readingStyle}
           </span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-korean font-bold text-foreground leading-tight text-balance">
+        <h1 className={cn('text-2xl sm:text-3xl font-bold text-foreground leading-tight text-balance', isKo ? 'font-korean' : isZh ? 'font-chinese' : 'font-serif')}>
           {passage.title}
         </h1>
         {/* English summary */}
@@ -333,7 +340,7 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
               >
                 <div className="flex items-start justify-between mb-1.5">
                   <div className="flex items-baseline gap-2">
-                    <span className="font-korean font-bold text-foreground">{vocab.korean}</span>
+                    <span className={cn('font-bold text-foreground', isKo ? 'font-korean' : isZh ? 'font-chinese' : '')}>{vocab.korean}</span>
                     <span className="text-xs font-mono text-muted-foreground">{vocab.romanization}</span>
                   </div>
                   <span className="text-[10px] uppercase tracking-wider font-semibold text-accent bg-accent/10 px-2 py-0.5 rounded shrink-0 ml-1">
@@ -342,7 +349,7 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
                 </div>
                 <p className="text-sm font-serif text-foreground font-medium mb-2">{vocab.english}</p>
                 {vocab.exampleSentence && (
-                  <p className="text-xs text-muted-foreground font-korean bg-secondary/50 px-3 py-2 rounded-lg leading-relaxed">
+                  <p className={cn('text-xs text-muted-foreground bg-secondary/50 px-3 py-2 rounded-lg leading-relaxed', isKo ? 'font-korean' : isZh ? 'font-chinese' : '')}>
                     {vocab.exampleSentence}
                   </p>
                 )}
@@ -366,7 +373,7 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
                   <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
                     {idx + 1}
                   </span>
-                  <p className="font-korean text-foreground leading-relaxed pt-0.5">{q.question}</p>
+                  <p className={cn('text-foreground leading-relaxed pt-0.5', isKo ? 'font-korean' : isZh ? 'font-chinese' : '')}>{q.question}</p>
                 </div>
                 <div className="border-t border-border/40">
                   {revealedAnswers.has(idx) ? (
@@ -377,7 +384,7 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
                     >
                       <CheckCircle2 className="w-4 h-4 text-accent shrink-0 mt-0.5" />
                       <div className="flex-1">
-                        <p className="font-korean text-foreground text-sm leading-relaxed">{q.answer}</p>
+                        <p className={cn('text-foreground text-sm leading-relaxed', isKo ? 'font-korean' : isZh ? 'font-chinese' : '')}>{q.answer}</p>
                         <button
                           onClick={() => toggleAnswer(idx)}
                           className="text-xs text-muted-foreground/50 hover:text-muted-foreground mt-2 transition-colors"
