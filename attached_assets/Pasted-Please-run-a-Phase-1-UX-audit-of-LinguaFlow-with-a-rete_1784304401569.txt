@@ -1,0 +1,82 @@
+Please run a Phase 1 UX audit of LinguaFlow with a retention and activation lens.
+
+Important:
+- Do not redesign yet
+- Do not patch code yet
+- Do not change files yet
+- This phase is audit only
+
+Goal:
+Figure out why users are trying LinguaFlow but not consistently going deeper into:
+- word gloss
+- TTS
+- vocabulary saves
+- repeat usage
+
+Context:
+LinguaFlow already gets curiosity and passage generation, but too few users are completing the full learning loop:
+generate passage -> tap word -> save vocabulary -> listen -> return tomorrow
+
+Please inspect the current app and evaluate these areas:
+- landing page
+- sign-in flow
+- first signed-in experience
+- signed-in home/dashboard
+- generate page
+- reader page
+- library page
+- vocabulary page
+- favorites page
+- settings page
+- empty states
+- mobile responsiveness
+- overall product clarity
+
+Focus especially on:
+
+1. First 60 seconds
+- Is it obvious what LinguaFlow does?
+- Is it obvious what the user should do first?
+- Is there friction or too much choice too early?
+
+2. Activation
+- How easy is it for a new user to complete a satisfying first session?
+- Where do users likely stop after generating a passage?
+- What is preventing them from using gloss, TTS, and vocab save?
+
+3. Habit formation
+- Does the app create a reason to come back?
+- Does progress feel visible and personal?
+- Does vocabulary feel like something worth building?
+
+4. UX clarity
+- What already feels polished?
+- What feels confusing, too passive, unfinished, or too spread out?
+
+5. Retention friction
+- Identify the biggest UX problems hurting retention
+- Rank them by severity and likely impact
+
+Deliverables:
+1. A concise UX audit summary
+2. Top 10 friction points ranked by severity
+3. Why each friction point hurts activation or retention
+4. The 5 highest-impact improvements for Phase 2
+5. A recommended implementation order for Phase 2
+
+Design lens:
+- premium
+- calm
+- clear
+- emotionally warm
+- guided
+- focused
+- mobile-friendly
+- not generic SaaS
+
+Product lens:
+Optimize for this loop:
+generate passage -> tap word -> save vocabulary -> listen -> return tomorrow
+
+Please keep the output practical and prioritized.
+Again: audit only, no code changes yet.
