@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Bookmark, Volume2, ChevronDown, ChevronUp, Lock } from 'lucide-react';
+import { ArrowLeft, Volume2, ChevronDown, ChevronUp, Lock, BookMarked, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthPromptModal } from './AuthPromptModal';
 import { DifficultyBadge } from '@/components/passage/DifficultyBadge';
@@ -46,13 +46,14 @@ export function GuestReader({ passage, onBack }: GuestReaderProps) {
 
   return (
     <div className="max-w-2xl mx-auto py-6 px-4">
+      {/* Top bar */}
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={onBack}
           className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm font-medium"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Generator
+          Back
         </button>
 
         <div className="flex items-center gap-2">
@@ -68,12 +69,13 @@ export function GuestReader({ passage, onBack }: GuestReaderProps) {
             onClick={() => setAuthPrompt('save')}
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
           >
-            <Bookmark className="w-4 h-4" />
+            <BookMarked className="w-4 h-4" />
             <span>Save</span>
           </button>
         </div>
       </div>
 
+      {/* Passage meta */}
       <div className="mb-8">
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <span className="text-sm font-medium px-2.5 py-1 rounded-full bg-secondary text-muted-foreground border border-border">
@@ -98,6 +100,7 @@ export function GuestReader({ passage, onBack }: GuestReaderProps) {
         )}
       </div>
 
+      {/* Reading */}
       <div className="bg-card border border-border rounded-2xl p-6 mb-6 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Reading</h2>
@@ -159,6 +162,7 @@ export function GuestReader({ passage, onBack }: GuestReaderProps) {
         </div>
       </div>
 
+      {/* Vocabulary preview */}
       {vocabulary.length > 0 && (
         <div className="bg-card border border-border rounded-2xl p-6 mb-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
@@ -211,24 +215,46 @@ export function GuestReader({ passage, onBack }: GuestReaderProps) {
         </div>
       )}
 
-      <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 text-center">
-        <p className="font-semibold text-foreground mb-1">Ready to keep going?</p>
-        <p className="text-sm text-muted-foreground mb-4">
-          Create a free account to generate unlimited stories, save your reading library, and track vocabulary.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+      {/* ── Conversion moment ── */}
+      <div className="mt-2 rounded-2xl border border-border overflow-hidden">
+        {/* Header band */}
+        <div className="px-6 pt-7 pb-5 text-center bg-gradient-to-b from-accent/5 to-transparent">
+          <div className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-4"
+               style={{ background: 'linear-gradient(135deg, hsl(174,62%,42%,0.12), hsl(255,52%,60%,0.12))' }}>
+            <BookMarked className="w-5 h-5 text-accent" />
+          </div>
+          <h2 className="text-xl font-serif font-bold text-foreground mb-2">
+            Keep what you learn
+          </h2>
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">
+            Save this passage to your library, tap words to build vocabulary, and listen to it anytime — all free.
+          </p>
+        </div>
+
+        {/* CTAs */}
+        <div className="px-6 pb-6 flex flex-col gap-3">
           <Link
             href="/sign-up"
-            className="px-6 py-3 rounded-xl font-bold bg-primary text-primary-foreground hover:opacity-90 transition-opacity text-sm"
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 hover:shadow-md"
+            style={{ background: 'linear-gradient(135deg, hsl(174,62%,42%), hsl(200,68%,52%), hsl(255,52%,60%))' }}
           >
+            <Sparkles className="w-4 h-4" />
             Create free account
           </Link>
-          <button
-            onClick={() => setAuthPrompt('generate')}
-            className="px-6 py-3 rounded-xl font-medium border border-border text-foreground hover:border-primary/30 transition-all text-sm"
+          <Link
+            href="/sign-in"
+            className="flex items-center justify-center w-full py-3 rounded-xl text-sm font-semibold bg-secondary text-foreground border border-border hover:border-accent/30 transition-all"
           >
-            Generate another story
-          </button>
+            Sign in
+          </Link>
+          <div className="text-center pt-1">
+            <button
+              onClick={() => setAuthPrompt('generate')}
+              className="text-xs text-muted-foreground hover:text-primary transition-colors"
+            >
+              Or generate another story first →
+            </button>
+          </div>
         </div>
       </div>
 

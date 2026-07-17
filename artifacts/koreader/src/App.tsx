@@ -15,7 +15,6 @@ import { AppLayout } from "@/components/layout/AppLayout";
 const Generate = lazy(() => import("@/pages/Generate"));
 const Library = lazy(() => import("@/pages/Library"));
 const Reader = lazy(() => import("@/pages/Reader"));
-const Favorites = lazy(() => import("@/pages/Favorites"));
 const Settings = lazy(() => import("@/pages/Settings"));
 const Vocabulary = lazy(() => import("@/pages/Vocabulary"));
 const Admin = lazy(() => import("@/pages/Admin"));
@@ -128,7 +127,7 @@ function Router() {
         <Route path="/library" component={Library} />
         <Route path="/library/:id" component={Reader} />
         <Route path="/passage" component={Reader} />
-        <Route path="/favorites" component={Favorites} />
+        <Route path="/favorites" component={() => <Redirect to="/library" />} />
         <Route path="/vocabulary" component={Vocabulary} />
         <Route path="/settings" component={Settings} />
         <Route path="/admin" component={Admin} />

@@ -15,7 +15,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { getListPassagesQueryKey, getGetPassageQueryKey } from '@workspace/api-client-react';
 import { useSettings, fontSizeMap } from '@/hooks/use-settings';
 
-const HINT_KEY = 'lf-hint-word-tap';
+const HINT_WORD_TAP = 'lf-hint-word-tap';
+const HINT_TTS = 'lf-hint-tts';
 
 type ViewMode = 'reading' | 'study' | 'full';
 
@@ -34,12 +35,24 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [showTapHint, setShowTapHint] = useState(() => {
-    try { return !localStorage.getItem(HINT_KEY); } catch { return false; }
+    try { return !localStorage.getItem(HINT_WORD_TAP); } catch { return false; }
+  });
+
+  // TTS hint shows only after word-tap hint has been dismissed (sequential discovery)
+  const [showTtsHint, setShowTtsHint] = useState(() => {
+    try {
+      return !!localStorage.getItem(HINT_WORD_TAP) && !localStorage.getItem(HINT_TTS);
+    } catch { return false; }
   });
 
   const dismissHint = useCallback(() => {
     setShowTapHint(false);
-    try { localStorage.setItem(HINT_KEY, '1'); } catch {}
+    try { localStorage.setItem(HINT_WORD_TAP, '1'); } catch {}
+  }, []);
+
+  const dismissTtsHint = useCallback(() => {
+    setShowTtsHint(false);
+    try { localStorage.setItem(HINT_TTS, '1'); } catch {}
   }, []);
 
   const { toggle: toggleTTS, isPlaying, isLoading: ttsLoading, hasAudio: ttsHasAudio, stop: stopTTS } = useOpenAITTS(passage.language ?? 'ko');
@@ -59,6 +72,11 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
     setActiveWord({ word: cleaned, context, anchorRect: rect });
     dismissHint();
   }, [dismissHint]);
+
+  const handleTTSClick = useCallback(() => {
+    toggleTTS(passage.koreanText);
+    dismissTtsHint();
+  }, [toggleTTS, passage.koreanText, dismissTtsHint]);
 
   const toggleSentence = (index: number) => {
     setExpandedSentences(prev => {
@@ -115,7 +133,7 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
   };
 
   const modes = [
-    { id: 'reading', label: 'Reading', icon: Eye,      tooltip: 'Korean text only — no distractions' },
+    { id: 'reading', label: 'Reading', icon: Eye,      tooltip: 'Target language only — no distractions' },
     { id: 'study',   label: 'Study',   icon: BookOpen, tooltip: 'Tap each sentence to reveal translation' },
     { id: 'full',    label: 'Full',    icon: Layout,   tooltip: 'All translations always visible' },
   ] as const;
@@ -178,9 +196,9 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
               <Type className="w-4 h-4" />
             </button>
 
-            {/* TTS */}
+            {/* TTS — with hint highlight ring when hint is active */}
             <button
-              onClick={() => toggleTTS(passage.koreanText)}
+              onClick={handleTTSClick}
               disabled={ttsLoading}
               className={cn(
                 'flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium border transition-all',
@@ -188,6 +206,8 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
                   ? 'bg-card text-muted-foreground border-border opacity-70 cursor-wait'
                   : isPlaying
                     ? 'bg-accent/10 text-accent border-accent/30'
+                    : showTtsHint
+                    ? 'bg-card text-foreground border-accent/50 shadow-[0_0_0_3px_hsl(var(--accent)/0.15)]'
                     : 'bg-card text-foreground border-border hover:border-primary/30'
               )}
             >
@@ -254,7 +274,6 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
         <h1 className={cn('text-2xl sm:text-3xl font-bold text-foreground leading-tight text-balance', isKo ? 'font-korean' : isZh ? 'font-chinese' : 'font-serif')}>
           {passage.title}
         </h1>
-        {/* English summary */}
         {summary && (
           <div className="flex items-start gap-2 text-left max-w-lg mx-auto bg-secondary/40 rounded-xl px-4 py-3 mt-1">
             <FileText className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
@@ -263,10 +282,11 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
         )}
       </header>
 
-      {/* ── First-tap hint ── */}
+      {/* ── Hints (word-tap first, then TTS on next visit) ── */}
       <AnimatePresence>
         {showTapHint && (
           <motion.div
+            key="hint-tap"
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4, transition: { duration: 0.2 } }}
@@ -279,6 +299,29 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
             </div>
             <button
               onClick={dismissHint}
+              className="p-1 rounded-full text-accent/60 hover:text-accent hover:bg-accent/10 transition-colors shrink-0"
+              aria-label="Dismiss hint"
+            >
+              <XIcon className="w-3.5 h-3.5" />
+            </button>
+          </motion.div>
+        )}
+
+        {showTtsHint && !showTapHint && (
+          <motion.div
+            key="hint-tts"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4, transition: { duration: 0.2 } }}
+            transition={{ duration: 0.3, delay: 0.8, ease: 'easeOut' }}
+            className="flex items-center justify-between gap-3 mb-6 px-4 py-3 rounded-2xl bg-accent/8 border border-accent/20 text-sm text-accent"
+          >
+            <div className="flex items-center gap-2.5">
+              <Volume2 className="w-4 h-4 shrink-0" />
+              <span className="font-medium">Press <strong>Listen</strong> to hear this passage read aloud</span>
+            </div>
+            <button
+              onClick={dismissTtsHint}
               className="p-1 rounded-full text-accent/60 hover:text-accent hover:bg-accent/10 transition-colors shrink-0"
               aria-label="Dismiss hint"
             >
@@ -310,7 +353,6 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
       >
         {passage.sentences.map((sentence, idx) => (
           <div key={idx} className="group">
-            {/* Korean text — word-clickable */}
             <p className={koreanFontClass}>
               {sentence.korean.split(' ').map((word, wIdx) => (
                 <span
@@ -323,7 +365,6 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
               ))}
             </p>
 
-            {/* Translation */}
             {viewMode !== 'reading' && (
               <div className="mt-2">
                 {viewMode === 'study' && !expandedSentences.has(idx) ? (
@@ -370,7 +411,7 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
         <section className="mt-14 pt-8 border-t border-border">
           <h3 className="text-base font-bold font-serif text-foreground mb-5 flex items-center gap-2">
             <List className="w-4 h-4 text-primary" />
-            Vocabulary · 어휘
+            Vocabulary
           </h3>
           <div className="grid gap-3 sm:grid-cols-2">
             {passage.vocabulary.map((vocab, idx) => (
@@ -404,7 +445,7 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
         <section className="mt-10 pt-8 border-t border-border">
           <h3 className="text-base font-bold font-serif text-foreground mb-5 flex items-center gap-2">
             <HelpCircle className="w-4 h-4 text-primary" />
-            Comprehension · 이해 확인
+            Comprehension
           </h3>
           <div className="space-y-4">
             {comprehensionQuestions.map((q, idx) => (

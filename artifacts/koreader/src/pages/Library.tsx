@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, BookOpen, WifiOff, Download, Check, Sparkles } from 'lucide-react';
+import { Search, Filter, BookOpen, WifiOff, Download, Check, Sparkles, ArrowRight } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AuthGate } from '@/components/auth/AuthGate';
 import { useListPassages } from '@workspace/api-client-react';
 import { PassageCard } from '@/components/passage/PassageCard';
+import { DifficultyBadge } from '@/components/passage/DifficultyBadge';
 import { cn } from '@/lib/utils';
 import { useOfflineLibrary } from '@/hooks/use-offline-library';
 import { LANGUAGE_CONFIG, type AppLanguage } from '@/hooks/use-language';
@@ -15,11 +16,11 @@ const LANGUAGE_ORDER: AppLanguage[] = ['ko', 'zh', 'es', 'it', 'en'];
 
 export default function Library() {
   const { data: passages, isLoading, isError } = useListPassages();
-  const [searchQuery, setSearchQuery]         = useState('');
-  const [activeTab, setActiveTab]             = useState<FilterTab>('all');
+  const [searchQuery, setSearchQuery]           = useState('');
+  const [activeTab, setActiveTab]               = useState<FilterTab>('all');
   const [difficultyFilter, setDifficultyFilter] = useState<string>('all');
-  const [languageFilter, setLanguageFilter]   = useState<string>('all');
-  const [synced, setSynced]                   = useState(false);
+  const [languageFilter, setLanguageFilter]     = useState<string>('all');
+  const [synced, setSynced]                     = useState(false);
 
   const { offlinePassages, isOnline, syncAll, isSyncing } = useOfflineLibrary();
 
@@ -39,7 +40,7 @@ export default function Library() {
     }
   };
 
-  const hasActiveFilters = searchQuery || activeTab === 'bookmarked' || difficultyFilter !== 'all' || languageFilter !== 'all';
+  const hasActiveFilters = !!(searchQuery || activeTab === 'bookmarked' || difficultyFilter !== 'all' || languageFilter !== 'all');
 
   const filteredPassages = activePassages.filter(passage => {
     if (activeTab === 'bookmarked' && !passage.isBookmarked) return false;
@@ -57,6 +58,11 @@ export default function Library() {
   });
 
   const isEmptyLibrary = isOnline && !isLoading && !isError && activePassages.length === 0;
+
+  // Most recently saved passage (API returns ascending by createdAt)
+  const mostRecent = activePassages.length > 0
+    ? [...activePassages].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
+    : null;
 
   return (
     <AppLayout>
@@ -100,7 +106,7 @@ export default function Library() {
           </div>
         </header>
 
-        {/* Welcome empty state — no passages yet */}
+        {/* Welcome empty state */}
         {isEmptyLibrary ? (
           <div className="flex flex-col items-center justify-center text-center py-20 px-6 bg-card rounded-2xl border border-dashed border-border">
             <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-5">
@@ -121,7 +127,35 @@ export default function Library() {
           </div>
         ) : (
           <>
-            {/* Filters & Search Bar */}
+            {/* ── Continue reading — most recent passage ── */}
+            {!hasActiveFilters && mostRecent && !isLoading && (
+              <div className="mb-8">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-3">
+                  Continue reading
+                </p>
+                <Link href={`/library/${mostRecent.id}`}>
+                  <div className="group flex items-center justify-between gap-4 p-5 bg-card border border-accent/20 rounded-2xl hover:border-accent/40 hover:shadow-md transition-all duration-200 cursor-pointer">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0 text-lg">
+                        {LANGUAGE_CONFIG[mostRecent.language as AppLanguage]?.flag ?? '📖'}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <DifficultyBadge difficulty={mostRecent.difficulty} />
+                          <span className="text-xs text-muted-foreground capitalize">{mostRecent.topic}</span>
+                        </div>
+                        <h3 className="font-serif font-bold text-foreground text-base leading-snug truncate group-hover:text-accent transition-colors">
+                          {mostRecent.title}
+                        </h3>
+                      </div>
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-accent shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                </Link>
+              </div>
+            )}
+
+            {/* Filters & Search */}
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -233,7 +267,7 @@ export default function Library() {
                   {!isOnline
                     ? 'Use "Sync for offline" while connected to save stories for your trip.'
                     : hasActiveFilters
-                    ? "Try adjusting your filters or search query."
+                    ? 'Try adjusting your filters or search query.'
                     : "You haven't saved any passages yet."}
                 </p>
               </div>

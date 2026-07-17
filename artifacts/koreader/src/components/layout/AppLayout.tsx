@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'wouter';
-import { Library, PlusCircle, LayoutDashboard, Heart, Settings, Sun, Moon, LogIn, LogOut, User, BookMarked, WifiOff } from 'lucide-react';
+import { Library, PlusCircle, LayoutDashboard, Settings, Sun, Moon, LogIn, LogOut, User, BookMarked, WifiOff } from 'lucide-react';
 import { useIsOnline } from '@/hooks/use-offline-library';
 import { cn } from '@/lib/utils';
 import { useThemeStore, useThemeInit } from '@/hooks/use-theme';
@@ -14,7 +14,6 @@ const navItems = [
   { href: '/',           icon: LayoutDashboard, label: 'Home'       },
   { href: '/generate',   icon: PlusCircle,      label: 'Generate'   },
   { href: '/library',    icon: Library,         label: 'Library'    },
-  { href: '/favorites',  icon: Heart,           label: 'Favorites'  },
   { href: '/vocabulary', icon: BookMarked,      label: 'Vocabulary' },
   { href: '/settings',   icon: Settings,        label: 'Settings'   },
 ];
@@ -40,8 +39,6 @@ export function AppLayout({ children, minimal = false }: AppLayoutProps) {
     await signOut();
     queryClient.clear();
   };
-
-  const langConfig = LANGUAGE_CONFIG[language];
 
   return (
     <div className="min-h-screen flex flex-col bg-background selection:bg-accent/20">
@@ -87,64 +84,29 @@ export function AppLayout({ children, minimal = false }: AppLayoutProps) {
           <div className={cn('flex items-center gap-1.5 shrink-0', minimal && 'ml-auto')}>
             {/* Language switcher */}
             <div className="flex items-center p-0.5 bg-secondary/60 border border-border rounded-xl gap-0.5">
-              <button
-                onClick={() => setLanguage('ko')}
-                title="Korean — LinguaFlow"
-                className={cn(
-                  'px-2.5 py-1.5 rounded-[0.6rem] text-xs font-bold transition-all duration-200',
-                  language === 'ko'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
+              <button onClick={() => setLanguage('ko')} title="Korean"
+                className={cn('px-2.5 py-1.5 rounded-[0.6rem] text-xs font-bold transition-all duration-200',
+                  language === 'ko' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}>
                 한
               </button>
-              <button
-                onClick={() => setLanguage('zh')}
-                title="Chinese — Hanzi Flow"
-                className={cn(
-                  'px-2.5 py-1.5 rounded-[0.6rem] text-xs font-bold transition-all duration-200',
-                  language === 'zh'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
+              <button onClick={() => setLanguage('zh')} title="Chinese"
+                className={cn('px-2.5 py-1.5 rounded-[0.6rem] text-xs font-bold transition-all duration-200',
+                  language === 'zh' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}>
                 汉
               </button>
-              <button
-                onClick={() => setLanguage('es')}
-                title="Spanish — LinguaFlow"
-                className={cn(
-                  'px-2.5 py-1.5 rounded-[0.6rem] text-xs font-bold transition-all duration-200',
-                  language === 'es'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
+              <button onClick={() => setLanguage('es')} title="Spanish"
+                className={cn('px-2.5 py-1.5 rounded-[0.6rem] text-xs font-bold transition-all duration-200',
+                  language === 'es' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}>
                 Es
               </button>
-              <button
-                onClick={() => setLanguage('en')}
-                title="English — LinguaFlow"
-                className={cn(
-                  'px-2.5 py-1.5 rounded-[0.6rem] text-xs font-bold transition-all duration-200',
-                  language === 'en'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
+              <button onClick={() => setLanguage('en')} title="English"
+                className={cn('px-2.5 py-1.5 rounded-[0.6rem] text-xs font-bold transition-all duration-200',
+                  language === 'en' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}>
                 En
               </button>
-              <button
-                onClick={() => setLanguage('it')}
-                title="Italian — LinguaFlow"
-                className={cn(
-                  'px-2.5 py-1.5 rounded-[0.6rem] text-xs font-bold transition-all duration-200',
-                  language === 'it'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
+              <button onClick={() => setLanguage('it')} title="Italian"
+                className={cn('px-2.5 py-1.5 rounded-[0.6rem] text-xs font-bold transition-all duration-200',
+                  language === 'it' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}>
                 It
               </button>
             </div>

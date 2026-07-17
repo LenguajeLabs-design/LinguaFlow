@@ -1,0 +1,74 @@
+Implement Phase 3 for LinguaFlow.
+
+Context:
+Phase 2 fixed the most important loop issue:
+- `Save to Vocabulary` now works in the regular word popover
+- users now get a first-tap word hint
+- signed-in empty library has a warmer welcome state
+- guest onboarding nav is cleaner
+- vocabulary has a basic progress signal
+
+Now I want Phase 3 to strengthen conversion and return behavior without turning this into a giant project.
+
+Please implement these in order:
+
+1. Fix the auth-gate copy on `/generate`
+- The message is currently hardcoded to Korean.
+- It should reflect the currently selected language.
+- Example:
+  - Korean: `Sign in to generate personalized Korean reading passages.`
+  - Chinese: `Sign in to generate personalized Chinese reading passages.`
+  - Spanish: `Sign in to generate personalized Spanish reading passages.`
+  - Italian: `Sign in to generate personalized Italian reading passages.`
+
+2. Add a strong guest-to-signup conversion moment after reading
+- After a guest user finishes reading a generated passage, show a clear prompt that explains why creating an account is worth it.
+- Focus on benefits:
+  - save this passage
+  - build your vocabulary
+  - keep your progress
+- The prompt should feel warm and motivating, not aggressive.
+- It should appear at a natural point after the read experience, not immediately as a blocking wall.
+
+Suggested direction:
+- headline like: `Keep what you learn`
+- short supporting copy like: `Create a free account to save this passage, build your vocabulary, and come back to it anytime.`
+- clear CTA to sign up
+- secondary CTA to sign in
+
+3. Add a first-time TTS discovery hint
+- Similar to the word-tap hint, add a subtle first-time hint introducing the Listen feature.
+- Example:
+  - `Press Listen to hear the passage aloud.`
+- Show it once per browser/session using the same lightweight approach as the word hint.
+- Keep it calm and non-intrusive.
+
+4. Add a lightweight return hook on Home and/or Vocabulary
+- The app needs a better reason to come back tomorrow.
+- Add one simple return-oriented progress surface, such as:
+  - total saved words
+  - recently saved words
+  - continue your last passage
+  - a friendly “pick up where you left off” section
+- Keep scope small. No big streak system yet.
+- The goal is to make progress feel alive and personal.
+
+5. Re-evaluate Favorites vs Library
+- Do not do a big rewrite unless necessary.
+- First inspect whether Favorites should remain its own page or whether the UX would be better if it were just a filter inside Library.
+- If the fix is simple and clearly better, implement it.
+- If it would cause too much churn, leave it and report the recommended direction instead.
+
+Important constraints:
+- Keep this Phase 3 focused and practical
+- Do not redesign the entire app
+- Preserve the premium, calm visual language
+- Prioritize activation, conversion, and return behavior
+- Avoid feature sprawl
+- Run available checks after changes and report any issues
+
+Deliverables after implementation:
+1. What changed
+2. Any screenshots or UI verification you did
+3. Whether Favorites stayed separate or not, and why
+4. Remaining recommended Phase 4 ideas
