@@ -1,7 +1,7 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Mail, MessageSquareHeart } from "lucide-react";
 
-const CONTACT_EMAIL = "lenguajelabs@proton.me";
+const CONTACT_EMAIL = "forozc1@gmail.com";
 
 export default function Contact() {
   return (

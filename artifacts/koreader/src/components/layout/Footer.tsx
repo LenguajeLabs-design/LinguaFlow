@@ -1,7 +1,7 @@
 import { Link } from 'wouter';
 import { Mail } from 'lucide-react';
 
-const CONTACT_EMAIL = 'lenguajelabs@proton.me';
+const CONTACT_EMAIL = 'forozc1@gmail.com';
 
 export function Footer() {
   return (

@@ -1,6 +1,6 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 
-const CONTACT_EMAIL = "lenguajelabs@proton.me";
+const CONTACT_EMAIL = "forozc1@gmail.com";
 
 export default function Terms() {
   return (
