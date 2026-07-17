@@ -21,7 +21,7 @@ export default function Home() {
 
   if (!hasOnboarded) {
     return (
-      <AppLayout>
+      <AppLayout minimal>
         <Onboarding
           variant="guest"
           onSkip={skipOnboarding}

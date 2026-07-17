@@ -1,10 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Loader2, BookOpen } from 'lucide-react';
-import { useGlossWord } from '@workspace/api-client-react';
+import { X, Loader2, BookOpen, BookMarked, Check } from 'lucide-react';
+import { useGlossWord, vocabularyApi } from '@workspace/api-client-react';
 import { cn } from '@/lib/utils';
 import { useSettings } from '@/hooks/use-settings';
+import { useUser } from '@clerk/react';
 
 interface WordPopoverProps {
   word: string;
@@ -12,6 +13,7 @@ interface WordPopoverProps {
   difficulty: string;
   language?: string;
   supportLanguage?: string;
+  passageId?: number;
   anchorRect: DOMRect | null;
   onClose: () => void;
 }
@@ -42,14 +44,19 @@ function computePosition(rect: DOMRect): { top?: string; bottom?: string; left: 
   };
 }
 
-export function WordPopover({ word, contextSentence, difficulty, language, supportLanguage, anchorRect, onClose }: WordPopoverProps) {
+export function WordPopover({ word, contextSentence, difficulty, language, supportLanguage, passageId, anchorRect, onClose }: WordPopoverProps) {
   const { showRomanization } = useSettings();
   const glossMutation = useGlossWord();
   const prevWordRef = useRef('');
+  const { user } = useUser();
+
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     if (word && anchorRect && word !== prevWordRef.current) {
       prevWordRef.current = word;
+      setSaved(false);
       glossMutation.mutate({
         data: {
           word,
@@ -65,6 +72,27 @@ export function WordPopover({ word, contextSentence, difficulty, language, suppo
   useEffect(() => {
     if (!word) prevWordRef.current = '';
   }, [word]);
+
+  const handleSave = async () => {
+    if (!user || saving || saved || !glossMutation.data) return;
+    setSaving(true);
+    try {
+      await vocabularyApi.save({
+        language: (language ?? 'ko') as any,
+        word,
+        pinyin: glossMutation.data.romanization ?? undefined,
+        meaning: glossMutation.data.englishMeaning,
+        exampleSentence: glossMutation.data.exampleSentence ?? undefined,
+        sourcePassageId: passageId,
+        difficulty,
+      });
+      setSaved(true);
+    } catch (err) {
+      console.error('Failed to save vocabulary:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const isOpen = Boolean(word && anchorRect);
 
@@ -170,6 +198,30 @@ export function WordPopover({ word, contextSentence, difficulty, language, suppo
                 </div>
               )}
             </div>
+
+            {/* Save to Vocabulary */}
+            {user && glossMutation.isSuccess && glossMutation.data && (
+              <div className="px-4 pb-4 pt-1">
+                <button
+                  onClick={handleSave}
+                  disabled={saving || saved}
+                  className={cn(
+                    'w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200',
+                    saved
+                      ? 'bg-green-500/15 text-green-600 border border-green-500/30'
+                      : 'bg-accent/10 text-accent border border-accent/25 hover:bg-accent/20 active:scale-[0.98]'
+                  )}
+                >
+                  {saving ? (
+                    <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving…</>
+                  ) : saved ? (
+                    <><Check className="w-3.5 h-3.5" /> Saved to Vocabulary</>
+                  ) : (
+                    <><BookMarked className="w-3.5 h-3.5" /> Save to Vocabulary</>
+                  )}
+                </button>
+              </div>
+            )}
           </motion.div>
         </>
       )}

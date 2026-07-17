@@ -21,7 +21,12 @@ const navItems = [
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-export function AppLayout({ children }: { children: React.ReactNode }) {
+interface AppLayoutProps {
+  children: React.ReactNode;
+  minimal?: boolean;
+}
+
+export function AppLayout({ children, minimal = false }: AppLayoutProps) {
   const [location] = useLocation();
   const { theme, toggle } = useThemeStore();
   const { language, setLanguage } = useLanguageStore();
@@ -52,32 +57,34 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             />
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-0.5 flex-1 justify-center">
-            {navItems.map((item) => {
-              const isActive =
-                location === item.href ||
-                (item.href !== '/' && location.startsWith(item.href));
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    'px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-1.5 outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                    isActive
-                      ? 'bg-secondary text-secondary-foreground shadow-sm'
-                      : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'
-                  )}
-                >
-                  <item.icon className={cn('w-4 h-4', isActive && 'text-accent')} />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
+          {/* Desktop Nav — hidden in minimal mode */}
+          {!minimal && (
+            <nav className="hidden md:flex items-center gap-0.5 flex-1 justify-center">
+              {navItems.map((item) => {
+                const isActive =
+                  location === item.href ||
+                  (item.href !== '/' && location.startsWith(item.href));
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      'px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-1.5 outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      isActive
+                        ? 'bg-secondary text-secondary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'
+                    )}
+                  >
+                    <item.icon className={cn('w-4 h-4', isActive && 'text-accent')} />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
 
           {/* Right controls */}
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className={cn('flex items-center gap-1.5 shrink-0', minimal && 'ml-auto')}>
             {/* Language switcher */}
             <div className="flex items-center p-0.5 bg-secondary/60 border border-border rounded-xl gap-0.5">
               <button
@@ -199,27 +206,29 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <Footer />
       </div>
 
-      {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur-md flex justify-around px-1 py-1">
-        {navItems.map((item) => {
-          const isActive =
-            location === item.href ||
-            (item.href !== '/' && location.startsWith(item.href));
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'flex flex-col items-center justify-center min-w-[44px] py-1.5 rounded-xl transition-colors duration-200 outline-none gap-0.5',
-                isActive ? 'text-accent' : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              <item.icon className={cn('w-4 h-4', isActive && 'fill-accent/15')} />
-              <span className="text-[8px] font-medium">{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
+      {/* Mobile Bottom Nav — hidden in minimal mode */}
+      {!minimal && (
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur-md flex justify-around px-1 py-1">
+          {navItems.map((item) => {
+            const isActive =
+              location === item.href ||
+              (item.href !== '/' && location.startsWith(item.href));
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'flex flex-col items-center justify-center min-w-[44px] py-1.5 rounded-xl transition-colors duration-200 outline-none gap-0.5',
+                  isActive ? 'text-accent' : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <item.icon className={cn('w-4 h-4', isActive && 'fill-accent/15')} />
+                <span className="text-[8px] font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      )}
     </div>
   );
 }

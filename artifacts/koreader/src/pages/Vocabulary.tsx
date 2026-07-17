@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { BookMarked, Download, Trash2, Check, Loader2, Search, Globe } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { BookMarked, Download, Trash2, Check, Loader2, Search, TrendingUp } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AuthGate } from '@/components/auth/AuthGate';
 import { cn } from '@/lib/utils';
@@ -56,6 +56,17 @@ export default function Vocabulary() {
     );
   });
 
+  const thisWeekCount = useMemo(() => {
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return vocab.filter((v) => {
+      try {
+        return new Date((v as any).createdAt).getTime() > cutoff;
+      } catch {
+        return false;
+      }
+    }).length;
+  }, [vocab]);
+
   const tabs: { value: LangFilter; label: string; flag: string }[] = [
     { value: 'all', label: 'All',     flag: '🌐' },
     { value: 'ko',  label: 'Korean',  flag: '🇰🇷' },
@@ -71,7 +82,7 @@ export default function Vocabulary() {
         <div className="max-w-3xl mx-auto">
 
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-6">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
@@ -94,6 +105,25 @@ export default function Vocabulary() {
               )}
             </div>
           </div>
+
+          {/* Progress banner — only when there are words saved */}
+          {vocab.length > 0 && (
+            <div className="flex items-center gap-4 px-5 py-3.5 mb-6 rounded-2xl bg-accent/8 border border-accent/15">
+              <div className="w-9 h-9 rounded-xl bg-accent/15 flex items-center justify-center shrink-0">
+                <TrendingUp className="w-4 h-4 text-accent" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground">
+                  {vocab.length} {vocab.length === 1 ? 'word' : 'words'} in your collection
+                </p>
+                {thisWeekCount > 0 && (
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    +{thisWeekCount} saved this week — keep going
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Lang tabs + search */}
           <div className="flex flex-col sm:flex-row gap-3 mb-6">

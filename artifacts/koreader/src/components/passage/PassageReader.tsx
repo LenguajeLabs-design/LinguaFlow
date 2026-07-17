@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Volume2, Pause, Square, Eye, EyeOff, BookOpen, Layout, Bookmark,
-  Type, ChevronDown, ChevronUp, List, FileText, HelpCircle, CheckCircle2
+  Type, ChevronDown, ChevronUp, List, FileText, HelpCircle, CheckCircle2,
+  MousePointerClick, X as XIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Passage } from '@workspace/api-client-react';
@@ -13,6 +14,8 @@ import { useSavePassage, useToggleBookmark } from '@workspace/api-client-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { getListPassagesQueryKey, getGetPassageQueryKey } from '@workspace/api-client-react';
 import { useSettings, fontSizeMap } from '@/hooks/use-settings';
+
+const HINT_KEY = 'lf-hint-word-tap';
 
 type ViewMode = 'reading' | 'study' | 'full';
 
@@ -30,6 +33,15 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
   const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const [showTapHint, setShowTapHint] = useState(() => {
+    try { return !localStorage.getItem(HINT_KEY); } catch { return false; }
+  });
+
+  const dismissHint = useCallback(() => {
+    setShowTapHint(false);
+    try { localStorage.setItem(HINT_KEY, '1'); } catch {}
+  }, []);
+
   const { toggle: toggleTTS, isPlaying, isLoading: ttsLoading, hasAudio: ttsHasAudio, stop: stopTTS } = useOpenAITTS(passage.language ?? 'ko');
   const { fontSize } = useSettings();
   const queryClient = useQueryClient();
@@ -45,7 +57,8 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
     if (!cleaned) return;
     const rect = e.currentTarget.getBoundingClientRect();
     setActiveWord({ word: cleaned, context, anchorRect: rect });
-  }, []);
+    dismissHint();
+  }, [dismissHint]);
 
   const toggleSentence = (index: number) => {
     setExpandedSentences(prev => {
@@ -117,6 +130,8 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
   );
   const comprehensionQuestions = (passage as any).comprehensionQuestions as Array<{ question: string; answer: string }> | undefined;
   const summary = (passage as any).summary as string | undefined;
+
+  const passageId = isUnsaved ? undefined : passage.id;
 
   return (
     <div className="max-w-2xl mx-auto pb-28 md:pb-16" ref={containerRef}>
@@ -247,6 +262,31 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
           </div>
         )}
       </header>
+
+      {/* ── First-tap hint ── */}
+      <AnimatePresence>
+        {showTapHint && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4, transition: { duration: 0.2 } }}
+            transition={{ duration: 0.3, delay: 0.6, ease: 'easeOut' }}
+            className="flex items-center justify-between gap-3 mb-6 px-4 py-3 rounded-2xl bg-accent/8 border border-accent/20 text-sm text-accent"
+          >
+            <div className="flex items-center gap-2.5">
+              <MousePointerClick className="w-4 h-4 shrink-0" />
+              <span className="font-medium">Tap any word to look it up</span>
+            </div>
+            <button
+              onClick={dismissHint}
+              className="p-1 rounded-full text-accent/60 hover:text-accent hover:bg-accent/10 transition-colors shrink-0"
+              aria-label="Dismiss hint"
+            >
+              <XIcon className="w-3.5 h-3.5" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Study mode show/hide all ── */}
       {viewMode === 'study' && (
@@ -415,6 +455,7 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
         difficulty={passage.difficulty}
         language={passage.language}
         supportLanguage={(passage as any).supportLanguage}
+        passageId={passageId}
         anchorRect={activeWord?.anchorRect || null}
         onClose={() => setActiveWord(null)}
       />
