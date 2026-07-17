@@ -59,10 +59,20 @@ export default function Library() {
 
   const isEmptyLibrary = isOnline && !isLoading && !isError && activePassages.length === 0;
 
-  // Most recently saved passage (API returns ascending by createdAt)
+  // Most recently saved passage (sorted by createdAt DESC)
   const mostRecent = activePassages.length > 0
     ? [...activePassages].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
     : null;
+
+  // 24h return nudge — check if user hasn't read in >24h
+  const welcomeBack = (() => {
+    try {
+      const lastRead = parseInt(localStorage.getItem('lf-last-read') || '0');
+      if (!lastRead) return false;
+      const hoursSince = (Date.now() - lastRead) / (1000 * 60 * 60);
+      return hoursSince > 24;
+    } catch { return false; }
+  })();
 
   return (
     <AppLayout>
@@ -127,14 +137,24 @@ export default function Library() {
           </div>
         ) : (
           <>
-            {/* ── Continue reading — most recent passage ── */}
+            {/* ── Continue reading / Welcome back ── */}
             {!hasActiveFilters && mostRecent && !isLoading && (
               <div className="mb-8">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-3">
-                  Continue reading
+                  {welcomeBack ? 'Welcome back' : 'Continue reading'}
                 </p>
+                {welcomeBack && (
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Good to see you again. Pick up where you left off.
+                  </p>
+                )}
                 <Link href={`/library/${mostRecent.id}`}>
-                  <div className="group flex items-center justify-between gap-4 p-5 bg-card border border-accent/20 rounded-2xl hover:border-accent/40 hover:shadow-md transition-all duration-200 cursor-pointer">
+                  <div className={cn(
+                    'group flex items-center justify-between gap-4 p-5 bg-card border rounded-2xl hover:shadow-md transition-all duration-200 cursor-pointer',
+                    welcomeBack
+                      ? 'border-accent/30 shadow-sm hover:border-accent/50'
+                      : 'border-accent/20 hover:border-accent/40'
+                  )}>
                     <div className="flex items-center gap-4 min-w-0">
                       <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0 text-lg">
                         {LANGUAGE_CONFIG[mostRecent.language as AppLanguage]?.flag ?? '📖'}

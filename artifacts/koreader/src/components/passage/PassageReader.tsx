@@ -4,6 +4,8 @@ import {
   Type, ChevronDown, ChevronUp, List, FileText, HelpCircle, CheckCircle2,
   MousePointerClick, X as XIcon
 } from 'lucide-react';
+import { PostReadReview } from './PostReadReview';
+import { WhatNext } from './WhatNext';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Passage } from '@workspace/api-client-react';
 import { DifficultyBadge } from './DifficultyBadge';
@@ -63,6 +65,17 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
   const bookmarkMutation = useToggleBookmark();
 
   useEffect(() => () => stopTTS(), [stopTTS]);
+
+  // Record last-read for the 24h return nudge in Library
+  useEffect(() => {
+    if (!isUnsaved && passage.id) {
+      try {
+        localStorage.setItem('lf-last-read', Date.now().toString());
+        localStorage.setItem('lf-last-passage-id', String(passage.id));
+        localStorage.setItem('lf-last-passage-title', passage.title ?? '');
+      } catch {}
+    }
+  }, [isUnsaved, passage.id, passage.title]);
 
   const handleWordClick = useCallback((e: React.MouseEvent<HTMLSpanElement>, word: string, context: string) => {
     e.stopPropagation();
@@ -487,6 +500,23 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
             ))}
           </div>
         </section>
+      )}
+
+      {/* ── Post-read review — quick recall for 3 vocab words ── */}
+      {!isUnsaved && passage.vocabulary && passage.vocabulary.length > 0 && (
+        <PostReadReview
+          vocabulary={passage.vocabulary}
+          language={passage.language}
+        />
+      )}
+
+      {/* ── What's next ── */}
+      {!isUnsaved && (
+        <WhatNext
+          topic={(passage as any).topic}
+          difficulty={passage.difficulty}
+          language={passage.language}
+        />
       )}
 
       {/* ── Word popover ── */}

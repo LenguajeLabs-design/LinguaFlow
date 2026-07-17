@@ -1,0 +1,74 @@
+Implement Phase 4 for LinguaFlow.
+
+Context:
+Phase 2 fixed the core loop:
+- save-to-vocabulary now works
+- word-tap hint exists
+- signed-in empty library is warmer
+- onboarding nav is cleaner
+- vocabulary has a basic progress signal
+
+Phase 3 improved conversion and return behavior:
+- guest read experience now has a stronger sign-up prompt
+- TTS discovery hint exists
+- Library has a lightweight “continue reading” hook
+- Favorites was merged into Library navigation
+
+Now I want Phase 4 to deepen retention and make progress feel more alive, but still keep scope disciplined.
+
+Please implement these in order:
+
+1. Add lightweight vocabulary progress on the Vocabulary page
+- Make the page feel like an active learning surface, not just a flat list.
+- Keep it simple.
+- Add one or more of:
+  - total saved words
+  - words saved this week
+  - words reviewed
+  - short encouraging progress message
+- The tone should feel personal and motivating, not gamified in a cheesy way.
+
+2. Add a simple post-read review moment
+- After a user finishes reading a passage, give them a lightweight way to reinforce learning.
+- Keep scope small.
+- Example directions:
+  - show 2–3 saved or highlighted words from the passage
+  - let the user quickly self-check meaning recall
+  - keep it fast and elegant, not like a heavy quiz
+- This should strengthen memory and create a reason to keep interacting after reading.
+
+3. Add smarter “what next” recommendations
+- After reading or from the home/library surface, suggest the next action in a way that feels personal.
+- Keep logic lightweight and frontend-friendly if possible.
+- Good examples:
+  - Continue your last passage
+  - Review words from your last passage
+  - Read another passage on a similar topic
+  - Try the next level up
+- The goal is to reduce the chance that users finish something and then leave.
+
+4. Add a lightweight 24-hour return mechanism if possible
+- If there is already any email or notification infrastructure, use the smallest viable version.
+- If not, do not force a big backend system.
+- In that case, implement the best in-product substitute you can and clearly report what would be needed for real email reminders later.
+- If email is possible with low effort, prefer a simple benefit-led reminder rather than a generic nudge.
+
+5. Keep the UX premium and calm
+- Do not turn the app into a gamified dashboard.
+- Avoid clutter.
+- Preserve the calm, elegant LinguaFlow feel.
+- This phase should increase retention without making the interface noisy.
+
+Important constraints:
+- Keep this practical and high-signal
+- Avoid feature sprawl
+- Reuse existing data where possible
+- Do not build a huge streak system unless it is genuinely low effort
+- Prefer a few polished retention touches over many shallow ones
+- Run available checks after changes and report any issues
+
+Deliverables after implementation:
+1. What changed
+2. Which retention ideas were implemented vs deferred
+3. Any screenshots or UI verification
+4. What would be the best Phase 5 next step

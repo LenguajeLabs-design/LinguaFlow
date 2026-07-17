@@ -67,6 +67,18 @@ export default function Vocabulary() {
     }).length;
   }, [vocab]);
 
+  const reviewedCount = useMemo(() => vocab.filter(v => v.reviewed).length, [vocab]);
+  const reviewProgress = vocab.length > 0 ? reviewedCount / vocab.length : 0;
+
+  const progressMessage = useMemo(() => {
+    if (vocab.length === 0) return null;
+    if (reviewProgress === 1) return 'All words reviewed — great work!';
+    if (reviewProgress >= 0.75) return 'Almost there — a few more to go.';
+    if (reviewProgress >= 0.5) return 'Halfway through your reviews.';
+    if (reviewedCount === 0) return 'Tap ✓ on any word after reviewing it.';
+    return `${vocab.length - reviewedCount} ${vocab.length - reviewedCount === 1 ? 'word' : 'words'} left to review.`;
+  }, [vocab.length, reviewedCount, reviewProgress]);
+
   const tabs: { value: LangFilter; label: string; flag: string }[] = [
     { value: 'all', label: 'All',     flag: '🌐' },
     { value: 'ko',  label: 'Korean',  flag: '🇰🇷' },
@@ -106,21 +118,36 @@ export default function Vocabulary() {
             </div>
           </div>
 
-          {/* Progress banner — only when there are words saved */}
+          {/* Progress panel — only when there are words saved */}
           {vocab.length > 0 && (
-            <div className="flex items-center gap-4 px-5 py-3.5 mb-6 rounded-2xl bg-accent/8 border border-accent/15">
-              <div className="w-9 h-9 rounded-xl bg-accent/15 flex items-center justify-center shrink-0">
-                <TrendingUp className="w-4 h-4 text-accent" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground">
-                  {vocab.length} {vocab.length === 1 ? 'word' : 'words'} in your collection
-                </p>
-                {thisWeekCount > 0 && (
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    +{thisWeekCount} saved this week — keep going
+            <div className="mb-6 p-5 rounded-2xl bg-accent/8 border border-accent/15">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-9 h-9 rounded-xl bg-accent/15 flex items-center justify-center shrink-0 mt-0.5">
+                  <TrendingUp className="w-4 h-4 text-accent" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground">
+                    {vocab.length} {vocab.length === 1 ? 'word' : 'words'} in your collection
+                    {thisWeekCount > 0 && (
+                      <span className="ml-2 text-xs font-normal text-accent">
+                        +{thisWeekCount} this week
+                      </span>
+                    )}
                   </p>
-                )}
+                  {progressMessage && (
+                    <p className="text-xs text-muted-foreground mt-0.5">{progressMessage}</p>
+                  )}
+                </div>
+                <span className="text-xs font-semibold text-accent shrink-0 mt-1">
+                  {reviewedCount}/{vocab.length} reviewed
+                </span>
+              </div>
+              {/* Progress bar */}
+              <div className="h-1.5 rounded-full bg-accent/15 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-accent transition-all duration-500"
+                  style={{ width: `${Math.max(reviewProgress * 100, reviewedCount > 0 ? 4 : 0)}%` }}
+                />
               </div>
             </div>
           )}
