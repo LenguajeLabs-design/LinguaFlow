@@ -42,8 +42,17 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-border/40 px-4 sm:px-6 py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} LinguaFlow. All rights reserved.
+      <div className="border-t border-border/40 px-4 sm:px-6 py-4 flex flex-col items-center gap-1 text-xs text-muted-foreground">
+        <span>© {new Date().getFullYear()} LinguaFlow. All rights reserved.</span>
+        <span className="text-muted-foreground/50 tracking-wide">
+          Created by Federico Orozco &nbsp;·&nbsp;{' '}
+          <a
+            href="mailto:forozc1@gmail.com"
+            className="hover:text-muted-foreground transition-colors"
+          >
+            forozc1@gmail.com
+          </a>
+        </span>
       </div>
     </footer>
   );
