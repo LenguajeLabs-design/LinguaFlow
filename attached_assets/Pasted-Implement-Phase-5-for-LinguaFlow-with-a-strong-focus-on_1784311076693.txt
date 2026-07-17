@@ -1,0 +1,45 @@
+Implement Phase 5 for LinguaFlow with a strong focus on conversion first, then retention. Keep the experience elegant, calm, and premium. No noisy gamification.
+
+Build these items in this order:
+
+1. Guest review teaser
+- In the guest reading experience, add a small preview of the post-read review moment at the bottom.
+- Show 1 vocabulary recall card only.
+- Let the user reveal the meaning, but gate the full review flow behind sign-up.
+- Copy should make the value clear:
+  - save useful words
+  - review them later
+  - build vocabulary naturally
+- Add a clear but tasteful CTA to create a free account.
+- This should feel like a natural continuation of reading, not a popup or interruption.
+
+2. Email return nudge preparation
+- Do not build the email sender yet unless the infrastructure already exists cleanly.
+- Instead, prepare the app for it cleanly:
+  - confirm where last-read data should live
+  - if needed, add the minimum safe persistence needed for future 24h reactivation
+  - keep implementation simple and production-safe
+- If email infrastructure already exists and is easy to extend, outline the exact next step, but do not overbuild.
+
+3. TTS in post-read review
+- In the saved-user post-read review cards, add a subtle audio action so the learner can hear the reviewed word aloud.
+- Reuse the existing TTS pattern if possible.
+- Keep it lightweight and polished.
+
+4. Smarter step-up recommendation
+- In the “Generate another” next-step card, make the suggestion smarter when possible.
+- If a learner has already read multiple passages at the same level, nudge them gently toward the next difficulty level.
+- Keep copy encouraging, not pushy.
+
+Rules:
+- Preserve the current visual style.
+- No gimmicks.
+- No extra features outside this scope.
+- Mobile must remain clean.
+- Prefer small, elegant changes over big new systems.
+
+After implementation, give me:
+- files changed
+- what each change does
+- anything that still needs backend/email infrastructure
+- your recommendation for Phase 6

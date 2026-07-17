@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Volume2, ChevronDown, ChevronUp, Lock, BookMarked, Sparkles } from 'lucide-react';
+import { ArrowLeft, Volume2, ChevronDown, ChevronUp, Lock, BookMarked, Sparkles, CheckCircle2, Brain } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthPromptModal } from './AuthPromptModal';
 import { DifficultyBadge } from '@/components/passage/DifficultyBadge';
@@ -19,12 +19,20 @@ export function GuestReader({ passage, onBack }: GuestReaderProps) {
   const [showAllTranslations, setShowAllTranslations] = useState(false);
   const [authPrompt, setAuthPrompt] = useState<'save' | 'vocab' | 'audio' | 'generate' | null>(null);
 
+  // Guest review teaser state
+  const [teaserFlipped, setTeaserFlipped] = useState(false);
+
   const lang = passage.language as AppLanguage;
   const langConfig = LANGUAGE_CONFIG[lang] ?? LANGUAGE_CONFIG['ko'];
   const sentences: Array<{ korean: string; english: string; pinyin?: string }> = passage.sentences ?? [];
   const vocabulary: Array<{ korean: string; romanization: string; english: string; partOfSpeech: string; exampleSentence?: string }> = passage.vocabulary ?? [];
   const previewVocab = vocabulary.slice(0, VOCAB_PREVIEW_COUNT);
   const hiddenVocabCount = Math.max(0, vocabulary.length - VOCAB_PREVIEW_COUNT);
+  const teaserWord = vocabulary[0];
+
+  const isZh = lang === 'zh';
+  const isKo = lang === 'ko';
+  const wordFont = isZh ? 'font-chinese' : isKo ? 'font-korean' : '';
 
   const toggleSentence = (i: number) => {
     setExpandedSentences(prev => {
@@ -215,9 +223,102 @@ export function GuestReader({ passage, onBack }: GuestReaderProps) {
         </div>
       )}
 
+      {/* ── Review teaser — single flip card, gated at self-check ── */}
+      {teaserWord && (
+        <div className="mb-6 rounded-2xl border border-border/70 overflow-hidden bg-card shadow-sm">
+          <div className="px-5 pt-5 pb-3 border-b border-border/40 flex items-center gap-2">
+            <Brain className="w-4 h-4 text-accent" />
+            <span className="text-sm font-semibold text-foreground">Try a vocabulary recall</span>
+            <span className="ml-auto text-xs text-muted-foreground">1 of {vocabulary.length}</span>
+          </div>
+
+          {/* Card front */}
+          <div className="flex flex-col items-center px-8 pt-8 pb-5">
+            <p className={cn('text-4xl font-bold text-foreground text-center mb-2', wordFont)}>
+              {teaserWord.korean}
+            </p>
+            {teaserWord.romanization && (
+              <p className="text-sm text-muted-foreground/60 mb-4">{teaserWord.romanization}</p>
+            )}
+
+            {!teaserFlipped ? (
+              <button
+                onClick={() => setTeaserFlipped(true)}
+                className="mt-1 px-6 py-2.5 rounded-xl text-sm font-semibold border border-accent/30 text-accent hover:bg-accent/10 transition-colors"
+              >
+                Reveal meaning
+              </button>
+            ) : null}
+          </div>
+
+          {/* Card back — meaning revealed, then gate self-check */}
+          <AnimatePresence>
+            {teaserFlipped && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                transition={{ duration: 0.2 }}
+                className="border-t border-border/40 bg-secondary/30 px-6 py-4"
+              >
+                {teaserWord.romanization && (
+                  <p className="text-xs font-mono text-accent mb-1">{teaserWord.romanization}</p>
+                )}
+                <p className="text-base font-semibold text-foreground mb-1">{teaserWord.english}</p>
+                {teaserWord.partOfSpeech && (
+                  <p className="text-xs text-muted-foreground capitalize mb-3">{teaserWord.partOfSpeech}</p>
+                )}
+                {teaserWord.exampleSentence && (
+                  <p className={cn('text-xs text-muted-foreground italic leading-relaxed mb-4', wordFont)}>
+                    {teaserWord.exampleSentence}
+                  </p>
+                )}
+                {/* Gate self-check behind sign-up */}
+                <div className="flex gap-2 mb-4">
+                  <button
+                    onClick={() => setAuthPrompt('save')}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-semibold bg-green-500/10 text-green-700 hover:bg-green-500/20 border border-green-500/20 transition-colors"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    Got it
+                  </button>
+                  <button
+                    onClick={() => setAuthPrompt('save')}
+                    className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-border text-muted-foreground hover:border-accent/30 hover:text-foreground transition-all"
+                  >
+                    Not quite
+                  </button>
+                </div>
+
+                {/* Inline conversion copy */}
+                <div className="text-center py-3 px-2 border-t border-border/40">
+                  <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+                    Create an account to review all {vocabulary.length} words, save your progress, and build vocabulary naturally over time.
+                  </p>
+                  <div className="flex gap-2">
+                    <Link
+                      href="/sign-up"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-bold text-white hover:opacity-90 transition-opacity"
+                      style={{ background: 'linear-gradient(135deg, hsl(174,62%,42%), hsl(200,68%,52%), hsl(255,52%,60%))' }}
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      Create free account
+                    </Link>
+                    <Link
+                      href="/sign-in"
+                      className="flex-1 flex items-center justify-center py-2.5 rounded-xl text-sm font-semibold bg-secondary text-foreground border border-border hover:border-accent/30 transition-all"
+                    >
+                      Sign in
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
       {/* ── Conversion moment ── */}
-      <div className="mt-2 rounded-2xl border border-border overflow-hidden">
-        {/* Header band */}
+      <div className="rounded-2xl border border-border overflow-hidden">
         <div className="px-6 pt-7 pb-5 text-center bg-gradient-to-b from-accent/5 to-transparent">
           <div className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-4"
                style={{ background: 'linear-gradient(135deg, hsl(174,62%,42%,0.12), hsl(255,52%,60%,0.12))' }}>
@@ -231,7 +332,6 @@ export function GuestReader({ passage, onBack }: GuestReaderProps) {
           </p>
         </div>
 
-        {/* CTAs */}
         <div className="px-6 pb-6 flex flex-col gap-3">
           <Link
             href="/sign-up"

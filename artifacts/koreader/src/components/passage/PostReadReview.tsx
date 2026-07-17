@@ -1,8 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, RotateCcw, BookMarked, ChevronRight } from 'lucide-react';
+import { CheckCircle2, RotateCcw, BookMarked, ChevronRight, Volume2, Loader2 } from 'lucide-react';
 import { Link } from 'wouter';
 import { cn } from '@/lib/utils';
+import { useOpenAITTS } from '@/hooks/use-openai-tts';
 
 interface VocabItem {
   korean: string;
@@ -20,6 +21,7 @@ interface PostReadReviewProps {
 const MAX_CARDS = 3;
 
 export function PostReadReview({ vocabulary, language }: PostReadReviewProps) {
+  const lang = language ?? 'ko';
   const cards = useMemo(() => {
     const shuffled = [...vocabulary].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, MAX_CARDS);
@@ -30,11 +32,14 @@ export function PostReadReview({ vocabulary, language }: PostReadReviewProps) {
   const [done, setDone] = useState(false);
   const [gotIt, setGotIt] = useState<boolean[]>([]);
 
-  const isZh = language === 'zh';
-  const isKo = language === 'ko';
+  const { toggle: playWord, stop: stopWord, isPlaying: wordPlaying, isLoading: wordLoading } = useOpenAITTS(lang);
+
+  const isZh = lang === 'zh';
+  const isKo = lang === 'ko';
   const wordFont = isZh ? 'font-chinese' : isKo ? 'font-korean' : '';
 
-  const advance = (remembered: boolean) => {
+  const advance = useCallback((remembered: boolean) => {
+    stopWord();
     const next = [...gotIt, remembered];
     setGotIt(next);
     if (index + 1 >= cards.length) {
@@ -43,9 +48,10 @@ export function PostReadReview({ vocabulary, language }: PostReadReviewProps) {
       setFlipped(false);
       setTimeout(() => setIndex(i => i + 1), 120);
     }
-  };
+  }, [gotIt, index, cards.length, stopWord]);
 
   const restart = () => {
+    stopWord();
     setIndex(0);
     setFlipped(false);
     setDone(false);
@@ -131,11 +137,27 @@ export function PostReadReview({ vocabulary, language }: PostReadReviewProps) {
             </div>
 
             {/* Card */}
-            <div
-              className="relative bg-card border border-border/60 rounded-2xl overflow-hidden shadow-sm min-h-[180px] flex flex-col"
-            >
-              {/* Front — word */}
-              <div className="flex-1 flex flex-col items-center justify-center px-8 pt-10 pb-6">
+            <div className="relative bg-card border border-border/60 rounded-2xl overflow-hidden shadow-sm min-h-[180px] flex flex-col">
+              {/* Front — word + TTS button */}
+              <div className="flex-1 flex flex-col items-center justify-center px-8 pt-10 pb-6 relative">
+                {/* Subtle TTS button — top-right of card */}
+                <button
+                  onClick={() => playWord(card.korean)}
+                  disabled={wordLoading}
+                  title="Hear this word"
+                  className={cn(
+                    'absolute top-3 right-3 p-2 rounded-xl border transition-all duration-200',
+                    wordPlaying
+                      ? 'border-accent/30 bg-accent/10 text-accent'
+                      : 'border-border text-muted-foreground/50 hover:text-muted-foreground hover:border-border'
+                  )}
+                >
+                  {wordLoading
+                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    : <Volume2 className="w-3.5 h-3.5" />
+                  }
+                </button>
+
                 <p className={cn('text-4xl font-bold text-foreground text-center mb-2', wordFont)}>
                   {card.korean}
                 </p>

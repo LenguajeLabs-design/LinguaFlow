@@ -66,16 +66,21 @@ export function PassageReader({ passage, isUnsaved = false, onSaved }: PassageRe
 
   useEffect(() => () => stopTTS(), [stopTTS]);
 
-  // Record last-read for the 24h return nudge in Library
+  // Record last-read for the 24h return nudge and step-up tracking
   useEffect(() => {
     if (!isUnsaved && passage.id) {
       try {
         localStorage.setItem('lf-last-read', Date.now().toString());
         localStorage.setItem('lf-last-passage-id', String(passage.id));
         localStorage.setItem('lf-last-passage-title', passage.title ?? '');
+        // Rolling difficulty history — last 10 reads — drives WhatNext step-up suggestion
+        if (passage.difficulty) {
+          const prev: string[] = JSON.parse(localStorage.getItem('lf-read-difficulties') || '[]');
+          localStorage.setItem('lf-read-difficulties', JSON.stringify([...prev, passage.difficulty].slice(-10)));
+        }
       } catch {}
     }
-  }, [isUnsaved, passage.id, passage.title]);
+  }, [isUnsaved, passage.id, passage.title, passage.difficulty]);
 
   const handleWordClick = useCallback((e: React.MouseEvent<HTMLSpanElement>, word: string, context: string) => {
     e.stopPropagation();
