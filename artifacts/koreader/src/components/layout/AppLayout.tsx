@@ -10,12 +10,17 @@ import { useQueryClient } from '@tanstack/react-query';
 import appIcon from '/linguaflow-logo.png';
 import { Footer } from '@/components/layout/Footer';
 
-const navItems = [
+const allNavItems = [
   { href: '/',           icon: LayoutDashboard, label: 'Home'       },
   { href: '/generate',   icon: PlusCircle,      label: 'Generate'   },
   { href: '/library',    icon: Library,         label: 'Library'    },
   { href: '/vocabulary', icon: BookMarked,      label: 'Vocabulary' },
   { href: '/settings',   icon: Settings,        label: 'Settings'   },
+];
+
+const guestNavItems = [
+  { href: '/',         icon: LayoutDashboard, label: 'Home'     },
+  { href: '/generate', icon: PlusCircle,      label: 'Generate' },
 ];
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -39,6 +44,8 @@ export function AppLayout({ children, minimal = false }: AppLayoutProps) {
     await signOut();
     queryClient.clear();
   };
+
+  const navItems = (isLoaded && user) ? allNavItems : guestNavItems;
 
   return (
     <div className="min-h-screen flex flex-col bg-background selection:bg-accent/20">

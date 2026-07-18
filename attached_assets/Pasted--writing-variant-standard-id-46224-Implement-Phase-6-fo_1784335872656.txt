@@ -1,0 +1,66 @@
+:::writing{variant="standard" id="46224"}
+Implement Phase 6 for LinguaFlow as a simplification pass. This is not a feature phase. The goal is to make the first-run experience feel lighter, clearer, and easier to act on within 3 seconds.
+
+Focus on ease of use, balance, and simplicity.
+
+Build these changes:
+
+1. Collapse advanced options on first load
+- On the signed-out home/generate experience, keep the primary flow simple:
+  - choose reading language
+  - enter topic
+  - generate
+- Move CEFR level, format, and length into a lighter “Customize” or “Advanced options” section
+- Keep those options accessible, but visually secondary
+- Default choices should still work well without touching advanced settings
+
+2. Reduce signed-out navigation
+- For signed-out users, simplify the header/nav
+- Keep only what helps first-time activation
+- Prefer a minimal top nav such as:
+  - Home
+  - Generate
+  - Sign in
+- Hide or defer product sections like Library / Vocabulary / Settings until the user is signed in or onboarded
+- Keep it elegant, not empty
+
+3. Clarify the language model
+- Make the distinction clearer between:
+  - interface language
+  - reading language
+  - support language
+- Reduce confusion in the first screen
+- Rename labels if needed so a first-time user immediately understands what each language choice means
+- Especially improve the meaning of “What language helps you learn?” if there is a clearer label
+
+4. Tighten mobile hierarchy
+- Make the mobile experience feel less crowded
+- Reduce the feeling of multiple systems competing at once:
+  - top controls
+  - main form
+  - bottom nav
+- Keep the screen calm and obvious
+- Do not let advanced configuration dominate mobile
+
+5. Clean footer redundancy
+- Keep the founder credit
+- Keep the email
+- But show the email only once
+- Preserve the premium/professional tone
+
+Rules:
+- Do not add new features
+- Do not add gimmicks
+- Preserve the current visual language
+- Keep the app calm, premium, and polished
+- Mobile should be a major part of the review
+- Prefer subtraction and hierarchy over adding more UI
+
+After implementation, give me:
+- files changed
+- what each simplification improved
+- any tradeoffs introduced
+- whether the first-run flow now feels meaningfully lighter
+
+
+Once Replit replies, paste me the result and I’ll help you judge whether it actually improved the product.

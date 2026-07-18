@@ -1,7 +1,4 @@
 import { Link } from 'wouter';
-import { Mail } from 'lucide-react';
-
-const CONTACT_EMAIL = 'forozc1@gmail.com';
 
 export function Footer() {
   return (
@@ -30,16 +27,6 @@ export function Footer() {
             Terms
           </Link>
         </nav>
-
-        <div className="text-sm">
-          <a
-            href={`mailto:${CONTACT_EMAIL}`}
-            className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Mail className="w-3.5 h-3.5" />
-            {CONTACT_EMAIL}
-          </a>
-        </div>
       </div>
 
       <div className="border-t border-border/40 px-4 sm:px-6 py-4 flex flex-col items-center gap-1 text-xs text-muted-foreground">

@@ -119,11 +119,11 @@ export default function Generate() {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Support language */}
           <div className="bg-card border border-border p-6 sm:p-8 rounded-2xl shadow-sm">
-            <label className="block text-lg font-bold text-foreground mb-4">
-              What language helps you learn?
+            <label className="block text-lg font-bold text-foreground mb-1">
+              Explanation language
             </label>
             <p className="text-sm text-muted-foreground mb-4">
-              Vocabulary meanings, translations, and grammar notes will be shown in this language.
+              Translations and vocabulary notes will appear in this language.
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {SUPPORT_LANGUAGE_OPTIONS.map(({ value, label, flag }) => (
