@@ -1,0 +1,152 @@
+I want you to implement a small teacher-facing branch in my existing LinguaFlow application.
+
+Important context:
+
+LinguaFlow currently serves individual language learners. It creates personalized readings about topics they care about, at an appropriate language level, with optional support such as vocabulary, questions, audio, and translation.
+
+I want to preserve that learner experience.
+
+I am beginning to explore a second audience: teachers and educators who need meaningful, level-appropriate mentor texts and supported readings for multilingual students. The teacher experience may eventually include standards alignment and instructional tools, but I do not want to build those features yet.
+
+The goal today is only to create a clear teacher-facing entrance and test whether educators respond to the idea.
+
+Before changing anything:
+
+1. Inspect the current project structure, homepage, routes, shared components, styling, localization system, authentication, and existing reading-creation flow.
+2. Explain briefly what you found and which files you intend to change.
+3. Preserve the existing visual identity and learner experience.
+4. Do not rebuild or clone the application.
+
+Implement the following:
+
+1. Add a visible “For Educators” link to the public homepage navigation.
+2. Create a new public page at `/teach`.
+3. Keep the current learner homepage and reading experience intact.
+4. Connect the teacher page’s primary button to the existing reading-creation experience.
+5. Use the existing contact page or contact mechanism for pilot inquiries.
+6. Reuse existing components, styles, header, footer, buttons, and localization architecture wherever possible.
+
+Use this content for `/teach`:
+
+HERO
+
+Headline:
+Raise the level. Keep every learner included.
+
+Supporting copy:
+Create meaningful, level-appropriate mentor texts and supported readings with vocabulary, audio, questions, and multilingual support built in.
+
+Primary button:
+Create a supported text
+
+Secondary button:
+Join the teacher pilot
+
+PROBLEM SECTION
+
+Heading:
+One lesson. Different learners. A better way in.
+
+Copy:
+Every classroom includes learners with different languages, proficiency levels, interests, and background knowledge. Finding one text that reaches everyone can feel impossible.
+
+LinguaFlow helps teachers create pathways into meaningful texts without lowering the intellectual level of the learning.
+
+HOW IT WORKS
+
+Heading:
+From a learning goal to a supported text.
+
+Steps:
+
+1. Choose what matters  
+Start with a curriculum topic, student interest, standard, or learning objective.
+
+2. Set the right level of challenge  
+Choose the language, proficiency level, text type, and details your learners need.
+
+3. Create the reading  
+Generate an engaging text using the existing LinguaFlow reading experience.
+
+4. Provide support when it is needed  
+Give learners access to vocabulary, audio, translation, and questions.
+
+OUTCOME SECTION
+
+Heading:
+Increase access without decreasing ambition.
+
+Copy:
+LinguaFlow preserves meaningful, age-respectful ideas while adding the support learners need to understand, discuss, and write.
+
+PILOT SECTION
+
+Heading:
+Start with five students.
+
+Copy:
+Imagine five students receiving texts connected to what they care about, at the right level of challenge, with support in a language they understand.
+
+Try LinguaFlow with a small group of learners and help shape the educator experience.
+
+Button:
+Join the teacher pilot
+
+LEARNER LINK
+
+Include a smaller link or section that says:
+
+Learning a language yourself?
+
+Read what you love, at your level, with support when you need it.
+
+Button or link:
+Explore LinguaFlow for learners
+
+FINAL SECTION
+
+Heading:
+Give every learner access to texts worth reading.
+
+Copy:
+Help learners gain the words to understand ideas, communicate what they know, and build connections across languages.
+
+Button:
+Create a supported text
+
+Implementation constraints:
+
+- Do not create a separate website or duplicate the codebase.
+- Do not build a teacher dashboard.
+- Do not add student accounts, classes, rosters, assignments, analytics, or school administration.
+- Do not create a standards database.
+- Do not change the database schema unless it is absolutely necessary—and it should not be necessary for this page.
+- Do not alter pricing, authentication, or the existing reading generator.
+- Do not remove or rewrite the current learner homepage.
+- Do not introduce a new visual design system.
+- Do not make unrelated changes.
+- Make this experiment easy to revise or remove later.
+
+Quality requirements:
+
+- The page must work well on mobile and desktop.
+- Use semantic headings and accessible links and buttons.
+- Maintain sufficient color contrast and visible keyboard focus.
+- Add appropriate page metadata:
+  - Title: LinguaFlow for Educators | Supported Texts for Every Learner
+  - Description: Create meaningful, level-appropriate mentor texts and supported readings with vocabulary, audio, questions, and multilingual support.
+- Follow the application’s existing localization system. If translating all the new content would substantially expand this experiment, create a clean English fallback and tell me what localization work remains.
+- Verify that all new links and buttons lead to the correct existing routes.
+- Run the project’s available checks.
+- Visually inspect the completed page at mobile and desktop sizes.
+
+Do not deploy or publish automatically. Show me the completed preview first.
+
+When finished, report:
+
+1. What you changed
+2. Which files changed
+3. Where each button leads
+4. What checks you performed
+5. Any localization work that remains
+6. Any problems or assumptions

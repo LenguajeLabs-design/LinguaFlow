@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'wouter';
-import { Library, PlusCircle, LayoutDashboard, Settings, Sun, Moon, LogIn, LogOut, User, BookMarked, WifiOff } from 'lucide-react';
+import { Library, PlusCircle, LayoutDashboard, Settings, Sun, Moon, LogIn, LogOut, User, BookMarked, WifiOff, GraduationCap } from 'lucide-react';
 import { useIsOnline } from '@/hooks/use-offline-library';
 import { cn } from '@/lib/utils';
 import { useThemeStore, useThemeInit } from '@/hooks/use-theme';
@@ -10,17 +10,26 @@ import { useQueryClient } from '@tanstack/react-query';
 import appIcon from '/linguaflow-logo.png';
 import { Footer } from '@/components/layout/Footer';
 
-const allNavItems = [
-  { href: '/',           icon: LayoutDashboard, label: 'Home'       },
-  { href: '/generate',   icon: PlusCircle,      label: 'Generate'   },
-  { href: '/library',    icon: Library,         label: 'Library'    },
-  { href: '/vocabulary', icon: BookMarked,      label: 'Vocabulary' },
-  { href: '/settings',   icon: Settings,        label: 'Settings'   },
+interface NavItem {
+  href: string;
+  icon: React.ElementType;
+  label: string;
+  hideMobile?: boolean;
+}
+
+const allNavItems: NavItem[] = [
+  { href: '/',           icon: LayoutDashboard, label: 'Home'          },
+  { href: '/generate',   icon: PlusCircle,      label: 'Generate'      },
+  { href: '/library',    icon: Library,         label: 'Library'       },
+  { href: '/vocabulary', icon: BookMarked,      label: 'Vocabulary'    },
+  { href: '/settings',   icon: Settings,        label: 'Settings'      },
+  { href: '/teach',      icon: GraduationCap,   label: 'For Educators', hideMobile: true },
 ];
 
-const guestNavItems = [
-  { href: '/',         icon: LayoutDashboard, label: 'Home'     },
-  { href: '/generate', icon: PlusCircle,      label: 'Generate' },
+const guestNavItems: NavItem[] = [
+  { href: '/',         icon: LayoutDashboard, label: 'Home'           },
+  { href: '/generate', icon: PlusCircle,      label: 'Generate'       },
+  { href: '/teach',    icon: GraduationCap,   label: 'For Educators', hideMobile: true },
 ];
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -178,7 +187,7 @@ export function AppLayout({ children, minimal = false }: AppLayoutProps) {
       {/* Mobile Bottom Nav — hidden in minimal mode */}
       {!minimal && (
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur-md flex justify-around px-1 py-1">
-          {navItems.map((item) => {
+          {navItems.filter(item => !item.hideMobile).map((item) => {
             const isActive =
               location === item.href ||
               (item.href !== '/' && location.startsWith(item.href));

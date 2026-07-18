@@ -21,6 +21,7 @@ const Admin = lazy(() => import("@/pages/Admin"));
 const Contact = lazy(() => import("@/pages/Contact"));
 const Privacy = lazy(() => import("@/pages/Privacy"));
 const Terms = lazy(() => import("@/pages/Terms"));
+const Teach = lazy(() => import("@/pages/Teach"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 const clerkPubKey = publishableKeyFromHost(
@@ -134,6 +135,7 @@ function Router() {
         <Route path="/contact" component={Contact} />
         <Route path="/privacy" component={Privacy} />
         <Route path="/terms" component={Terms} />
+        <Route path="/teach" component={Teach} />
         <Route
           path="/sign-in/*?"
           component={() => (
